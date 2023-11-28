@@ -1,0 +1,50 @@
+package fr.team92.serpents.game.model;
+
+public final class Segment {
+    private Position position;
+
+    public Segment(Position position) {
+        this.position = position.clone();
+    }
+
+    public void move(Direction direction) {
+        switch (direction) {
+            case NORTH:
+                position.setY(position.getY() - 1);
+                break;
+            case SOUTH:
+                position.setY(position.getY() + 1);
+                break;
+            case EAST:
+                position.setX(position.getX() + 1);
+                break;
+            case WEST:
+                position.setX(position.getX() - 1);
+                break;
+        }
+    }
+
+    public Position simulateMove(Direction direction) {
+        Position newPosition = position.clone();
+        switch (direction) {
+            case NORTH:
+                newPosition.setY(newPosition.getY() - 1);
+                break;
+            case SOUTH:
+                newPosition.setY(newPosition.getY() + 1);
+                break;
+            case EAST:
+                newPosition.setX(newPosition.getX() + 1);
+                break;
+            case WEST:
+                newPosition.setX(newPosition.getX() - 1);
+                break;
+        }
+        return newPosition;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+}
