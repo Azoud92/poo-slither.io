@@ -7,6 +7,10 @@ public final class Segment {
         this.position = position.clone();
     }
 
+    /**
+     * Move the segment in the given direction
+     * @param direction the direction
+     */
     public void move(Direction direction) {
         switch (direction) {
             case NORTH:
@@ -24,6 +28,11 @@ public final class Segment {
         }
     }
 
+    /**
+     * Simulate the move of the segment in the given direction
+     * @param direction the direction
+     * @return the new position
+     */
     public Position simulateMove(Direction direction) {
         Position newPosition = position.clone();
         switch (direction) {
@@ -43,6 +52,10 @@ public final class Segment {
         return newPosition;
     }
 
+    /**
+     * Get the position of the segment
+     * @return the position of the segment
+     */
     public Position getPosition() {
         return position;
     }

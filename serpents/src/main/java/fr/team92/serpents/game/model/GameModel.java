@@ -27,6 +27,9 @@ public final class GameModel implements Observable {
         this.grid[0][0] = Optional.of(this.head);
     }
 
+    /**
+     * Initialize the grid
+     */
     private void initGrid() {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
@@ -35,6 +38,10 @@ public final class GameModel implements Observable {
         }
     }
 
+    /**
+     * Move the snake in the given direction
+     * @param direction the direction
+     */
     public void move(Direction direction) {
         Position nextPosition = head.simulateMove(direction);
         if (isValidMove(nextPosition)) {
@@ -45,6 +52,11 @@ public final class GameModel implements Observable {
         }
     }
 
+    /**
+     * Check if the move is valid
+     * @param position the position
+     * @return true if the move is valid, false otherwise
+     */
     public boolean isValidMove(Position position) {
         return position.getX() >= 0
         && position.getX() < width && position.getY() >= 0
@@ -52,17 +64,16 @@ public final class GameModel implements Observable {
         && !grid[position.getX()][position.getY()].isPresent();
     }
 
-
     @Override
     public void addObserver(Observer observer) {
         observers.add(observer);
     }
-
+    
     @Override
     public void removeObserver(Observer observer) {
         observers.remove(observer);
     }
-
+    
     @Override
     public void notifyObservers() {
         for (Observer observer : this.observers) {
@@ -70,18 +81,34 @@ public final class GameModel implements Observable {
         }
     }
 
+    /**
+     * Get the head of the snake
+     * @return the head of the snake
+     */
     public Segment getHead() {
         return head;
     }
 
+    /**
+     * Get the width of the grid
+     * @return the width of the grid
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Get the height of the grid
+     * @return the height of the grid
+     */
     public int getHeight() {
         return height;
     }
 
+    /**
+     * Get the grid
+     * @return the grid
+     */
     public Optional<Segment>[][] getGrid() {
         return grid.clone();
     }

@@ -15,6 +15,10 @@ public class GameController {
         setKeyListeners(scene);
     }
 
+    /**
+     * Set the key listeners
+     * @param scene
+     */
     private void setKeyListeners(Scene scene) {
         scene.setOnKeyReleased(event -> {
             switch (event.getCode()) {
@@ -36,14 +40,26 @@ public class GameController {
         });
     }
 
+    /**
+     * Get the width of the grid
+     * @return the width of the grid
+     */
     public int getWidth() {
         return model.getWidth();
     }
 
+    /**
+     * Get the height of the grid
+     * @return the height of the grid
+     */
     public int getHeight() {
         return model.getHeight();
     }
 
+    /**
+     * Get the grid
+     * @return the grid
+     */
     public Optional<Segment>[][] getGrid() {
         return model.getGrid();
     }
