@@ -37,11 +37,13 @@ public final class GameController {
      * Ajoute les écouteurs d'événements clavier
      * @param scene la scène JavaFX
      */
-    private void setKeyListeners(Scene scene) {
-        if (model.getState() != GameState.RUNNING) {
-            return;
-        }
+    private void setKeyListeners(Scene scene) {        
         scene.setOnKeyReleased(event -> {
+
+            if (model.getState() != GameState.RUNNING) {
+                return;
+            }
+
             Snake currentSnake = model.getCurrentPlayer();
             SnakeController controller = currentSnake.getController();
 
@@ -54,7 +56,7 @@ public final class GameController {
                 model.moveSnake();
                 botPlay();
             }
-            catch (IllegalArgumentException e) { }            
+            catch (IllegalArgumentException e) { }
         });
     }
 

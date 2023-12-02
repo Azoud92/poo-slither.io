@@ -51,18 +51,21 @@ public final class GameView implements Observer {
             Rectangle rect = new Rectangle(pos.getX() * CELL_SIZE, pos.getY() * CELL_SIZE, CELL_SIZE, CELL_SIZE);
 
             if (segment.isDead()) {
-                FillTransition fillTransition = new FillTransition(Duration.seconds(3), rect);
-                fillTransition.setFromValue(Color.RED);
-                fillTransition.setToValue(Color.ORANGE);
-                fillTransition.play();
-            } else {
+                if (rect.getFill() == Color.RED) {
+                    FillTransition fillTransition = new FillTransition(Duration.seconds(3), rect);
+                    fillTransition.setFromValue(Color.RED);
+                    fillTransition.setToValue(Color.ORANGE);
+                    fillTransition.play();
+                }                
+            }
+            else {
                 rect.setFill(Color.RED);
             }
 
             pane.getChildren().add(rect);
         }   
         
-        endGame();
+        //endGame();
     }
 
     public void endGame() {

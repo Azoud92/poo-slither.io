@@ -187,7 +187,7 @@ public final class GameModel implements Observable {
     public boolean isOccupied(Position position) {
         for (Snake snake : snakes) {
             for (Segment segment : snake.getSegments()) {
-                if (segment.getPosition().equals(position)) {
+                if (segment.getPosition().equals(position) && !segment.isDead()) {
                     return true;
                 }
             }
