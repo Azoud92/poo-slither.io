@@ -8,6 +8,7 @@ import java.util.Map;
 import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.Direction;
+import fr.team92.serpents.utils.GameState;
 import fr.team92.serpents.utils.Observable;
 import fr.team92.serpents.utils.Observer;
 import fr.team92.serpents.utils.Position;
@@ -43,6 +44,11 @@ public final class GameModel implements Observable {
     private int snakeIndex;
 
     /**
+     * L'état de la partie
+     */
+    private GameState state;
+
+    /**
      * Constructeur du modèle de jeu
      * @param width la largeur
      * @param height la hauteur
@@ -53,12 +59,15 @@ public final class GameModel implements Observable {
         this.width = width;
         this.height = height;
         this.grid = new HashMap<>();
+        this.state = GameState.WAITING;
         
         this.snakes = new ArrayList<>();
         for (Snake snake : players) {
             addSnake(snake);
         }
-        this.snakeIndex = 0;                
+        this.snakeIndex = 0;
+
+        this.state = GameState.RUNNING;
     }
 
     /**
@@ -91,7 +100,11 @@ public final class GameModel implements Observable {
             }
         }
         else {
-            // on gèrera la mort du serpent ici
+            snake.die();
+            snakes.remove(snake);
+            if (snakes.size() == 1) {
+                state = GameState.FINISHED;
+            }
         }
 
         snakeIndex = (snakeIndex + 1) % snakes.size();
@@ -197,5 +210,13 @@ public final class GameModel implements Observable {
         for (Observer observer : this.observers) {
             observer.update();
         }
+    }
+
+    /**
+     * Obtenir l'état de la partie
+     * @return l'état de la partie
+     */
+    public GameState getState() {
+        return state;
     }    
 }

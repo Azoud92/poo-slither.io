@@ -120,4 +120,13 @@ public final class Snake {
         return controller;
     }
 
+    /**
+     * Tuer le serpent
+     */
+    public void die() {
+        for (Segment segment : segments) {
+            segment.die();
+        }
+    }
+
 }

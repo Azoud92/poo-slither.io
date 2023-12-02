@@ -8,6 +8,7 @@ import fr.team92.serpents.snake.controller.HumanSnakeController;
 import fr.team92.serpents.snake.controller.SnakeController;
 import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.snake.model.Snake;
+import fr.team92.serpents.utils.GameState;
 import fr.team92.serpents.utils.Position;
 import javafx.scene.Scene;
 
@@ -37,6 +38,9 @@ public final class GameController {
      * @param scene la scène JavaFX
      */
     private void setKeyListeners(Scene scene) {
+        if (model.getState() != GameState.RUNNING) {
+            return;
+        }
         scene.setOnKeyReleased(event -> {
             Snake currentSnake = model.getCurrentPlayer();
             SnakeController controller = currentSnake.getController();
@@ -54,7 +58,13 @@ public final class GameController {
         });
     }
 
+    /**
+     * Fait jouer le bot
+     */
     private void botPlay() {
+        if (model.getState() != GameState.RUNNING) {
+            return;
+        }
         if (model.getCurrentPlayer().getController() instanceof BotController) {
             SnakeController controller = model.getCurrentPlayer().getController();
             controller.controlSnake(model.getCurrentPlayer(), model);
@@ -84,5 +94,13 @@ public final class GameController {
      */
     public Map<Position, Segment> getGrid() {
         return model.getGrid();
+    }
+
+    /**
+     * Vérifier si la partie est finie
+     * @return true si la partie est finie, false sinon
+     */
+    public boolean gameFinished() {
+        return model.getState() == GameState.FINISHED;
     }
 }

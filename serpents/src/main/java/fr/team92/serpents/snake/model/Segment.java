@@ -13,6 +13,8 @@ public final class Segment {
      */
     private Position position;
 
+    private boolean dead = false;
+
     /**
      * Créer un nouveau segment à la position donnée
      * @param position la position du segment
@@ -43,6 +45,17 @@ public final class Segment {
      */
     public void setPosition(Position position) {
         this.position = position;
+    }
+
+    public boolean isDead() {
+        return dead;
+    }
+
+    public void die() {
+        if (dead) {
+            throw new IllegalStateException("Segment already dead");
+        }
+        this.dead = true;
     }
 
 }
