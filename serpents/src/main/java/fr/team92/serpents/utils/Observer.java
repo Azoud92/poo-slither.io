@@ -1,8 +1,12 @@
 package fr.team92.serpents.utils;
 
+/**
+ * Interface d'un observateur
+ */
 public interface Observer {
+    
     /**
-     * Update the observer
+     * Mettre à jour l'observateur
      */
     void update();
 }

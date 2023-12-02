@@ -1,21 +1,24 @@
 package fr.team92.serpents.utils;
 
+/**
+ * Interface d'un observable
+ */
 public interface Observable {
 
     /**
-     * Add an observer to the list of observers
-     * @param observer
+     * Ajoute un observateur à la liste des observateurs
+     * @param observer l'observateur
      */
     void addObserver(Observer observer);
 
     /**
-     * Remove an observer from the list of observers
-     * @param observer
+     * Supprime un observateur de la liste des observateurs
+     * @param observer l'observateur
      */
     void removeObserver(Observer observer);
 
     /**
-     * Notify all observers
+     * Notifie tous les observateurs
      */
     void notifyObservers();
 }

@@ -1,17 +1,23 @@
 package fr.team92.serpents.main;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import fr.team92.serpents.game.bots.BotController;
-import fr.team92.serpents.game.bots.strategy.RandomBotStrategy;
 import fr.team92.serpents.game.controller.GameController;
-import fr.team92.serpents.game.controller.SegmentController;
 import fr.team92.serpents.game.model.GameModel;
-import fr.team92.serpents.game.model.Position;
-import fr.team92.serpents.game.model.Segment;
 import fr.team92.serpents.game.view.GameView;
+import fr.team92.serpents.snake.bot.factory.AvoidWallsBotFactory;
+import fr.team92.serpents.snake.controller.HumanSnakeController;
+import fr.team92.serpents.snake.controller.KeyboardControl;
+import fr.team92.serpents.snake.controller.SnakeController;
+import fr.team92.serpents.snake.controller.SnakeEventControl;
+import fr.team92.serpents.snake.model.Snake;
+import fr.team92.serpents.utils.Direction;
+import fr.team92.serpents.utils.Position;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -25,19 +31,25 @@ public final class App extends Application {
         Pane root = new Pane();
         Scene scene = new Scene(root, 800, 600);
 
-        Segment player1 = new Segment(new Position(0, 0));
-        Segment bot1 = new Segment(new Position(79, 59));        
-        
-        SegmentController bot1Controller = new BotController(new RandomBotStrategy());
+        SnakeController botController = new AvoidWallsBotFactory().createBotController();
+        Snake botSnake = new Snake(botController, 5, new Position(10, 10), Direction.EAST);
 
-        bot1.setController(bot1Controller);
+        Map<KeyCode, Direction> keyMap = new HashMap<>();
+        keyMap.put(KeyCode.UP, Direction.NORTH);
+        keyMap.put(KeyCode.DOWN, Direction.SOUTH);
+        keyMap.put(KeyCode.LEFT, Direction.WEST);
+        keyMap.put(KeyCode.RIGHT, Direction.EAST);
+        SnakeEventControl snakeEventControl = new KeyboardControl(keyMap);
 
-        List<Segment> segments = List.of(player1, bot1);
+        SnakeController snakeController = new HumanSnakeController(snakeEventControl);
+        Snake humanSnake = new Snake(snakeController, 5, new Position(10, 20), Direction.SOUTH);
 
-        GameModel model = new GameModel(80, 60, segments);
-        
+        List<Snake> snakes = List.of(botSnake, humanSnake);
+
+        GameModel model = new GameModel(80, 60, snakes);
         GameController controller = new GameController(model, scene);
         /* GameView view = */ new GameView(model, controller, root);
+        
 
         stage.setTitle("Serpents");
         stage.setScene(scene);
