@@ -14,17 +14,23 @@ public final class GameModel implements Observable {
     private final int width;
     private final int height;
     private Optional<Segment>[][] grid;
-    private Segment head;
+    
+    private List<Segment> players;
+    private int playerIndex;
 
     @SuppressWarnings("unchecked")
-    public GameModel(int width, int height) {        
+    public GameModel(int width, int height, List<Segment> players) {        
         this.observers = new ArrayList<>();
         this.width = width;
         this.height = height;
         this.grid = (Optional<Segment>[][]) new Optional[width][height];
         initGrid();
-        this.head = new Segment(new Position(0, 0));
-        this.grid[0][0] = Optional.of(this.head);
+        
+        this.players = new ArrayList<>();
+        for (Segment player : players) {
+            addPlayer(player);
+        }
+        this.playerIndex = 0;
     }
 
     /**
@@ -39,29 +45,57 @@ public final class GameModel implements Observable {
     }
 
     /**
-     * Move the snake in the given direction
-     * @param direction the direction
-     */
-    public void move(Direction direction) {
-        Position nextPosition = head.simulateMove(direction);
-        if (isValidMove(nextPosition)) {
-            grid[head.getPosition().getX()][head.getPosition().getY()] = Optional.empty();
-            head.move(direction);
-            grid[head.getPosition().getX()][head.getPosition().getY()] = Optional.of(head);
-            notifyObservers();
-        }
-    }
-
-    /**
-     * Check if the move is valid
+     * Check if the position is valid
      * @param position the position
-     * @return true if the move is valid, false otherwise
+     * @return true if the position is valid, false otherwise
      */
-    public boolean isValidMove(Position position) {
+    public boolean isValidPosition(Position position) {
         return position.getX() >= 0
         && position.getX() < width && position.getY() >= 0
         && position.getY() < height
         && !grid[position.getX()][position.getY()].isPresent();
+    }
+
+    /**
+     * Move the current player in the given direction
+     * @param direction the direction
+     */
+    public void movePlayer(Direction direction) {
+        Segment player = players.get(playerIndex);
+        Position newPosition = player.simulateMove(direction);
+        
+        if (isValidPosition(newPosition)) {
+            grid[player.getPosition().getX()][player.getPosition().getY()] = Optional.empty();
+            player.move(direction);
+            grid[player.getPosition().getX()][player.getPosition().getY()] = Optional.of(player);
+        }
+        else {
+            removePlayer(player);
+        }
+
+        playerIndex = (playerIndex + 1) % players.size();
+        notifyObservers();
+    }
+
+    /**
+     * Add the player to the grid
+     * @param player the player
+     */
+    public void addPlayer(Segment player) {
+        if (!isValidPosition(player.getPosition())) {
+            throw new IllegalArgumentException("Invalid position");
+        }
+        players.add(player);
+        grid[player.getPosition().getX()][player.getPosition().getY()] = Optional.of(player);        
+    }
+
+    /**
+     * Remove the player from the grid
+     * @param player the player
+     */
+    public void removePlayer(Segment player) {
+        players.remove(player);
+        grid[player.getPosition().getX()][player.getPosition().getY()] = Optional.empty();
     }
 
     @Override
@@ -80,15 +114,7 @@ public final class GameModel implements Observable {
             observer.update();
         }
     }
-
-    /**
-     * Get the head of the snake
-     * @return the head of the snake
-     */
-    public Segment getHead() {
-        return head;
-    }
-
+    
     /**
      * Get the width of the grid
      * @return the width of the grid
@@ -111,6 +137,31 @@ public final class GameModel implements Observable {
      */
     public Optional<Segment>[][] getGrid() {
         return grid.clone();
+    }
+
+    /**
+     * Get current player
+     * @return current player
+     */
+    public Segment getCurrentPlayer() {
+        return players.get(playerIndex);
+    }
+
+    /**
+     * Get the players
+     * @return the players
+     */
+    public List<Segment> getPlayers() {
+        return players;
+    }
+
+    public boolean isOccupied(Position position) {
+        for (Segment player : players) {
+            if (player.getPosition().equals(position)) {
+                return true;
+            }
+        }
+        return false;
     }
     
 }

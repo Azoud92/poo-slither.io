@@ -2,17 +2,19 @@ package fr.team92.serpents.game.controller;
 
 import java.util.Optional;
 
+import fr.team92.serpents.game.bots.BotController;
 import fr.team92.serpents.game.model.Direction;
 import fr.team92.serpents.game.model.GameModel;
 import fr.team92.serpents.game.model.Segment;
 import javafx.scene.Scene;
 
-public class GameController {
+public final class GameController {
     private GameModel model;
 
     public GameController(GameModel model, Scene scene) {
         this.model = model;
         setKeyListeners(scene);
+        gameLoop();
     }
 
     /**
@@ -21,23 +23,38 @@ public class GameController {
      */
     private void setKeyListeners(Scene scene) {
         scene.setOnKeyReleased(event -> {
+            Segment currentPlayer = model.getCurrentPlayer();
+            if (currentPlayer.getController() instanceof BotController) return;          
+
             switch (event.getCode()) {
                 case UP:
-                    model.move(Direction.NORTH);
+                    model.movePlayer(Direction.NORTH);
+                    gameLoop();
                     break;
                 case DOWN:
-                    model.move(Direction.SOUTH);
+                    model.movePlayer(Direction.SOUTH);
+                    gameLoop();
                     break;
                 case LEFT:
-                    model.move(Direction.WEST);
+                    model.movePlayer(Direction.WEST);
+                    gameLoop();
                     break;
                 case RIGHT:
-                    model.move(Direction.EAST);
+                    model.movePlayer(Direction.EAST);
+                    gameLoop();
                     break;
                 default:
                     break;
             }
         });
+    }
+
+    private void gameLoop() {
+        Segment currentPlayer = model.getCurrentPlayer();
+        if (currentPlayer.getController() instanceof BotController) {
+            Direction botMove = currentPlayer.getController().getNextMove(model, currentPlayer);
+            model.movePlayer(botMove);
+        }        
     }
 
     /**

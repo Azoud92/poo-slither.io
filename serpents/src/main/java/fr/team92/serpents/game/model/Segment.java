@@ -1,7 +1,10 @@
 package fr.team92.serpents.game.model;
 
+import fr.team92.serpents.game.controller.SegmentController;
+
 public final class Segment {
     private Position position;
+    private SegmentController controller;
 
     public Segment(Position position) {
         this.position = position.clone();
@@ -58,6 +61,22 @@ public final class Segment {
      */
     public Position getPosition() {
         return position;
+    }
+
+    /**
+     * Set the position of the segment
+     * @param position the position of the segment
+     */
+    public SegmentController getController() {
+        return controller;
+    }
+
+    /**
+     * Set the controller of the segment
+     * @param controller the controller of the segment
+     */
+    public void setController(SegmentController controller) {
+        this.controller = controller;
     }
 
 }
