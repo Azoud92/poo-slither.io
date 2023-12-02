@@ -56,7 +56,10 @@ public final class GameView implements Observer {
                     fillTransition.setFromValue(Color.RED);
                     fillTransition.setToValue(Color.ORANGE);
                     fillTransition.play();
-                }                
+                }
+                else {
+                    rect.setFill(Color.ORANGE);
+                }     
             }
             else {
                 rect.setFill(Color.RED);

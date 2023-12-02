@@ -67,7 +67,21 @@ public final class GameModel implements Observable {
         }
         this.snakeIndex = 0;
 
+        initFeed();
+
         this.state = GameState.RUNNING;
+    }
+
+    private void initFeed() {
+        for (int i = 0; i < 50; i++) {
+            Position pos = new Position((int) (Math.random() * width), (int) (Math.random() * height));
+            while (isOccupied(pos)) {
+                pos = new Position((int) (Math.random() * width), (int) (Math.random() * height));
+            }
+            Segment segment = new Segment(pos);
+            segment.die();
+            grid.put(pos, segment);
+        }
     }
 
     /**
@@ -88,9 +102,16 @@ public final class GameModel implements Observable {
     public void moveSnake() {
         Snake snake = snakes.get(snakeIndex);
         Direction direction = snake.getDirection();
-        Position newHeadPos = snake.getHeadPosition().move(direction);
+        Position newHeadPos = snake.getHeadPosition().move(direction);      
 
         if (isValidPosition(newHeadPos)) {
+
+            Segment deadSegment = grid.get(newHeadPos);
+            if (deadSegment != null && deadSegment.isDead()) {
+                grid.remove(newHeadPos);
+                snake.addSegment();            
+            }
+
             grid.remove(snake.getTailPosition());
             
             snake.move();

@@ -47,10 +47,17 @@ public final class Segment {
         this.position = position;
     }
 
+    /**
+     * Savoir si le segment est mort
+     * @return true si le segment est mort, false sinon
+     */
     public boolean isDead() {
         return dead;
     }
 
+    /**
+     * Tuer le segment
+     */
     public void die() {
         if (dead) {
             throw new IllegalStateException("Segment already dead");

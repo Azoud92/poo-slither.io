@@ -18,6 +18,11 @@ public final class Snake {
     private LinkedList<Segment> segments;
 
     /**
+     * La liste des segments à ajouter au serpent
+     */
+    private LinkedList<Segment> segmentsToAdd;
+
+    /**
      * Le contrôleur du serpent
      */
     private SnakeController controller;
@@ -37,6 +42,7 @@ public final class Snake {
         this.controller = controller;
         this.segments = new LinkedList<>();
         this.direction = direction;
+        this.segmentsToAdd = new LinkedList<>();
         initSegments(length, position.clone(), direction);
     }
 
@@ -69,6 +75,17 @@ public final class Snake {
             segments.get(i).setPosition(prev);
             prev = tmpPos;
         }
+
+        if (!segmentsToAdd.isEmpty()) {
+            segments.addLast(segmentsToAdd.getFirst());
+            segmentsToAdd.removeFirst();
+        }
+    }
+
+    public void addSegment() {
+        Position tailPos = segments.getLast().getPosition();
+        Segment newSegment = new Segment(tailPos);
+        segmentsToAdd.add(newSegment);
     }
 
     /**
@@ -78,7 +95,6 @@ public final class Snake {
     public void setDirection(Direction direction) {
         this.direction = direction;
     }
-
 
     /**
      * Obtenir la direction du serpent

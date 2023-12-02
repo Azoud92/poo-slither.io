@@ -1,5 +1,7 @@
 package fr.team92.serpents.utils;
 
+import java.util.Objects;
+
 /**
  * Une position représente une paire de coordonnées X et Y dans un plan
  */
@@ -78,13 +80,17 @@ public final class Position implements Cloneable {
         return new Position(this.x, this.y);
     }
 
-    /**
-     * Vérifier si la position est égale à une autre position
-     * @param pos la position à comparer
-     * @return true si les positions sont égales, false sinon
-     */
-    public boolean equals(Position pos) {
-        return this.x == pos.getX() && this.y == pos.getY();
-    }   
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || !(o instanceof Position)) return false;
+        Position p = (Position) o;
+        return x == p.x && y == p.y;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
+    }
 
 }
