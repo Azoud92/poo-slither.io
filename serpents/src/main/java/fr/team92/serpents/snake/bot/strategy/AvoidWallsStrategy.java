@@ -1,6 +1,7 @@
 package fr.team92.serpents.snake.bot.strategy;
 
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import fr.team92.serpents.game.model.GameModel;
 import fr.team92.serpents.snake.model.Snake;
@@ -8,6 +9,7 @@ import fr.team92.serpents.utils.Direction;
 import fr.team92.serpents.utils.Position;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Stratégie de déplacement du serpent évitant les murs et l'auto-collision
@@ -20,10 +22,15 @@ public final class AvoidWallsStrategy implements BotStrategy {
     public Direction detMove(Snake snake, GameModel gameModel) {
         Direction[] directions = Direction.values();
 
-        return Arrays.stream(directions)
+        List<Direction> validDirections = Arrays.stream(directions)
                 .filter(dir -> !wallCollisionRisk(snake, dir, gameModel) && !autoCollisionRisk(snake, dir))
-                .findFirst()
-                .orElse(directions[random.nextInt(directions.length)]);
+                .collect(Collectors.toList());
+
+        if (!validDirections.isEmpty()) {
+            return validDirections.get(random.nextInt(validDirections.size()));
+        } else {
+            return directions[random.nextInt(directions.length)];
+        }
     }
 
     /**
