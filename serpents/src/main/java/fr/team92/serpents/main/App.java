@@ -39,13 +39,13 @@ public final class App extends Application {
         model.addSnake(botSnake);
         model.addSnake(humanSnake);
         GameController controller = new GameController(model, scene);
-        /* GameView view = */ new GameView(model, controller, root);
-        
-        //model.gameStart();
+        /* GameView view = */ new GameView(model, controller, root);        
 
         stage.setTitle("Serpents");
         stage.setScene(scene);
-        stage.show();        
+        stage.show();
+
+        controller.gameStart();
     }
 
     public static void main(String[] args) {

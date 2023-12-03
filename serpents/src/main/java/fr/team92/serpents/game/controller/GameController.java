@@ -3,13 +3,13 @@ package fr.team92.serpents.game.controller;
 import java.util.Map;
 
 import fr.team92.serpents.game.model.GameModel;
-import fr.team92.serpents.snake.controller.BotController;
 import fr.team92.serpents.snake.controller.HumanSnakeController;
 import fr.team92.serpents.snake.controller.SnakeController;
 import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.GameState;
 import fr.team92.serpents.utils.Position;
+import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 
@@ -24,6 +24,21 @@ public final class GameController {
     private final GameModel model;
 
     /**
+     * Le timer du jeu
+     */
+    private AnimationTimer gameLoop;
+
+    /**
+     * Le temps entre chaque mise à jour du jeu
+     */
+    private static final long TIME_UNIT = 1_000_000_000; // 1 seconde
+
+    /**
+     * Le dernier temps de mise à jour du jeu
+     */
+    private long lastUpdate = 0;
+
+    /**
      * Constructeur du contrôleur du jeu
      * @param model le modèle du jeu
      * @param scene la scène JavaFX
@@ -31,7 +46,29 @@ public final class GameController {
     public GameController(GameModel model, Scene scene) {
         this.model = model;
         setKeyListeners(scene);
-        botPlay();
+    }
+
+    public void gameStart() {
+        if (model.getState() != GameState.WAITING) throw new IllegalStateException("Game is not waiting to start");
+        if (gameLoop != null) throw new IllegalStateException("Game loop already started");
+        model.gameStart();
+        gameLoop = new AnimationTimer() {
+
+            @Override
+            public void handle(long now) {
+                if (model.getState() != GameState.RUNNING) {
+                    this.stop();
+                }
+                else if (model.getState() == GameState.RUNNING) {
+                    if (now - lastUpdate >= TIME_UNIT) {                        
+                        updateGame();
+                        lastUpdate = now;
+                    }
+                }
+            }
+            
+        };
+        gameLoop.start();
     }
 
     /**
@@ -39,8 +76,8 @@ public final class GameController {
      * @param scene la scène JavaFX
      */
     private void setKeyListeners(Scene scene) {        
-        scene.setOnKeyReleased(event -> {
-            handleKeyRealeased(event);               
+        scene.setOnKeyPressed(event -> {
+            handleKeyPressed(event);               
         });
     }
 
@@ -48,46 +85,33 @@ public final class GameController {
      * Applique les actions du joueur courant en fonction de l'événement clavier
      * @param event l'événement clavier
      */
-    private void handleKeyRealeased(KeyEvent event) {
+    private void handleKeyPressed(KeyEvent event) {
         if (model.getState() != GameState.RUNNING) {
             return;
         }
 
-        Snake currentSnake = model.getCurrentPlayer();
-        SnakeController controller = currentSnake.getController();
+        for (Snake snake : model.getSnakes()) {
+            SnakeController controller = snake.getController();
 
-        if (controller instanceof HumanSnakeController) {
-            ((HumanSnakeController) controller).setEvent(event);   
+            if (controller instanceof HumanSnakeController) {
+                ((HumanSnakeController) controller).setEvent(event);
+            }
         }
-
-        updateGame(controller);
     }
 
     /**
      * Met à jour le jeu
      * @param controller le contrôleur du serpent
      */
-    private void updateGame(SnakeController controller) {
-        try {
-            controller.controlSnake(model.getCurrentPlayer(), model);
-            model.moveSnake();
-            botPlay();
-        }
-        catch (IllegalArgumentException e) { }
-    }
-
-    /**
-     * Fait jouer le bot
-     */
-    private void botPlay() {
+    private void updateGame() {
         if (model.getState() != GameState.RUNNING) {
             return;
         }
-        if (model.getCurrentPlayer().getController() instanceof BotController) {
-            SnakeController controller = model.getCurrentPlayer().getController();
-            controller.controlSnake(model.getCurrentPlayer(), model);
-            model.moveSnake();
+        for (Snake snake : model.getSnakes()) {
+            SnakeController controller = snake.getController();
+            controller.controlSnake(snake, model);
         }
+        model.moveSnakes();
     }
 
     /**

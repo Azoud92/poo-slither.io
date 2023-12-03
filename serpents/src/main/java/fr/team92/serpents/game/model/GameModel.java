@@ -39,14 +39,14 @@ public final class GameModel implements Observable {
     private final List<Snake> snakes;
 
     /**
-     * L'index du serpent courant
-     */
-    private int snakeIndex;
-
-    /**
      * L'état de la partie
      */
     private GameState state;
+
+    /**
+     * Le nombre de nourriture à maintenir dans la partie
+     */
+    private static final int FEED_IN_PARTY = 50;
 
     /**
      * Constructeur du modèle de jeu
@@ -62,9 +62,6 @@ public final class GameModel implements Observable {
         this.state = GameState.WAITING;
         
         this.snakes = new ArrayList<>();
-        this.snakeIndex = 0;
-        this.state = GameState.RUNNING;
-        addFeed(50);
     }
 
     /**
@@ -109,53 +106,58 @@ public final class GameModel implements Observable {
      * @return true si la position est occupée, false sinon
      */
     public boolean isOccupied(Position position) {
-        for (Snake snake : snakes) {
-            for (Segment segment : snake.getSegments()) {
-                if (segment.getPosition().equals(position) && !segment.isDead()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return snakes.stream().anyMatch(snake ->
+            snake.getSegments().stream().anyMatch(segment ->
+                segment.getPosition().equals(position) && !segment.isDead()
+            )
+        );
     }
 
     /**
-     * Déplace un serpent
+     * Déplace les serpents
      */
-    public void moveSnake() {
-        Snake snake = snakes.get(snakeIndex);
-        Direction direction = snake.getDirection();
-        Position newHeadPos = snake.getHeadPosition().move(direction);      
+    public void moveSnakes() {
+        List<Snake> snakesToRemove = new ArrayList<>();
 
-        if (isValidPosition(newHeadPos)) {
+        for (Snake snake : snakes) {
+            Direction direction = snake.getDirection();
+            System.out.println(direction);
+            Position newHeadPos = snake.getHeadPosition().move(direction);      
 
-            Segment deadSegment = grid.get(newHeadPos);
-            if (deadSegment != null && deadSegment.isDead()) {
-                grid.remove(newHeadPos);
-                snake.addSegment();
-                addFeed(1);
+            if (isValidPosition(newHeadPos)) {
+
+                Segment deadSegment = grid.get(newHeadPos);
+                if (deadSegment != null && deadSegment.isDead()) {
+                    grid.remove(newHeadPos);
+                    snake.addSegment();
+                    addFeed(1);
+                }
+
+                grid.remove(snake.getTailPosition());
+                
+                snake.move();
+
+                for (Segment segment : snake.getSegments()) {
+                    grid.put(segment.getPosition(), segment);
+                }
             }
-
-            grid.remove(snake.getTailPosition());
-            
-            snake.move();
-
-            for (Segment segment : snake.getSegments()) {
-                grid.put(segment.getPosition(), segment);
+            else {
+                snake.die();
+                snakesToRemove.add(snake);                
             }
         }
-        else {
-            snake.die();
-            snakes.remove(snake);
-            if (snakes.size() == 1) {
-                state = GameState.FINISHED;
-            }
+
+        for (Snake snake : snakesToRemove) {
+            removeSnake(snake);
         }
 
-        snakeIndex = (snakeIndex + 1) % snakes.size();
+        if (snakes.size() == 1) {
+            state = GameState.FINISHED;
+        }
+
         notifyObservers();
     }
-    
+
     /**
      * Ajoute un serpent dans le tableau
      * @param snake le serpent
@@ -191,6 +193,7 @@ public final class GameModel implements Observable {
         if (state != GameState.WAITING) {
             throw new IllegalStateException("Game already started");
         }
+        addFeed(FEED_IN_PARTY);
         state = GameState.RUNNING;
         notifyObservers();
     }
@@ -220,20 +223,20 @@ public final class GameModel implements Observable {
     }
 
     /**
-     * Obtenir le serpent courant
-     * @return le serpent courant
-     */
-    public Snake getCurrentPlayer() {
-        return snakes.get(snakeIndex);
-    }
-
-    /**
      * Obtenir l'état de la partie
      * @return l'état de la partie
      */
     public GameState getState() {
         return state;
-    }    
+    }
+
+    /**
+     * Obtenir la liste des serpents
+     * @return la liste des serpents
+     */
+    public List<Snake> getSnakes() {
+        return snakes;
+    }
 
     @Override
     public void addObserver(Observer observer) {
@@ -247,8 +250,6 @@ public final class GameModel implements Observable {
     
     @Override
     public void notifyObservers() {
-        for (Observer observer : this.observers) {
-            observer.update();
-        }
+        observers.forEach(observer -> observer.update());
     }
 }

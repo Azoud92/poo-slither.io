@@ -65,7 +65,7 @@ public final class Snake {
     
         for (int i = 0; i < length; i++) {
             segments.add(new Segment(segmentPos));
-            segmentPos = segmentPos.move(startDirection);
+            segmentPos = segmentPos.move(startDirection.opposite());
         }
     }    
 
@@ -73,6 +73,14 @@ public final class Snake {
      * Déplacer le serpent
      */
     public void move() {
+        moveSegments();
+        addNewSegments();
+    }
+
+    /**
+     * Déplacer les segments du serpent
+     */
+    private void moveSegments() {
         Position prev = segments.getFirst().getPosition();
         Position tmpPos;
 
@@ -83,13 +91,21 @@ public final class Snake {
             segments.get(i).setPosition(prev);
             prev = tmpPos;
         }
+    }
 
+    /**
+     * Ajouter les nouveaux segments en attente au serpent
+     */
+    private void addNewSegments() {
         if (!segmentsToAdd.isEmpty()) {
             segments.addLast(segmentsToAdd.getFirst());
             segmentsToAdd.removeFirst();
         }
     }
 
+    /**
+     * Ajouter un nouveau segment au serpent
+     */
     public void addSegment() {
         Position tailPos = segments.getLast().getPosition();
         Segment newSegment = new Segment(tailPos);

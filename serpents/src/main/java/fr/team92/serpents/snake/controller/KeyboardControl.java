@@ -33,7 +33,6 @@ public final class KeyboardControl implements SnakeEventControl {
         if (newDirection != null) {
             snake.setDirection(newDirection);            
         }
-        else throw new IllegalArgumentException("Touche non gérée");
     }
 
 }
