@@ -1,17 +1,11 @@
 package fr.team92.serpents.main;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import fr.team92.serpents.game.controller.GameController;
 import fr.team92.serpents.game.model.GameModel;
 import fr.team92.serpents.game.view.GameView;
-import fr.team92.serpents.snake.bot.factory.AvoidWallsBotFactory;
-import fr.team92.serpents.snake.controller.HumanSnakeController;
-import fr.team92.serpents.snake.controller.KeyboardControl;
-import fr.team92.serpents.snake.controller.SnakeController;
-import fr.team92.serpents.snake.controller.SnakeEventControl;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.Direction;
 import fr.team92.serpents.utils.Position;
@@ -31,25 +25,23 @@ public final class App extends Application {
         Pane root = new Pane();
         Scene scene = new Scene(root, 800, 600);
 
-        SnakeController botController = new AvoidWallsBotFactory().createBotController();
-        Snake botSnake = new Snake(botController, 5, new Position(10, 10), Direction.EAST);
+        Snake botSnake = Snake.CreateAvoidWallsBotSnake(5, new Position(10, 10), Direction.NORTH);
 
         Map<KeyCode, Direction> keyMap = new HashMap<>();
         keyMap.put(KeyCode.UP, Direction.NORTH);
         keyMap.put(KeyCode.DOWN, Direction.SOUTH);
         keyMap.put(KeyCode.LEFT, Direction.WEST);
         keyMap.put(KeyCode.RIGHT, Direction.EAST);
-        SnakeEventControl snakeEventControl = new KeyboardControl(keyMap);
+        
+        Snake humanSnake = Snake.CreateHumanKeyboardSnake(keyMap, 5, new Position(20, 20), Direction.NORTH);
 
-        SnakeController snakeController = new HumanSnakeController(snakeEventControl);
-        Snake humanSnake = new Snake(snakeController, 5, new Position(10, 20), Direction.SOUTH);
-
-        List<Snake> snakes = List.of(botSnake, humanSnake);
-
-        GameModel model = new GameModel(80, 60, snakes);
+        GameModel model = new GameModel(80, 60);
+        model.addSnake(botSnake);
+        model.addSnake(humanSnake);
         GameController controller = new GameController(model, scene);
         /* GameView view = */ new GameView(model, controller, root);
         
+        //model.gameStart();
 
         stage.setTitle("Serpents");
         stage.setScene(scene);

@@ -2,10 +2,15 @@ package fr.team92.serpents.snake.model;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import fr.team92.serpents.snake.bot.factory.AvoidWallsBotFactory;
+import fr.team92.serpents.snake.controller.HumanSnakeController;
+import fr.team92.serpents.snake.controller.KeyboardControl;
 import fr.team92.serpents.snake.controller.SnakeController;
 import fr.team92.serpents.utils.Direction;
 import fr.team92.serpents.utils.Position;
+import javafx.scene.input.KeyCode;
 
 /**
  * Représente un serpent
@@ -15,22 +20,24 @@ public final class Snake {
     /**
      * La liste des segments du serpent
      */
-    private LinkedList<Segment> segments;
+    private final LinkedList<Segment> segments;
 
     /**
      * La liste des segments à ajouter au serpent
      */
-    private LinkedList<Segment> segmentsToAdd;
+    private final LinkedList<Segment> segmentsToAdd;
 
     /**
      * Le contrôleur du serpent
      */
-    private SnakeController controller;
+    private final SnakeController controller;
     
     /**
      * La direction du serpent
      */
     private Direction direction;
+
+    private boolean isDead;
 
     /**
      * Constructeur du serpent
@@ -43,7 +50,8 @@ public final class Snake {
         this.segments = new LinkedList<>();
         this.direction = direction;
         this.segmentsToAdd = new LinkedList<>();
-        initSegments(length, position.clone(), direction);
+        this.isDead = false;
+        initSegments(length, position, direction);
     }
 
     /**
@@ -56,7 +64,7 @@ public final class Snake {
         Position segmentPos = startPosition;
     
         for (int i = 0; i < length; i++) {
-            segments.add(new Segment(segmentPos.clone()));
+            segments.add(new Segment(segmentPos));
             segmentPos = segmentPos.move(startDirection);
         }
     }    
@@ -136,13 +144,30 @@ public final class Snake {
         return controller;
     }
 
+    public boolean isDead() {
+        return isDead;
+    }
+
     /**
      * Tuer le serpent
      */
     public void die() {
+        if (isDead) {
+            throw new IllegalStateException("Le serpent est déjà mort");
+        }
         for (Segment segment : segments) {
             segment.die();
         }
+    }
+
+    public static Snake CreateHumanKeyboardSnake(Map<KeyCode, Direction> keyMap, int length, Position position, Direction direction) {
+        SnakeController controller = new HumanSnakeController(new KeyboardControl(keyMap));
+        return new Snake(controller, length, position, direction);
+    }
+
+    public static Snake CreateAvoidWallsBotSnake(int length, Position position, Direction direction) {
+        SnakeController controller = new AvoidWallsBotFactory().createBotController();
+        return new Snake(controller, length, position, direction);
     }
 
 }

@@ -6,7 +6,7 @@ import fr.team92.serpents.snake.model.Snake;
 /**
  * Contrôleur de serpent
  */
-public interface SnakeController {
+public sealed interface SnakeController permits HumanSnakeController, BotController {
 
     /**
      * Contrôle du serpent

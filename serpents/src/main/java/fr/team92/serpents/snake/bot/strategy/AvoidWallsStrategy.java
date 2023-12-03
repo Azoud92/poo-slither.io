@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 public final class AvoidWallsStrategy implements BotStrategy {
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
     @Override
     public Direction detMove(Snake snake, GameModel gameModel) {
@@ -35,7 +35,7 @@ public final class AvoidWallsStrategy implements BotStrategy {
      */
     private boolean wallCollisionRisk(Snake snake, Direction dir, GameModel gameModel) {
         Position eventualPos = snake.getHeadPosition().move(dir);
-        return eventualPos.getX() < 0 || eventualPos.getX() >= gameModel.getWidth() || eventualPos.getY() < 0 || eventualPos.getY() >= gameModel.getHeight();
+        return eventualPos.x() < 0 || eventualPos.x() >= gameModel.getWidth() || eventualPos.y() < 0 || eventualPos.y() >= gameModel.getHeight();
     }
 
     /**

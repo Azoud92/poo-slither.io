@@ -20,7 +20,7 @@ public final class Segment {
      * @param position la position du segment
      */
     public Segment(Position position) {
-        this.position = position.clone();
+        this.position = position;
     }
 
     /**

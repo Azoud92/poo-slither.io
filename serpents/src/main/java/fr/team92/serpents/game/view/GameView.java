@@ -18,8 +18,8 @@ import javafx.util.Duration;
 
 public final class GameView implements Observer {
 
-    private GameController controller;
-    private Pane pane;
+    private final GameController controller;
+    private final Pane pane;
     private static final int CELL_SIZE = 10;
 
     public GameView(Observable model, GameController controller, Pane pane) {
@@ -32,7 +32,13 @@ public final class GameView implements Observer {
 
 
     @Override
-    public void update() {
+    public void update() {       
+        redrawGrid();
+        drawSegments();
+        //endGame();
+    }
+
+    private void redrawGrid() {
         pane.getChildren().clear();
         int width = controller.getWidth();
         int height = controller.getHeight();
@@ -45,10 +51,12 @@ public final class GameView implements Observer {
                 pane.getChildren().add(rect);
             }
         }
+    }
 
+    private void drawSegments() {
         for (Segment segment : controller.getGrid().values()) {
             Position pos = segment.getPosition();
-            Rectangle rect = new Rectangle(pos.getX() * CELL_SIZE, pos.getY() * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+            Rectangle rect = new Rectangle(pos.x() * CELL_SIZE, pos.y() * CELL_SIZE, CELL_SIZE, CELL_SIZE);
 
             if (segment.isDead()) {
                 if (rect.getFill() == Color.RED) {
@@ -66,12 +74,11 @@ public final class GameView implements Observer {
             }
 
             pane.getChildren().add(rect);
-        }   
-        
-        //endGame();
+        }
     }
 
-    public void endGame() {
+    @SuppressWarnings("unused")
+    private void endGame() {
         if (!controller.gameFinished()) return;
 
         pane.getChildren().clear();

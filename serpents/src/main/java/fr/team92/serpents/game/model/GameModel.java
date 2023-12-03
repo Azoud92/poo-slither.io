@@ -21,7 +21,7 @@ public final class GameModel implements Observable {
     /**
      * La liste des observateurs
      */
-    private List<Observer> observers;
+    private final List<Observer> observers;
 
     /**
      * La largeur du tableau et sa hauteur
@@ -31,12 +31,12 @@ public final class GameModel implements Observable {
     /**
      * Le tableau de la partie
      */
-    private Map<Position, Segment> grid;
+    private final Map<Position, Segment> grid;
     
     /**
      * La liste des serpents
      */
-    private List<Snake> snakes;
+    private final List<Snake> snakes;
 
     /**
      * L'index du serpent courant
@@ -54,7 +54,7 @@ public final class GameModel implements Observable {
      * @param height la hauteur
      * @param players les joueurs
      */
-    public GameModel(int width, int height, List<Snake> players) {        
+    public GameModel(int width, int height) {        
         this.observers = new ArrayList<>();
         this.width = width;
         this.height = height;
@@ -62,30 +62,33 @@ public final class GameModel implements Observable {
         this.state = GameState.WAITING;
         
         this.snakes = new ArrayList<>();
-        for (Snake snake : players) {
-            addSnake(snake);
-        }
         this.snakeIndex = 0;
-
-        addFeed(50);
-
         this.state = GameState.RUNNING;
+        addFeed(50);
     }
 
-    /*
+    /**
      * Ajoute de la nourriture à la partie
      * @param nb le nombre de nourriture à ajouter
      */
     private void addFeed(int nb) {
         for (int i = 0; i < nb; i++) {
-            Position pos = new Position((int) (Math.random() * width), (int) (Math.random() * height));
-            while (isOccupied(pos)) {
-                pos = new Position((int) (Math.random() * width), (int) (Math.random() * height));
-            }
+            Position pos = generateRandomPosition();
             Segment segment = new Segment(pos);
             segment.die();
             grid.put(pos, segment);
         }
+    }
+    /**
+     * Génère une position aléatoire
+     * @return la position aléatoire
+     */
+    private Position generateRandomPosition() {
+        Position pos = new Position((int) (Math.random() * width), (int) (Math.random() * height));
+        while (isOccupied(pos)) {
+            pos = new Position((int) (Math.random() * width), (int) (Math.random() * height));
+        }
+        return pos;
     }
 
     /**
@@ -94,10 +97,26 @@ public final class GameModel implements Observable {
      * @return true si la position est valide, false sinon
      */
     public boolean isValidPosition(Position position) {
-        return position.getX() >= 0
-        && position.getX() < width && position.getY() >= 0
-        && position.getY() < height
+        return position.x() >= 0
+        && position.x() < width && position.y() >= 0
+        && position.y() < height
         && !isOccupied(position);
+    }
+
+    /**
+     * Vérifie si la position est occupée
+     * @param position la position
+     * @return true si la position est occupée, false sinon
+     */
+    public boolean isOccupied(Position position) {
+        for (Snake snake : snakes) {
+            for (Segment segment : snake.getSegments()) {
+                if (segment.getPosition().equals(position) && !segment.isDead()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -142,6 +161,9 @@ public final class GameModel implements Observable {
      * @param snake le serpent
      */
     public void addSnake(Snake snake) {
+        if (snake == null) {
+            throw new IllegalArgumentException("Snake cannot be null");
+        }
         for (Segment segment : snake.getSegments()) {
             if (!isValidPosition(segment.getPosition())) {
                 throw new IllegalArgumentException("Invalid position");
@@ -165,6 +187,14 @@ public final class GameModel implements Observable {
         snakes.remove(snake);
     }
 
+    public void gameStart() {
+        if (state != GameState.WAITING) {
+            throw new IllegalStateException("Game already started");
+        }
+        state = GameState.RUNNING;
+        notifyObservers();
+    }
+
     /**
      * Obtenir la largeur du tableau
      * @return la largeur du tableau
@@ -186,40 +216,24 @@ public final class GameModel implements Observable {
      * @return le tableau de la partie
      */
     public Map<Position, Segment> getGrid() {
-        return grid;
+        return new HashMap<>(grid);
     }
 
     /**
-     * Get current player
-     * @return current player
+     * Obtenir le serpent courant
+     * @return le serpent courant
      */
     public Snake getCurrentPlayer() {
         return snakes.get(snakeIndex);
     }
 
     /**
-     * Get the players
-     * @return the players
+     * Obtenir l'état de la partie
+     * @return l'état de la partie
      */
-    public List<Snake> getPlayers() {
-        return snakes;
-    }
-
-    /**
-     * Vérifie si la position est occupée
-     * @param position la position
-     * @return true si la position est occupée, false sinon
-     */
-    public boolean isOccupied(Position position) {
-        for (Snake snake : snakes) {
-            for (Segment segment : snake.getSegments()) {
-                if (segment.getPosition().equals(position) && !segment.isDead()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+    public GameState getState() {
+        return state;
+    }    
 
     @Override
     public void addObserver(Observer observer) {
@@ -237,12 +251,4 @@ public final class GameModel implements Observable {
             observer.update();
         }
     }
-
-    /**
-     * Obtenir l'état de la partie
-     * @return l'état de la partie
-     */
-    public GameState getState() {
-        return state;
-    }    
 }

@@ -1,5 +1,6 @@
 package fr.team92.serpents.snake.controller;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import fr.team92.serpents.snake.model.Snake;
@@ -23,16 +24,16 @@ public final class KeyboardControl implements SnakeEventControl {
      * @param keyMap
      */
     public KeyboardControl(Map<KeyCode, Direction> keyMap) {
-        this.keyMap = keyMap;
+        this.keyMap = new HashMap<>(keyMap);
     }
 
     @Override
     public void handleControl(Snake snake, InputEvent event) {
         Direction newDirection = keyMap.get(((KeyEvent) event).getCode());
         if (newDirection != null) {
-            snake.setDirection(newDirection);
+            snake.setDirection(newDirection);            
         }
-        else throw new IllegalArgumentException("La touche n'est pas associée à une direction");
+        else throw new IllegalArgumentException("Touche non gérée");
     }
 
 }

@@ -1,8 +1,7 @@
-package fr.team92.serpents.snake.bot;
+package fr.team92.serpents.snake.controller;
 
 import fr.team92.serpents.game.model.GameModel;
 import fr.team92.serpents.snake.bot.strategy.BotStrategy;
-import fr.team92.serpents.snake.controller.SnakeController;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.Direction;
 
@@ -14,7 +13,7 @@ public final class BotController implements SnakeController {
     /**
      * Stratégie de déplacement du serpent
      */
-    private BotStrategy strategy;
+    private final BotStrategy strategy;
 
     /**
      * Constructeur du contrôleur de serpent automatisé

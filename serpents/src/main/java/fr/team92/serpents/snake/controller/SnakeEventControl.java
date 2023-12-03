@@ -12,6 +12,7 @@ public interface SnakeEventControl {
      * Gérer le contrôle du serpent en fonction de l'événement
      * @param snake le serpent
      * @param event l'événement
+     * @raise IllegalArgumentException si l'évènement n'a pas été géré
      */
     void handleControl(Snake snake, InputEvent event);
 }
