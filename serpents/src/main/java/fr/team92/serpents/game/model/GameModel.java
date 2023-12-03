@@ -67,13 +67,17 @@ public final class GameModel implements Observable {
         }
         this.snakeIndex = 0;
 
-        initFeed();
+        addFeed(50);
 
         this.state = GameState.RUNNING;
     }
 
-    private void initFeed() {
-        for (int i = 0; i < 50; i++) {
+    /*
+     * Ajoute de la nourriture à la partie
+     * @param nb le nombre de nourriture à ajouter
+     */
+    private void addFeed(int nb) {
+        for (int i = 0; i < nb; i++) {
             Position pos = new Position((int) (Math.random() * width), (int) (Math.random() * height));
             while (isOccupied(pos)) {
                 pos = new Position((int) (Math.random() * width), (int) (Math.random() * height));
@@ -109,7 +113,8 @@ public final class GameModel implements Observable {
             Segment deadSegment = grid.get(newHeadPos);
             if (deadSegment != null && deadSegment.isDead()) {
                 grid.remove(newHeadPos);
-                snake.addSegment();            
+                snake.addSegment();
+                addFeed(1);
             }
 
             grid.remove(snake.getTailPosition());
