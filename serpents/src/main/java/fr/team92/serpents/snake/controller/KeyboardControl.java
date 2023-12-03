@@ -35,4 +35,12 @@ public final class KeyboardControl implements SnakeEventControl {
         }
     }
 
+    /**
+     * Récupérer la map des touches
+     * @return la map des touches
+     */
+    public Map<KeyCode, Direction> getKeyMap() {
+        return new HashMap<>(keyMap);
+    }
+
 }

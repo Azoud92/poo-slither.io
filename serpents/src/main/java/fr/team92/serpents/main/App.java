@@ -27,17 +27,26 @@ public final class App extends Application {
 
         Snake botSnake = Snake.CreateAvoidWallsBotSnake(5, new Position(10, 10), Direction.NORTH);
 
-        Map<KeyCode, Direction> keyMap = new HashMap<>();
-        keyMap.put(KeyCode.UP, Direction.NORTH);
-        keyMap.put(KeyCode.DOWN, Direction.SOUTH);
-        keyMap.put(KeyCode.LEFT, Direction.WEST);
-        keyMap.put(KeyCode.RIGHT, Direction.EAST);
+        Map<KeyCode, Direction> keyMap1 = new HashMap<>();
+        keyMap1.put(KeyCode.UP, Direction.NORTH);
+        keyMap1.put(KeyCode.DOWN, Direction.SOUTH);
+        keyMap1.put(KeyCode.LEFT, Direction.WEST);
+        keyMap1.put(KeyCode.RIGHT, Direction.EAST);
         
-        Snake humanSnake = Snake.CreateHumanKeyboardSnake(keyMap, 5, new Position(20, 20), Direction.NORTH);
+        Snake humanSnake1 = Snake.CreateHumanKeyboardSnake(keyMap1, 5, new Position(20, 20), Direction.NORTH);
+
+        Map<KeyCode, Direction> keyMap2 = new HashMap<>();
+        keyMap2.put(KeyCode.Z, Direction.NORTH);
+        keyMap2.put(KeyCode.X, Direction.SOUTH);
+        keyMap2.put(KeyCode.Q, Direction.WEST);
+        keyMap2.put(KeyCode.D, Direction.EAST);
+
+        Snake humanSnake2 = Snake.CreateHumanKeyboardSnake(keyMap2, 5, new Position(30, 30), Direction.NORTH);
 
         GameModel model = new GameModel(80, 60);
-        model.addSnake(botSnake);
-        model.addSnake(humanSnake);
+        //model.addSnake(botSnake);
+        model.addSnake(humanSnake1);
+        model.addSnake(humanSnake2);
         GameController controller = new GameController(model, scene);
         /* GameView view = */ new GameView(model, controller, root);        
 

@@ -29,6 +29,14 @@ public final class HumanSnakeController implements SnakeController {
     }
 
     /**
+     * Récupérer le contrôleur d'événement du serpent
+     * @return le contrôleur d'événement du serpent 
+     */
+    public SnakeEventControl getSnakeEventControl() {
+        return snakeEventControl;
+    }
+
+    /**
      * Définir le dernier événement enregistré
      * @param event l'événement
      */

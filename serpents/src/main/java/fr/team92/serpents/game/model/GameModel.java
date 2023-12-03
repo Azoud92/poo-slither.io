@@ -2,9 +2,13 @@ package fr.team92.serpents.game.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import fr.team92.serpents.snake.controller.HumanSnakeController;
+import fr.team92.serpents.snake.controller.KeyboardControl;
 import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.Direction;
@@ -12,6 +16,7 @@ import fr.team92.serpents.utils.GameState;
 import fr.team92.serpents.utils.Observable;
 import fr.team92.serpents.utils.Observer;
 import fr.team92.serpents.utils.Position;
+import javafx.scene.input.KeyCode;
 
 /**
  * Représente le modèle de jeu
@@ -114,6 +119,32 @@ public final class GameModel implements Observable {
     }
 
     /**
+     * Vérifie si les keyCodes sont uniques
+     * @param snake le serpent
+     * @return true si les keyCodes sont uniques, false sinon
+     */
+    private boolean keyCodesUniques() {
+        Set<KeyCode> keyCodes = new HashSet<>();
+
+        snakes.stream()
+            .map(Snake::getController)
+            .filter(controller -> controller instanceof HumanSnakeController)
+            .map(controller -> (HumanSnakeController) controller)
+            .filter(humanController -> humanController.getSnakeEventControl() instanceof KeyboardControl)
+            .map(humanController -> (KeyboardControl) humanController.getSnakeEventControl())
+            .map(KeyboardControl::getKeyMap)
+            .flatMap(keyMap -> keyMap.keySet().stream())
+            .forEach(keyCode -> {
+                if (keyCodes.contains(keyCode)) {
+                    throw new IllegalArgumentException("Key code is not unique");
+                }
+                keyCodes.add(keyCode);
+            });
+
+        return true; // All key codes are unique
+    }
+
+    /**
      * Déplace les serpents
      */
     public void moveSnakes() {
@@ -121,7 +152,6 @@ public final class GameModel implements Observable {
 
         for (Snake snake : snakes) {
             Direction direction = snake.getDirection();
-            System.out.println(direction);
             Position newHeadPos = snake.getHeadPosition().move(direction);      
 
             if (isValidPosition(newHeadPos)) {
@@ -165,7 +195,7 @@ public final class GameModel implements Observable {
     public void addSnake(Snake snake) {
         if (snake == null) {
             throw new IllegalArgumentException("Snake cannot be null");
-        }
+        }        
         for (Segment segment : snake.getSegments()) {
             if (!isValidPosition(segment.getPosition())) {
                 throw new IllegalArgumentException("Invalid position");
@@ -183,15 +213,18 @@ public final class GameModel implements Observable {
         if (!snakes.contains(snake)) {
             throw new IllegalArgumentException("Snake not found");
         }
-        for (Segment segment : snake.getSegments()) {
-            grid.remove(segment.getPosition());
-        }
         snakes.remove(snake);
     }
 
+    /**
+     * Démarre la partie
+     */
     public void gameStart() {
         if (state != GameState.WAITING) {
             throw new IllegalStateException("Game already started");
+        }
+        if (!keyCodesUniques()) {
+            throw new IllegalArgumentException("Les touches doivent être uniques");
         }
         addFeed(FEED_IN_PARTY);
         state = GameState.RUNNING;
