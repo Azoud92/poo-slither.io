@@ -19,16 +19,27 @@ public final class AvoidWallsStrategy implements BotStrategy {
     private final Random random = new Random();
 
     @Override
-    public Direction detMove(Snake snake, GameModel gameModel) {
+    public Direction detMove(Snake snake, GameModel gameModel, double lastUpdate) {
         Direction[] directions = Direction.values();
-
+    
+        // Obtenir la direction actuelle du serpent
+        Direction currentDirection = snake.getDirection();
+    
+        // Filtrer les directions pour éviter les collisions avec les murs
         List<Direction> validDirections = Arrays.stream(directions)
-                .filter(dir -> !wallCollisionRisk(snake, dir, gameModel) && !autoCollisionRisk(snake, dir))
+                .filter(dir -> !wallCollisionRisk(snake, dir, gameModel, lastUpdate))
                 .collect(Collectors.toList());
-
+    
+        // Si la direction actuelle est sûre, continuer dans cette direction
+        if (validDirections.contains(currentDirection)) {
+            return currentDirection;
+        }
+    
+        // Si la direction actuelle n'est pas sûre, choisir une autre direction
         if (!validDirections.isEmpty()) {
             return validDirections.get(random.nextInt(validDirections.size()));
         } else {
+            // Si aucune direction n'est sûre, choisir au hasard (comportement de secours)
             return directions[random.nextInt(directions.length)];
         }
     }
@@ -40,20 +51,9 @@ public final class AvoidWallsStrategy implements BotStrategy {
      * @param gameModel Le modèle du jeu
      * @return true si le serpent risque de rentrer dans un mur, false sinon
      */
-    private boolean wallCollisionRisk(Snake snake, Direction dir, GameModel gameModel) {
-        Position eventualPos = snake.getHeadPosition().move(dir);
+    private boolean wallCollisionRisk(Snake snake, Direction dir, GameModel gameModel, double lastUpdate) {
+        Position eventualPos = snake.getHeadPosition().move(dir, snake.getSpeed() * lastUpdate);
         return eventualPos.x() < 0 || eventualPos.x() >= gameModel.getWidth() || eventualPos.y() < 0 || eventualPos.y() >= gameModel.getHeight();
-    }
-
-    /**
-     * Vérifie si le serpent risque de rentrer dans lui-même
-     * @param snake Le serpent à déplacer
-     * @param dir La direction dans laquelle le serpent tenterait d'aller
-     * @return true si le serpent risque de rentrer dans lui-même, false sinon
-     */
-    private boolean autoCollisionRisk(Snake snake, Direction dir) {
-        Position eventualPos = snake.getHeadPosition().move(dir);
-        return snake.getSegments().stream().anyMatch(s -> s.getPosition().equals(eventualPos));
     }
 
 }

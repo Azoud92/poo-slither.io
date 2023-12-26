@@ -13,5 +13,5 @@ public sealed interface SnakeController permits HumanSnakeController, BotControl
      * @param snake serpent à contrôler
      * @param gameModel modèle du jeu
      */
-    void controlSnake(Snake snake, GameModel gameModel);
+    void controlSnake(Snake snake, GameModel gameModel, double lastUpdate);
 }

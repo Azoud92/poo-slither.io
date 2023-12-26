@@ -30,7 +30,7 @@ public final class KeyboardControl implements SnakeEventControl {
     @Override
     public void handleControl(Snake snake, InputEvent event) {
         Direction newDirection = keyMap.get(((KeyEvent) event).getCode());
-        if (newDirection != null) {
+        if (newDirection != null && newDirection != snake.getDirection().opposite()) {
             snake.setDirection(newDirection);            
         }
     }

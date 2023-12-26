@@ -27,8 +27,8 @@ public final class BotController implements SnakeController {
     }
 
     @Override
-    public void controlSnake(Snake snake, GameModel gameModel) {
-        Direction move = strategy.detMove(snake, gameModel);
+    public void controlSnake(Snake snake, GameModel gameModel, double lastUpdate) {
+        Direction move = strategy.detMove(snake, gameModel, lastUpdate);
         snake.setDirection(move);
     }
 

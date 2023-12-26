@@ -41,12 +41,12 @@ public final class App extends Application {
         keyMap2.put(KeyCode.Q, Direction.WEST);
         keyMap2.put(KeyCode.D, Direction.EAST);
 
-        Snake humanSnake2 = Snake.CreateHumanKeyboardSnake(keyMap2, 5, new Position(30, 30), Direction.NORTH);
+        //Snake humanSnake2 = Snake.CreateHumanKeyboardSnake(keyMap2, 5, new Position(30, 30), Direction.NORTH);
 
         GameModel model = new GameModel(80, 60);
-        //model.addSnake(botSnake);
+        model.addSnake(botSnake);
         model.addSnake(humanSnake1);
-        model.addSnake(humanSnake2);
+        //model.addSnake(humanSnake2);
         GameController controller = new GameController(model, scene);
         /* GameView view = */ new GameView(model, controller, root);        
 

@@ -11,7 +11,6 @@ import fr.team92.serpents.snake.controller.HumanSnakeController;
 import fr.team92.serpents.snake.controller.KeyboardControl;
 import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.snake.model.Snake;
-import fr.team92.serpents.utils.Direction;
 import fr.team92.serpents.utils.GameState;
 import fr.team92.serpents.utils.Observable;
 import fr.team92.serpents.utils.Observer;
@@ -76,7 +75,7 @@ public final class GameModel implements Observable {
     private void addFeed(int nb) {
         for (int i = 0; i < nb; i++) {
             Position pos = generateRandomPosition();
-            Segment segment = new Segment(pos);
+            Segment segment = new Segment(pos, 1);
             segment.die();
             grid.put(pos, segment);
         }
@@ -87,7 +86,7 @@ public final class GameModel implements Observable {
      */
     private Position generateRandomPosition() {
         Position pos = new Position((int) (Math.random() * width), (int) (Math.random() * height));
-        while (isOccupied(pos)) {
+        while (isOccupied(pos, 1)) {
             pos = new Position((int) (Math.random() * width), (int) (Math.random() * height));
         }
         return pos;
@@ -98,11 +97,12 @@ public final class GameModel implements Observable {
      * @param position la position
      * @return true si la position est valide, false sinon
      */
-    public boolean isValidPosition(Position position) {
-        return position.x() >= 0
-        && position.x() < width && position.y() >= 0
-        && position.y() < height
-        && !isOccupied(position);
+    public boolean isValidPosition(Position position, double diameter) {
+        double radius = diameter / 2;
+        return position.x() >= radius
+        && position.x() < width - radius && position.y() >= radius
+        && position.y() < height - radius
+        && !isOccupied(position, diameter);
     }
 
     /**
@@ -110,12 +110,32 @@ public final class GameModel implements Observable {
      * @param position la position
      * @return true si la position est occupée, false sinon
      */
-    public boolean isOccupied(Position position) {
+    public boolean isOccupied(Position position, double diameter) {
         return snakes.stream().anyMatch(snake ->
             snake.getSegments().stream().anyMatch(segment ->
-                segment.getPosition().equals(position) && !segment.isDead()
+                segment.getPosition().distanceTo(position) < segment.getDiameter() / 2 + diameter / 2
+                && !segment.isDead()
             )
         );
+    }
+
+    public boolean isInCollision(Snake snake) {
+        Position headPosition = snake.getHeadPosition();
+        double headRadius = snake.getHeadDiameter() / 2;
+
+        if (headPosition.x() < 0 || headPosition.x() >= width ||
+            headPosition.y() < 0 || headPosition.y() >= height) {
+            return true;
+        }
+
+        return snakes.stream()
+            .filter(otherSnake -> !snake.equals(otherSnake))
+            .anyMatch(otherSnake ->
+                otherSnake.getSegments().stream().anyMatch(segment ->
+                    segment.getPosition().distanceTo(headPosition) < segment.getDiameter() / 2 + headRadius
+                    && !segment.isDead()
+                )
+            );
     }
 
     /**
@@ -141,39 +161,40 @@ public final class GameModel implements Observable {
                 keyCodes.add(keyCode);
             });
 
-        return true; // All key codes are unique
+        return true;
+    }
+
+    private void grow(Snake snake) {
+        for (Map.Entry<Position, Segment> entry : grid.entrySet()) {
+            Position pos = entry.getKey();
+            Segment segment = entry.getValue();
+            if (segment.isDead() && snake.getHeadPosition().distanceTo(pos) < snake.getHeadDiameter() / 2 + segment.getDiameter() / 2) {
+                grid.remove(pos);
+                snake.addSegment();
+                addFeed(1);
+                return;           
+            }
+        }
     }
 
     /**
      * Déplace les serpents
      */
-    public void moveSnakes() {
+    public void moveSnakes(double lastUpdate) {
         List<Snake> snakesToRemove = new ArrayList<>();
 
         for (Snake snake : snakes) {
-            Direction direction = snake.getDirection();
-            Position newHeadPos = snake.getHeadPosition().move(direction);      
+            snake.move(lastUpdate);
 
-            if (isValidPosition(newHeadPos)) {
-
-                Segment deadSegment = grid.get(newHeadPos);
-                if (deadSegment != null && deadSegment.isDead()) {
-                    grid.remove(newHeadPos);
-                    snake.addSegment();
-                    addFeed(1);
-                }
-
-                grid.remove(snake.getTailPosition());
-                
-                snake.move();
-
-                for (Segment segment : snake.getSegments()) {
-                    grid.put(segment.getPosition(), segment);
-                }
-            }
-            else {
+            if (isInCollision(snake)) {
                 snake.die();
-                snakesToRemove.add(snake);                
+                snakesToRemove.add(snake);
+            }
+
+            grow(snake);
+
+            for (Segment segment : snake.getSegments()) {
+                grid.put(segment.getPosition(), segment);
             }
         }
 
@@ -197,7 +218,7 @@ public final class GameModel implements Observable {
             throw new IllegalArgumentException("Snake cannot be null");
         }        
         for (Segment segment : snake.getSegments()) {
-            if (!isValidPosition(segment.getPosition())) {
+            if (!isValidPosition(segment.getPosition(), segment.getDiameter())) {
                 throw new IllegalArgumentException("Invalid position");
             }
             grid.put(segment.getPosition(), segment);

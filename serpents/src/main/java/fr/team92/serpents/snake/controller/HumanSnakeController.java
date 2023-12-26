@@ -45,7 +45,7 @@ public final class HumanSnakeController implements SnakeController {
     }
 
     @Override
-    public void controlSnake(Snake snake, GameModel gameModel) {
+    public void controlSnake(Snake snake, GameModel gameModel, double lastUpdate) {
         if (lastEvent != null) {
             if (lastEvent instanceof KeyEvent && snakeEventControl instanceof KeyboardControl) {
                 snakeEventControl.handleControl(snake, lastEvent);

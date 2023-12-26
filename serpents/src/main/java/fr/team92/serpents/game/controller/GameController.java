@@ -28,15 +28,7 @@ public final class GameController {
      */
     private AnimationTimer gameLoop;
 
-    /**
-     * Le temps entre chaque mise à jour du jeu
-     */
-    private static final long TIME_UNIT = 1_000_000_000; // 1 seconde
-
-    /**
-     * Le dernier temps de mise à jour du jeu
-     */
-    private long lastUpdate = 0;
+    private double lastUpdate;
 
     /**
      * Constructeur du contrôleur du jeu
@@ -52,6 +44,8 @@ public final class GameController {
         if (model.getState() != GameState.WAITING) throw new IllegalStateException("Game is not waiting to start");
         if (gameLoop != null) throw new IllegalStateException("Game loop already started");
         model.gameStart();
+        lastUpdate = System.nanoTime();   
+
         gameLoop = new AnimationTimer() {
 
             @Override
@@ -60,10 +54,9 @@ public final class GameController {
                     this.stop();
                 }
                 else if (model.getState() == GameState.RUNNING) {
-                    if (now - lastUpdate >= TIME_UNIT) {                        
-                        updateGame();
-                        lastUpdate = now;
-                    }
+                    double elapsedTimeInSeconds = (now - lastUpdate) / 1_000_000_000.0;
+                    updateGame(elapsedTimeInSeconds);
+                    lastUpdate = now;
                 }
             }
             
@@ -103,15 +96,15 @@ public final class GameController {
      * Met à jour le jeu
      * @param controller le contrôleur du serpent
      */
-    private void updateGame() {
+    private void updateGame(double lastUpdate) {
         if (model.getState() != GameState.RUNNING) {
             return;
         }
         for (Snake snake : model.getSnakes()) {
             SnakeController controller = snake.getController();
-            controller.controlSnake(snake, model);
+            controller.controlSnake(snake, model, lastUpdate);
         }
-        model.moveSnakes();
+        model.moveSnakes(lastUpdate);
     }
 
     /**

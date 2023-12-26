@@ -7,13 +7,13 @@ import fr.team92.serpents.utils.Observer;
 import fr.team92.serpents.utils.Position;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
-import javafx.animation.FillTransition;
 import javafx.util.Duration;
 
 public final class GameView implements Observer {
@@ -32,50 +32,27 @@ public final class GameView implements Observer {
 
 
     @Override
-    public void update() {       
-        redrawGrid();
+    public void update() {
         drawSegments();
         //endGame();
     }
 
-    private void redrawGrid() {
-        pane.getChildren().clear();
-        int width = controller.getWidth();
-        int height = controller.getHeight();
-
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                Rectangle rect = new Rectangle(i * CELL_SIZE, j * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-                rect.setFill(Color.TRANSPARENT);
-                rect.setStroke(Color.GRAY);
-                pane.getChildren().add(rect);
-            }
-        }
-    }
-
     private void drawSegments() {
-        for (Segment segment : controller.getGrid().values()) {
-            Position pos = segment.getPosition();
-            Rectangle rect = new Rectangle(pos.x() * CELL_SIZE, pos.y() * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        pane.getChildren().clear();
+    for (Segment segment : controller.getGrid().values()) {
+        Position pos = segment.getPosition();
+        double diameter = segment.getDiameter() * CELL_SIZE;
+        Circle circle = new Circle(pos.x() * CELL_SIZE + CELL_SIZE / 2.0, pos.y() * CELL_SIZE + CELL_SIZE / 2.0, diameter / 2.0);
 
-            if (segment.isDead()) {
-                if (rect.getFill() == Color.RED) {
-                    FillTransition fillTransition = new FillTransition(Duration.seconds(3), rect);
-                    fillTransition.setFromValue(Color.RED);
-                    fillTransition.setToValue(Color.ORANGE);
-                    fillTransition.play();
-                }
-                else {
-                    rect.setFill(Color.ORANGE);
-                }     
-            }
-            else {
-                rect.setFill(Color.RED);
-            }
-
-            pane.getChildren().add(rect);
+        if (segment.isDead()) {
+            circle.setFill(Color.ORANGE);
+        } else {
+            circle.setFill(Color.RED);
         }
+
+        pane.getChildren().add(circle);
     }
+}
 
     @SuppressWarnings("unused")
     private void endGame() {

@@ -15,20 +15,23 @@ public final class Segment {
 
     private boolean dead = false;
 
+    private double diameter;
+
     /**
      * Créer un nouveau segment à la position donnée
      * @param position la position du segment
      */
-    public Segment(Position position) {
+    public Segment(Position position, double diameter) {
         this.position = position;
+        this.diameter = diameter;
     }
 
     /**
      * Déplacer le segment dans la direction donnée
      * @param direction la direction dans laquelle déplacer le segment
      */
-    public void move(Direction direction) {
-        position = position.move(direction);
+    public void move(Direction direction, double delta) {
+        position = position.move(direction, delta);
     }
 
     /**
@@ -63,6 +66,10 @@ public final class Segment {
             throw new IllegalStateException("Segment already dead");
         }
         this.dead = true;
+    }
+
+    public double getDiameter() {
+        return diameter;
     }
 
 }

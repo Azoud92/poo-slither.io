@@ -15,5 +15,5 @@ public interface BotStrategy {
      * @param gameModel modèle du jeu
      * @return direction du déplacement
      */
-    Direction detMove(Snake snake, GameModel gameModel);
+    Direction detMove(Snake snake, GameModel gameModel, double lastUpdate);
 }
