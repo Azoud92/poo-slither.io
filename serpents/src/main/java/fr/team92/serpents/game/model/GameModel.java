@@ -36,7 +36,7 @@ public final class GameModel implements Observable {
      * Le tableau de la partie
      */
     private final Map<Position, Segment> grid;
-    
+
     /**
      * La liste des serpents
      */
@@ -54,22 +54,24 @@ public final class GameModel implements Observable {
 
     /**
      * Constructeur du modèle de jeu
-     * @param width la largeur
-     * @param height la hauteur
+     * 
+     * @param width   la largeur
+     * @param height  la hauteur
      * @param players les joueurs
      */
-    public GameModel(int width, int height) {        
+    public GameModel(int width, int height) {
         this.observers = new ArrayList<>();
         this.width = width;
         this.height = height;
         this.grid = new HashMap<>();
         this.state = GameState.WAITING;
-        
+
         this.snakes = new ArrayList<>();
     }
 
     /**
      * Ajoute de la nourriture à la partie
+     * 
      * @param nb le nombre de nourriture à ajouter
      */
     private void addFeed(int nb) {
@@ -80,8 +82,10 @@ public final class GameModel implements Observable {
             grid.put(pos, segment);
         }
     }
+
     /**
      * Génère une position aléatoire
+     * 
      * @return la position aléatoire
      */
     private Position generateRandomPosition() {
@@ -94,29 +98,29 @@ public final class GameModel implements Observable {
 
     /**
      * Vérifie si la position est valide
+     * 
      * @param position la position
      * @return true si la position est valide, false sinon
      */
     public boolean isValidPosition(Position position, double diameter) {
         double radius = diameter / 2;
         return position.x() >= radius
-        && position.x() < width - radius && position.y() >= radius
-        && position.y() < height - radius
-        && !isOccupied(position, diameter);
+                && position.x() < width - radius && position.y() >= radius
+                && position.y() < height - radius
+                && !isOccupied(position, diameter);
     }
 
     /**
      * Vérifie si la position est occupée
+     * 
      * @param position la position
      * @return true si la position est occupée, false sinon
      */
     public boolean isOccupied(Position position, double diameter) {
-        return snakes.stream().anyMatch(snake ->
-            snake.getSegments().stream().anyMatch(segment ->
-                segment.getPosition().distanceTo(position) < segment.getDiameter() / 2 + diameter / 2
-                && !segment.isDead()
-            )
-        );
+        return snakes.stream()
+                .anyMatch(snake -> snake.getSegments().stream().anyMatch(
+                        segment -> segment.getPosition().distanceTo(position) < segment.getDiameter() / 2 + diameter / 2
+                                && !segment.isDead()));
     }
 
     public boolean isInCollision(Snake snake) {
@@ -124,22 +128,21 @@ public final class GameModel implements Observable {
         double headRadius = snake.getHeadDiameter() / 2;
 
         if (headPosition.x() < 0 || headPosition.x() >= width ||
-            headPosition.y() < 0 || headPosition.y() >= height) {
+                headPosition.y() < 0 || headPosition.y() >= height) {
             return true;
         }
 
         return snakes.stream()
-            .filter(otherSnake -> !snake.equals(otherSnake))
-            .anyMatch(otherSnake ->
-                otherSnake.getSegments().stream().anyMatch(segment ->
-                    segment.getPosition().distanceTo(headPosition) < segment.getDiameter() / 2 + headRadius
-                    && !segment.isDead()
-                )
-            );
+                .filter(otherSnake -> !snake.equals(otherSnake))
+                .anyMatch(otherSnake -> otherSnake.getSegments().stream()
+                        .anyMatch(segment -> segment.getPosition().distanceTo(headPosition) < segment.getDiameter() / 2
+                                + headRadius
+                                && !segment.isDead()));
     }
 
     /**
      * Vérifie si les keyCodes sont uniques
+     * 
      * @param snake le serpent
      * @return true si les keyCodes sont uniques, false sinon
      */
@@ -147,19 +150,19 @@ public final class GameModel implements Observable {
         Set<KeyCode> keyCodes = new HashSet<>();
 
         snakes.stream()
-            .map(Snake::getController)
-            .filter(controller -> controller instanceof HumanSnakeController)
-            .map(controller -> (HumanSnakeController) controller)
-            .filter(humanController -> humanController.getSnakeEventControl() instanceof KeyboardControl)
-            .map(humanController -> (KeyboardControl) humanController.getSnakeEventControl())
-            .map(KeyboardControl::getKeyMap)
-            .flatMap(keyMap -> keyMap.keySet().stream())
-            .forEach(keyCode -> {
-                if (keyCodes.contains(keyCode)) {
-                    throw new IllegalArgumentException("Key code is not unique");
-                }
-                keyCodes.add(keyCode);
-            });
+                .map(Snake::getController)
+                .filter(controller -> controller instanceof HumanSnakeController)
+                .map(controller -> (HumanSnakeController) controller)
+                .filter(humanController -> humanController.getSnakeEventControl() instanceof KeyboardControl)
+                .map(humanController -> (KeyboardControl) humanController.getSnakeEventControl())
+                .map(KeyboardControl::getKeyMap)
+                .flatMap(keyMap -> keyMap.keySet().stream())
+                .forEach(keyCode -> {
+                    if (keyCodes.contains(keyCode)) {
+                        throw new IllegalArgumentException("Key code is not unique");
+                    }
+                    keyCodes.add(keyCode);
+                });
 
         return true;
     }
@@ -168,11 +171,12 @@ public final class GameModel implements Observable {
         for (Map.Entry<Position, Segment> entry : grid.entrySet()) {
             Position pos = entry.getKey();
             Segment segment = entry.getValue();
-            if (segment.isDead() && snake.getHeadPosition().distanceTo(pos) < snake.getHeadDiameter() / 2 + segment.getDiameter() / 2) {
+            if (segment.isDead() && snake.getHeadPosition().distanceTo(pos) < snake.getHeadDiameter() / 2
+                    + segment.getDiameter() / 2) {
                 grid.remove(pos);
                 snake.addSegment();
                 addFeed(1);
-                return;           
+                return;
             }
         }
     }
@@ -211,12 +215,13 @@ public final class GameModel implements Observable {
 
     /**
      * Ajoute un serpent dans le tableau
+     * 
      * @param snake le serpent
      */
     public void addSnake(Snake snake) {
         if (snake == null) {
             throw new IllegalArgumentException("Snake cannot be null");
-        }        
+        }
         for (Segment segment : snake.getSegments()) {
             if (!isValidPosition(segment.getPosition(), segment.getDiameter())) {
                 throw new IllegalArgumentException("Invalid position");
@@ -228,6 +233,7 @@ public final class GameModel implements Observable {
 
     /**
      * Supprime un serpent du tableau
+     * 
      * @param snake le serpent
      */
     public void removeSnake(Snake snake) {
@@ -254,6 +260,7 @@ public final class GameModel implements Observable {
 
     /**
      * Obtenir la largeur du tableau
+     * 
      * @return la largeur du tableau
      */
     public int getWidth() {
@@ -262,6 +269,7 @@ public final class GameModel implements Observable {
 
     /**
      * Obtenir la hauteur du tableau
+     * 
      * @return la hauteur du tableau
      */
     public int getHeight() {
@@ -270,6 +278,7 @@ public final class GameModel implements Observable {
 
     /**
      * Obtenir le tableau de la partie
+     * 
      * @return le tableau de la partie
      */
     public Map<Position, Segment> getGrid() {
@@ -278,6 +287,7 @@ public final class GameModel implements Observable {
 
     /**
      * Obtenir l'état de la partie
+     * 
      * @return l'état de la partie
      */
     public GameState getState() {
@@ -286,6 +296,7 @@ public final class GameModel implements Observable {
 
     /**
      * Obtenir la liste des serpents
+     * 
      * @return la liste des serpents
      */
     public List<Snake> getSnakes() {
@@ -296,12 +307,12 @@ public final class GameModel implements Observable {
     public void addObserver(Observer observer) {
         observers.add(observer);
     }
-    
+
     @Override
     public void removeObserver(Observer observer) {
         observers.remove(observer);
     }
-    
+
     @Override
     public void notifyObservers() {
         observers.forEach(observer -> observer.update());

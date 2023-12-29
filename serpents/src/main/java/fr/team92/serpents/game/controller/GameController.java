@@ -32,6 +32,7 @@ public final class GameController {
 
     /**
      * Constructeur du contrôleur du jeu
+     * 
      * @param model le modèle du jeu
      * @param scene la scène JavaFX
      */
@@ -41,10 +42,12 @@ public final class GameController {
     }
 
     public void gameStart() {
-        if (model.getState() != GameState.WAITING) throw new IllegalStateException("Game is not waiting to start");
-        if (gameLoop != null) throw new IllegalStateException("Game loop already started");
+        if (model.getState() != GameState.WAITING)
+            throw new IllegalStateException("Game is not waiting to start");
+        if (gameLoop != null)
+            throw new IllegalStateException("Game loop already started");
         model.gameStart();
-        lastUpdate = System.nanoTime();   
+        lastUpdate = System.nanoTime();
 
         gameLoop = new AnimationTimer() {
 
@@ -52,30 +55,31 @@ public final class GameController {
             public void handle(long now) {
                 if (model.getState() != GameState.RUNNING) {
                     this.stop();
-                }
-                else if (model.getState() == GameState.RUNNING) {
+                } else if (model.getState() == GameState.RUNNING) {
                     double elapsedTimeInSeconds = (now - lastUpdate) / 1_000_000_000.0;
                     updateGame(elapsedTimeInSeconds);
                     lastUpdate = now;
                 }
             }
-            
+
         };
         gameLoop.start();
     }
 
     /**
      * Ajoute les écouteurs d'événements clavier
+     * 
      * @param scene la scène JavaFX
      */
-    private void setKeyListeners(Scene scene) {        
+    private void setKeyListeners(Scene scene) {
         scene.setOnKeyPressed(event -> {
-            handleKeyPressed(event);               
+            handleKeyPressed(event);
         });
     }
 
     /**
      * Applique les actions du joueur courant en fonction de l'événement clavier
+     * 
      * @param event l'événement clavier
      */
     private void handleKeyPressed(KeyEvent event) {
@@ -94,6 +98,7 @@ public final class GameController {
 
     /**
      * Met à jour le jeu
+     * 
      * @param controller le contrôleur du serpent
      */
     private void updateGame(double lastUpdate) {
@@ -109,6 +114,7 @@ public final class GameController {
 
     /**
      * Obtenir la largeur de la grille
+     * 
      * @return la largeur de la grille
      */
     public int getWidth() {
@@ -117,6 +123,7 @@ public final class GameController {
 
     /**
      * Obtenir la hauteur de la grille
+     * 
      * @return la hauteur de la grille
      */
     public int getHeight() {
@@ -125,6 +132,7 @@ public final class GameController {
 
     /**
      * Obtenir la grille
+     * 
      * @return la grille
      */
     public Map<Position, Segment> getGrid() {
@@ -133,6 +141,7 @@ public final class GameController {
 
     /**
      * Vérifier si la partie est finie
+     * 
      * @return true si la partie est finie, false sinon
      */
     public boolean gameFinished() {

@@ -1,25 +1,17 @@
 package fr.team92.serpents.utils;
 
-/**
- * Contient les directions possibles pour un déplacement
- */
-public enum Direction {
-    NORTH,
-    SOUTH,
-    EAST,
-    WEST;
+public class Direction {
+    private double angle;
 
-    /**
-     * Retourne la direction opposée
-     * @return la direction opposée
-     */
+    public Direction(double angle) {
+        this.angle = angle;
+    }
+
     public Direction opposite() {
-        switch (this) {
-            case NORTH: return SOUTH;
-            case SOUTH: return NORTH;
-            case EAST: return WEST;
-            case WEST: return EAST;
-            default: throw new IllegalStateException("Direction inconnue");
-        }
+        return new Direction((this.angle + Math.PI) % (2 * Math.PI));
+    }
+
+    public double getAngle() {
+        return angle;
     }
 }

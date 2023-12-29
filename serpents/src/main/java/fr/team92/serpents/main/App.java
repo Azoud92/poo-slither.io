@@ -25,30 +25,27 @@ public final class App extends Application {
         Pane root = new Pane();
         Scene scene = new Scene(root, 800, 600);
 
-        Snake botSnake = Snake.CreateAvoidWallsBotSnake(5, new Position(10, 10), Direction.NORTH);
+        Snake botSnake = Snake.CreateAvoidWallsBotSnake(5, new Position(10, 10), new Direction(Math.PI / 2));
 
-        Map<KeyCode, Direction> keyMap1 = new HashMap<>();
-        keyMap1.put(KeyCode.UP, Direction.NORTH);
-        keyMap1.put(KeyCode.DOWN, Direction.SOUTH);
-        keyMap1.put(KeyCode.LEFT, Direction.WEST);
-        keyMap1.put(KeyCode.RIGHT, Direction.EAST);
-        
-        Snake humanSnake1 = Snake.CreateHumanKeyboardSnake(keyMap1, 5, new Position(20, 20), Direction.NORTH);
+        Map<KeyCode, Double> keyMap1 = new HashMap<>();
+        keyMap1.put(KeyCode.RIGHT, 0.05);
+        keyMap1.put(KeyCode.LEFT, -0.05);
 
-        Map<KeyCode, Direction> keyMap2 = new HashMap<>();
-        keyMap2.put(KeyCode.Z, Direction.NORTH);
-        keyMap2.put(KeyCode.X, Direction.SOUTH);
-        keyMap2.put(KeyCode.Q, Direction.WEST);
-        keyMap2.put(KeyCode.D, Direction.EAST);
+        Snake humanSnake1 = Snake.CreateHumanKeyboardSnake(keyMap1, 5, new Position(20, 20),
+                new Direction(Math.PI / 2));
 
-        //Snake humanSnake2 = Snake.CreateHumanKeyboardSnake(keyMap2, 5, new Position(30, 30), Direction.NORTH);
+        Map<KeyCode, Double> keyMap2 = new HashMap<>();
+        keyMap2.put(KeyCode.Q, 0.1);
+        keyMap2.put(KeyCode.D, -0.1);
+
+        Snake humanMouseSnake = Snake.CreateHumanMouseSnake(5, new Position(30, 30), new Direction(Math.PI / 2));
 
         GameModel model = new GameModel(80, 60);
         model.addSnake(botSnake);
         model.addSnake(humanSnake1);
-        //model.addSnake(humanSnake2);
+        model.addSnake(humanMouseSnake);
         GameController controller = new GameController(model, scene);
-        /* GameView view = */ new GameView(model, controller, root);        
+        /* GameView view = */ new GameView(model, controller, root);
 
         stage.setTitle("Serpents");
         stage.setScene(scene);

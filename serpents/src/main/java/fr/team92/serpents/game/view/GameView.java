@@ -30,33 +30,34 @@ public final class GameView implements Observer {
         this.update();
     }
 
-
     @Override
     public void update() {
         drawSegments();
-        //endGame();
+        // endGame();
     }
 
     private void drawSegments() {
         pane.getChildren().clear();
-    for (Segment segment : controller.getGrid().values()) {
-        Position pos = segment.getPosition();
-        double diameter = segment.getDiameter() * CELL_SIZE;
-        Circle circle = new Circle(pos.x() * CELL_SIZE + CELL_SIZE / 2.0, pos.y() * CELL_SIZE + CELL_SIZE / 2.0, diameter / 2.0);
+        for (Segment segment : controller.getGrid().values()) {
+            Position pos = segment.getPosition();
+            double diameter = segment.getDiameter() * CELL_SIZE;
+            Circle circle = new Circle(pos.x() * CELL_SIZE + CELL_SIZE / 2.0, pos.y() * CELL_SIZE + CELL_SIZE / 2.0,
+                    diameter / 2.0);
 
-        if (segment.isDead()) {
-            circle.setFill(Color.ORANGE);
-        } else {
-            circle.setFill(Color.RED);
+            if (segment.isDead()) {
+                circle.setFill(Color.ORANGE);
+            } else {
+                circle.setFill(Color.RED);
+            }
+
+            pane.getChildren().add(circle);
         }
-
-        pane.getChildren().add(circle);
     }
-}
 
     @SuppressWarnings("unused")
     private void endGame() {
-        if (!controller.gameFinished()) return;
+        if (!controller.gameFinished())
+            return;
 
         pane.getChildren().clear();
         Rectangle gameOverRect = new Rectangle(0, 0, pane.getWidth(), pane.getHeight());
@@ -80,4 +81,3 @@ public final class GameView implements Observer {
         fadeTransition.play();
     }
 }
-

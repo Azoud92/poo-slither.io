@@ -7,16 +7,14 @@ public record Position(double x, double y) {
 
     /**
      * Déplace la position dans la direction donnée
+     * 
      * @param direction la direction
      * @return la nouvelle position
      */
     public Position move(Direction direction, double delta) {
-        return switch(direction) {
-            case NORTH -> new Position(this.x, this.y - delta);
-            case SOUTH -> new Position(this.x, this.y + delta);
-            case EAST -> new Position(this.x + delta, this.y);
-            case WEST -> new Position(this.x - delta, this.y);
-        };
+        double dx = Math.cos(direction.getAngle()) * delta;
+        double dy = Math.sin(direction.getAngle()) * delta;
+        return new Position(this.x + dx, this.y + dy);
     }
 
     public double distanceTo(Position other) {
