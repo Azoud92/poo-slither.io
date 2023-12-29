@@ -52,6 +52,8 @@ public final class GameModel implements Observable {
      */
     private static final int FEED_IN_PARTY = 50;
 
+    private static final int CELL_SIZE = 10;
+
     /**
      * Constructeur du modèle de jeu
      * 
@@ -61,8 +63,8 @@ public final class GameModel implements Observable {
      */
     public GameModel(int width, int height) {
         this.observers = new ArrayList<>();
-        this.width = width;
-        this.height = height;
+        this.width = width / CELL_SIZE;
+        this.height = height / CELL_SIZE;
         this.grid = new HashMap<>();
         this.state = GameState.WAITING;
 
@@ -316,5 +318,9 @@ public final class GameModel implements Observable {
     @Override
     public void notifyObservers() {
         observers.forEach(observer -> observer.update());
+    }
+
+    public int getCellSize() {
+        return CELL_SIZE;
     }
 }

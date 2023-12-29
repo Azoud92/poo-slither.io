@@ -10,18 +10,51 @@ import javafx.scene.input.MouseEvent;
  */
 public final class MouseControl implements SnakeEventControl {
 
-    @Override
     public void handleControl(Snake snake, InputEvent event) {
         if (event instanceof MouseEvent) {
             MouseEvent mouseEvent = (MouseEvent) event;
-            double dx = mouseEvent.getX() - snake.getHeadPosition().x();
-            double dy = mouseEvent.getY() - snake.getHeadPosition().y();
-            double angle = Math.atan2(dy, dx);
+            double mouseX = mouseEvent.getX();
+            double mouseY = mouseEvent.getY();
 
-            Direction newDirection = new Direction(angle);
-            if (newDirection != snake.getDirection().opposite()) {
-                snake.setDirection(newDirection);
+            double snakeX = snake.getHeadPosition().x() * 10;
+            double snakeY = snake.getHeadPosition().y() * 10;
+
+            double dx = mouseX - snakeX;
+            double dy = mouseY - snakeY;
+
+            double targetAngle = Math.atan2(dy, dx);
+            double targetAngleInDegrees = Math.toDegrees(targetAngle) - 90;
+            if (targetAngleInDegrees < 0) {
+                targetAngleInDegrees += 360;
             }
+
+            double currentAngle = snake.getDirection().getAngle();
+            double angleDifference = targetAngleInDegrees - currentAngle;
+
+            // Normalise la différence d'angle à l'intervalle [-180, 180)
+            if (angleDifference > 180) {
+                angleDifference -= 360;
+            } else if (angleDifference < -180) {
+                angleDifference += 360;
+            }
+
+            // Augmente ou diminue progressivement l'angle actuel du serpent pour atteindre
+            // l'angle cible
+            double angleChangeSpeed = 5; // Vitesse de changement d'angle (en degrés par appel de la méthode)
+            if (angleDifference > 0) {
+                currentAngle += Math.min(angleChangeSpeed, angleDifference);
+            } else if (angleDifference < 0) {
+                currentAngle -= Math.min(angleChangeSpeed, -angleDifference);
+            }
+
+            // Normalise l'angle actuel à l'intervalle [0, 360)
+            if (currentAngle < 0) {
+                currentAngle += 360;
+            } else if (currentAngle >= 360) {
+                currentAngle -= 360;
+            }
+
+            snake.setDirection(new Direction(currentAngle));
         }
     }
 }

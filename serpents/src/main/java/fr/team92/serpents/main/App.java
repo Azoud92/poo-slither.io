@@ -35,15 +35,16 @@ public final class App extends Application {
                 new Direction(Math.PI / 2));
 
         Map<KeyCode, Double> keyMap2 = new HashMap<>();
-        keyMap2.put(KeyCode.Q, 0.1);
-        keyMap2.put(KeyCode.D, -0.1);
+        keyMap2.put(KeyCode.Q, 0.05);
+        keyMap2.put(KeyCode.D, -0.05);
 
-        Snake humanMouseSnake = Snake.CreateHumanMouseSnake(5, new Position(30, 30), new Direction(Math.PI / 2));
+        Snake humanMouseSnake = Snake.CreateHumanMouseSnake(5, new Position(30, 30), new Direction(Math.PI));
 
-        GameModel model = new GameModel(80, 60);
+        GameModel model = new GameModel((int) scene.getWidth(), (int) scene.getHeight());
         model.addSnake(botSnake);
         model.addSnake(humanSnake1);
         model.addSnake(humanMouseSnake);
+
         GameController controller = new GameController(model, scene);
         /* GameView view = */ new GameView(model, controller, root);
 

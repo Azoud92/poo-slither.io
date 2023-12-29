@@ -23,4 +23,17 @@ public record Position(double x, double y) {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    /**
+     * Renvoi une position entre deux positions
+     * 
+     * @param other l'autre position
+     * @param t     le coefficient
+     * @return la position entre les deux positions
+     */
+    public Position inter(Position other, double t) {
+        double newX = x + t * (other.x - x);
+        double newY = y + t * (other.y - y);
+        return new Position(newX, newY);
+    }
+
 }

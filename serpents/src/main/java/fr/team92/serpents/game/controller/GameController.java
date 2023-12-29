@@ -1,5 +1,6 @@
 package fr.team92.serpents.game.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import fr.team92.serpents.game.model.GameModel;
@@ -12,6 +13,7 @@ import fr.team92.serpents.utils.Position;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 
 /**
  * Représente le contrôleur du jeu
@@ -39,6 +41,7 @@ public final class GameController {
     public GameController(GameModel model, Scene scene) {
         this.model = model;
         setKeyListeners(scene);
+        setMouseListeners(scene);
     }
 
     public void gameStart() {
@@ -83,6 +86,37 @@ public final class GameController {
      * @param event l'événement clavier
      */
     private void handleKeyPressed(KeyEvent event) {
+        if (model.getState() != GameState.RUNNING) {
+            return;
+        }
+
+        for (Snake snake : model.getSnakes()) {
+            SnakeController controller = snake.getController();
+
+            if (controller instanceof HumanSnakeController) {
+                ((HumanSnakeController) controller).setEvent(event);
+            }
+        }
+    }
+
+    /**
+     * Ajoute les écouteurs d'événements de la souris
+     * 
+     * @param scene la scène JavaFX
+     */
+    private void setMouseListeners(Scene scene) {
+        scene.setOnMouseMoved(event -> {
+            handleMouseMoved(event);
+        });
+    }
+
+    /**
+     * Applique les actions du joueur courant en fonction de l'événement de la
+     * souris
+     * 
+     * @param event l'événement de la souris
+     */
+    private void handleMouseMoved(MouseEvent event) {
         if (model.getState() != GameState.RUNNING) {
             return;
         }
@@ -146,5 +180,18 @@ public final class GameController {
      */
     public boolean gameFinished() {
         return model.getState() == GameState.FINISHED;
+    }
+
+    /**
+     * Obtenir la liste des serpents
+     * 
+     * @return la liste des serpents
+     */
+    public List<Snake> getSnakes() {
+        return model.getSnakes();
+    }
+
+    public int getCellSize() {
+        return model.getCellSize();
     }
 }
