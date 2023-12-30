@@ -186,22 +186,7 @@ public final class GameModel implements Observable {
         List<Snake> snakesToRemove = new ArrayList<>();
 
         for (Snake snake : snakes) {
-            snake.move(lastUpdate);
-
-            Position headPosition = snake.getHeadPosition();
-
-            // Si le serpent sort du terrain, il réapparaît de l'autre côté
-            if (headPosition.x() < 0) {
-                snake.setHeadPosition(new Position(width, headPosition.y()));
-            } else if (headPosition.x() >= width) {
-                snake.setHeadPosition(new Position(0, headPosition.y()));
-            }
-
-            if (headPosition.y() < 0) {
-                snake.setHeadPosition(new Position(headPosition.x(), height));
-            } else if (headPosition.y() >= height) {
-                snake.setHeadPosition(new Position(headPosition.x(), 0));
-            }
+            snake.move(lastUpdate, width, height);
 
             if (isInCollision(snake)) {
                 snake.die();

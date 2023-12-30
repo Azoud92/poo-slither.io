@@ -77,41 +77,49 @@ public final class Snake {
 
         for (int i = 0; i < length * 30; i++) {
             segments.add(new Segment(segmentPos, 1));
-            segmentPos = segmentPos.move(startDirection.opposite(), 0.05);
+            segmentPos = segmentPos.move(startDirection.opposite(), 0.005);
         }
     }
 
     /**
      * Déplacer le serpent
      */
-    public void move(double lastUpdate) {
-        moveSegments(lastUpdate);
+    public void move(double lastUpdate, double width, double height) {
+        moveSegments(lastUpdate, width, height);
         addNewSegments();
     }
 
     /**
      * Déplacer les segments du serpent
      */
-    private void moveSegments(double lastUpdate) {
+    private void moveSegments(double lastUpdate, double width, double height) {
         double maxMoveDistance = segments.getFirst().getDiameter() * speed * lastUpdate;
 
-        for (int i = segments.size() - 1; i > 0; i--) {
+        for (int i = segments.size() - 1; i >= 0; i--) {
             Position oldPosition = segments.get(i).getPosition();
-            Position newPosition = new Position(segments.get(i - 1).getPosition().x(),
-                    segments.get(i - 1).getPosition().y());
+            Position newPosition;
 
-            double distance = oldPosition.distance(newPosition);
-            if (distance > maxMoveDistance) {
-                double scale = maxMoveDistance / distance;
-                double dx = (newPosition.x() - oldPosition.x()) * scale;
-                double dy = (newPosition.y() - oldPosition.y()) * scale;
-                newPosition = new Position(oldPosition.x() + dx, oldPosition.y() + dy);
+            if (i > 0) {
+                newPosition = new Position(segments.get(i - 1).getPosition().x(),
+                        segments.get(i - 1).getPosition().y());
+            } else {
+                newPosition = oldPosition.move(direction, maxMoveDistance);
+            }
+
+            // Vérifie si le segment est sorti des limites de l'écran
+            if (newPosition.x() < 0) {
+                newPosition = new Position(width + newPosition.x(), newPosition.y());
+            } else if (newPosition.x() > width) {
+                newPosition = new Position(newPosition.x() - width, newPosition.y());
+            }
+            if (newPosition.y() < 0) {
+                newPosition = new Position(newPosition.x(), height + newPosition.y());
+            } else if (newPosition.y() > height) {
+                newPosition = new Position(newPosition.x(), newPosition.y() - height);
             }
 
             segments.get(i).setPosition(newPosition);
         }
-
-        segments.getFirst().move(direction, maxMoveDistance);
     }
 
     /**
