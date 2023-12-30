@@ -28,8 +28,8 @@ public final class App extends Application {
         Snake botSnake = Snake.CreateAvoidWallsBotSnake(5, new Position(10, 10), new Direction(Math.PI / 2));
 
         Map<KeyCode, Double> keyMap1 = new HashMap<>();
-        keyMap1.put(KeyCode.RIGHT, 0.05);
-        keyMap1.put(KeyCode.LEFT, -0.05);
+        keyMap1.put(KeyCode.RIGHT, 0.1);
+        keyMap1.put(KeyCode.LEFT, -0.1);
 
         Snake humanSnake1 = Snake.CreateHumanKeyboardSnake(keyMap1, 5, new Position(20, 20),
                 new Direction(Math.PI / 2));
@@ -40,7 +40,7 @@ public final class App extends Application {
 
         Snake humanMouseSnake = Snake.CreateHumanMouseSnake(5, new Position(30, 30), new Direction(Math.PI));
 
-        GameModel model = new GameModel((int) scene.getWidth(), (int) scene.getHeight());
+        GameModel model = new GameModel((int) scene.getWidth(), (int) scene.getHeight(), 10);
         model.addSnake(botSnake);
         model.addSnake(humanSnake1);
         model.addSnake(humanMouseSnake);

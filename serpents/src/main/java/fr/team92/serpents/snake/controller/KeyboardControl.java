@@ -29,7 +29,7 @@ public final class KeyboardControl implements SnakeEventControl {
     }
 
     @Override
-    public void handleControl(Snake snake, InputEvent event) {
+    public void handleControl(Snake snake, InputEvent event, int cellSize) {
         Double angleChange = keyMap.get(((KeyEvent) event).getCode());
         if (angleChange != null) {
             double newAngle = snake.getDirection().getAngle() + angleChange;

@@ -75,9 +75,9 @@ public final class Snake {
     private void initSegments(int length, Position startPosition, Direction startDirection) {
         Position segmentPos = startPosition;
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length * 30; i++) {
             segments.add(new Segment(segmentPos, 1));
-            segmentPos = segmentPos.move(startDirection.opposite(), 1);
+            segmentPos = segmentPos.move(startDirection.opposite(), 0.05);
         }
     }
 
@@ -93,34 +93,25 @@ public final class Snake {
      * Déplacer les segments du serpent
      */
     private void moveSegments(double lastUpdate) {
-        segments.getFirst().move(direction, speed * lastUpdate);
+        double maxMoveDistance = segments.getFirst().getDiameter() * speed * lastUpdate;
 
-        Position oldPosition = new Position(segments.getFirst().getPosition().x(),
-                segments.getFirst().getPosition().y());
+        for (int i = segments.size() - 1; i > 0; i--) {
+            Position oldPosition = segments.get(i).getPosition();
+            Position newPosition = new Position(segments.get(i - 1).getPosition().x(),
+                    segments.get(i - 1).getPosition().y());
 
-        for (int i = 1; i < segments.size(); i++) {
-            Segment currentSegment = segments.get(i);
+            double distance = oldPosition.distance(newPosition);
+            if (distance > maxMoveDistance) {
+                double scale = maxMoveDistance / distance;
+                double dx = (newPosition.x() - oldPosition.x()) * scale;
+                double dy = (newPosition.y() - oldPosition.y()) * scale;
+                newPosition = new Position(oldPosition.x() + dx, oldPosition.y() + dy);
+            }
 
-            Position targetPosition = calculateTargetPosition(oldPosition, currentSegment.getPosition());
-
-            currentSegment.setPosition(targetPosition);
-
-            oldPosition = new Position(currentSegment.getPosition().x(), currentSegment.getPosition().y());
+            segments.get(i).setPosition(newPosition);
         }
-    }
 
-    private Position calculateTargetPosition(Position previousSegmentPos, Position currentSegmentPos) {
-        double dx = previousSegmentPos.x() - currentSegmentPos.x();
-        double dy = previousSegmentPos.y() - currentSegmentPos.y();
-
-        double distance = Math.sqrt(dx * dx + dy * dy);
-        double unitDx = distance > 0 ? dx / distance : 0;
-        double unitDy = distance > 0 ? dy / distance : 0;
-
-        double newX = previousSegmentPos.x() - unitDx;
-        double newY = previousSegmentPos.y() - unitDy;
-
-        return new Position(newX, newY);
+        segments.getFirst().move(direction, maxMoveDistance);
     }
 
     /**
@@ -238,6 +229,12 @@ public final class Snake {
 
     public Segment getHeadSegment() {
         return segments.getFirst();
+    }
+
+    public void setHeadPosition(Position position) {
+        if (!segments.isEmpty()) {
+            segments.set(0, new Segment(position, segments.get(0).getDiameter()));
+        }
     }
 
 }

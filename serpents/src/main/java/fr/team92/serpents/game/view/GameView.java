@@ -1,10 +1,7 @@
 package fr.team92.serpents.game.view;
 
-import java.util.List;
-
 import fr.team92.serpents.game.controller.GameController;
 import fr.team92.serpents.snake.model.Segment;
-import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.Observable;
 import fr.team92.serpents.utils.Observer;
 import fr.team92.serpents.utils.Position;
@@ -37,53 +34,27 @@ public final class GameView implements Observer {
     @Override
     public void update() {
         drawSegments();
-        drawSnakes();
         // endGame();
-    }
-
-    private void drawSnakes() {
-        double overlap = 0.01; // valeur pour changer le chevauchement
-        for (Snake snake : controller.getSnakes()) {
-            List<Segment> segments = snake.getSegments();
-            for (int i = 0; i < segments.size() - 1; i++) {
-                Segment segment1 = segments.get(i);
-                Segment segment2 = segments.get(i + 1);
-                drawCircle(segment1.getPosition(), overlap);
-                // Insère des positions entre segment1 et segment2
-                for (double t = 0.5; t < 1.0; t += 0.001) {
-                    Position interPos = segment1.getPosition().inter(segment2.getPosition(), t);
-                    drawCircle(interPos, overlap);
-                }
-            }
-            // Dessin du dernier segment
-            drawCircle(segments.get(segments.size() - 1).getPosition(), overlap);
-        }
-    }
-
-    private void drawCircle(Position pos, double overlap) {
-        double diameter = CELL_SIZE;
-        double x = (pos.x() - overlap) * CELL_SIZE + CELL_SIZE / 2.0;
-        double y = (pos.y() - overlap) * CELL_SIZE + CELL_SIZE / 2.0;
-        if (x >= 0 && x <= pane.getWidth() && y >= 0 && y <= pane.getHeight()) {
-            Circle circle = new Circle(x, y, diameter / 2.0);
-            circle.setFill(Color.RED);
-            pane.getChildren().add(circle);
-        }
     }
 
     private void drawSegments() {
         pane.getChildren().clear();
         for (Segment segment : controller.getGrid().values()) {
-            if (segment.isDead()) {
-                Position pos = segment.getPosition();
-                double diameter = segment.getDiameter() * CELL_SIZE;
-                double x = pos.x() * CELL_SIZE + CELL_SIZE / 2.0;
-                double y = pos.y() * CELL_SIZE + CELL_SIZE / 2.0;
-                if (x >= 0 && x <= pane.getWidth() && y >= 0 && y <= pane.getHeight()) {
-                    Circle circle = new Circle(x, y, diameter / 2.0);
-                    pane.getChildren().add(circle);
+
+            Position pos = segment.getPosition();
+            double diameter = segment.getDiameter() * CELL_SIZE;
+            double x = pos.x() * CELL_SIZE + CELL_SIZE / 2.0;
+            double y = pos.y() * CELL_SIZE + CELL_SIZE / 2.0;
+            if (x >= 0 && x <= pane.getWidth() && y >= 0 && y <= pane.getHeight()) {
+                Circle circle = new Circle(x, y, diameter / 2.0);
+                if (segment.isDead()) {
+                    circle.setFill(Color.ORANGE);
+                } else {
+                    circle.setFill(Color.RED);
                 }
+                pane.getChildren().add(circle);
             }
+
         }
     }
 

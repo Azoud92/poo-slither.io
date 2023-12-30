@@ -10,8 +10,10 @@ public interface SnakeEventControl {
 
     /**
      * Gérer le contrôle du serpent en fonction de l'événement
+     * 
      * @param snake le serpent
      * @param event l'événement
+     * @param i
      */
-    void handleControl(Snake snake, InputEvent event);
+    void handleControl(Snake snake, InputEvent event, int cellSize);
 }

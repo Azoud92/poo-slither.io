@@ -10,14 +10,14 @@ import javafx.scene.input.MouseEvent;
  */
 public final class MouseControl implements SnakeEventControl {
 
-    public void handleControl(Snake snake, InputEvent event) {
+    public void handleControl(Snake snake, InputEvent event, int cellSize) {
         if (event instanceof MouseEvent) {
             MouseEvent mouseEvent = (MouseEvent) event;
             double mouseX = mouseEvent.getX();
             double mouseY = mouseEvent.getY();
 
-            double snakeX = snake.getHeadPosition().x() * 10;
-            double snakeY = snake.getHeadPosition().y() * 10;
+            double snakeX = snake.getHeadPosition().x() * cellSize;
+            double snakeY = snake.getHeadPosition().y() * cellSize;
 
             double dx = mouseX - snakeX;
             double dy = mouseY - snakeY;
@@ -40,7 +40,7 @@ public final class MouseControl implements SnakeEventControl {
 
             // Augmente ou diminue progressivement l'angle actuel du serpent pour atteindre
             // l'angle cible
-            double angleChangeSpeed = 5; // Vitesse de changement d'angle (en degrés par appel de la méthode)
+            double angleChangeSpeed = 6; // Vitesse de changement d'angle (en degrés par appel de la méthode)
             if (angleDifference > 0) {
                 currentAngle += Math.min(angleChangeSpeed, angleDifference);
             } else if (angleDifference < 0) {

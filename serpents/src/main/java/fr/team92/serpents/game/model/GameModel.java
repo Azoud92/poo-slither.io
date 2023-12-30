@@ -52,7 +52,7 @@ public final class GameModel implements Observable {
      */
     private static final int FEED_IN_PARTY = 50;
 
-    private static final int CELL_SIZE = 10;
+    private static int CELL_SIZE;
 
     /**
      * Constructeur du modèle de jeu
@@ -61,7 +61,8 @@ public final class GameModel implements Observable {
      * @param height  la hauteur
      * @param players les joueurs
      */
-    public GameModel(int width, int height) {
+    public GameModel(int width, int height, int cellSize) {
+        CELL_SIZE = cellSize;
         this.observers = new ArrayList<>();
         this.width = width / CELL_SIZE;
         this.height = height / CELL_SIZE;
@@ -129,11 +130,6 @@ public final class GameModel implements Observable {
         Position headPosition = snake.getHeadPosition();
         double headRadius = snake.getHeadDiameter() / 2;
 
-        if (headPosition.x() < 0 || headPosition.x() >= width ||
-                headPosition.y() < 0 || headPosition.y() >= height) {
-            return true;
-        }
-
         return snakes.stream()
                 .filter(otherSnake -> !snake.equals(otherSnake))
                 .anyMatch(otherSnake -> otherSnake.getSegments().stream()
@@ -191,6 +187,21 @@ public final class GameModel implements Observable {
 
         for (Snake snake : snakes) {
             snake.move(lastUpdate);
+
+            Position headPosition = snake.getHeadPosition();
+
+            // Si le serpent sort du terrain, il réapparaît de l'autre côté
+            if (headPosition.x() < 0) {
+                snake.setHeadPosition(new Position(width, headPosition.y()));
+            } else if (headPosition.x() >= width) {
+                snake.setHeadPosition(new Position(0, headPosition.y()));
+            }
+
+            if (headPosition.y() < 0) {
+                snake.setHeadPosition(new Position(headPosition.x(), height));
+            } else if (headPosition.y() >= height) {
+                snake.setHeadPosition(new Position(headPosition.x(), 0));
+            }
 
             if (isInCollision(snake)) {
                 snake.die();

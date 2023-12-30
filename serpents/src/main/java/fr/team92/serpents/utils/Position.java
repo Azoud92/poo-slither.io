@@ -14,6 +14,7 @@ public record Position(double x, double y) {
     public Position move(Direction direction, double delta) {
         double dx = Math.cos(direction.getAngle()) * delta;
         double dy = Math.sin(direction.getAngle()) * delta;
+
         return new Position(this.x + dx, this.y + dy);
     }
 
@@ -34,6 +35,12 @@ public record Position(double x, double y) {
         double newX = x + t * (other.x - x);
         double newY = y + t * (other.y - y);
         return new Position(newX, newY);
+    }
+
+    public double distance(Position newPosition) {
+        double dx = this.x - newPosition.x;
+        double dy = this.y - newPosition.y;
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
 }
