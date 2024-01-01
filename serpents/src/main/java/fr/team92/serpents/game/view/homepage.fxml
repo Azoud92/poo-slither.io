@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.MotionBlur?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="your.package.name.SlitherIOController">
+    <stylesheets>
+        <URL value="@style.css" />
+    </stylesheets>
+    <children>
+        <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+            <ImageView cache="true" fitHeight="400.0" fitWidth="600.0" focusTraversable="true">
+               <image>
+                  <Image url="@../../main/ressources/background.jpg" />
+               </image>
+               <effect>
+                  <MotionBlur />
+               </effect>
+            </ImageView>
+                <ImageView fitHeight="400.0" fitWidth="600.0">
+                    <image>
+                        <Image url="@ressources/background.jpg" />
+                    </image>
+                </ImageView>
+                <VBox alignment="CENTER" spacing="20">
+                    <Label styleClass="title-label" text="Bienvenue sur Slither.io" textAlignment="CENTER" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+                        <font>
+                            <Font size="29.0" />
+                        </font>
+                    </Label>
+                    <Label styleClass="subtitle-label" text="Choisissez une option pour commencer" textAlignment="CENTER" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+                        <font>
+                            <Font size="16.0" />
+                        </font>
+                    </Label>
+                    <VBox alignment="CENTER" prefHeight="79.0" prefWidth="600.0" spacing="10">
+                        <Button contentDisplay="CENTER" onAction="#singlePlayerClicked" style="-fx-background-color: black;" text="Hors Ligne" textFill="WHITE">
+                            <graphic>
+                                <ImageView>
+                                    <image>
+                                        <Image url="@ressources/solo.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                        <Button onAction="#multiplayerClicked" style="-fx-background-color: black;" text="Multijoueur" textFill="WHITE">
+                            <graphic>
+                                <ImageView>
+                                    <image>
+                                        <Image url="@ressources/multi.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                    </VBox>
+               <HBox alignment="BOTTOM_CENTER" prefHeight="67.0" prefWidth="600.0" spacing="20" style="-fx-padding: 10;">
+                    <children>
+                        <Button onAction="#optionsButtonClicked" style="-fx-background-color: black;" text="Paramètres" textFill="#fcfafa">
+                            <graphic>
+                                <ImageView>
+                                    <image>
+                                        <Image url="@ressources/settings.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                        <Button onAction="#changeControlsClicked" style="-fx-background-color: black;" text="Modifier les touches" textFill="#f2efef">
+                            <graphic>
+                                <ImageView>
+                                    <image>
+                                        <Image url="@ressources/controls.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                    </children>
+                </HBox>
+                     <Button cache="true" cacheHint="QUALITY" onAction="#exitButtonClicked" style="-fx-background-color: black; -fx-border-color: red;" text="Quitter" textFill="RED" textOverrun="WORD_ELLIPSIS">
+                         <graphic>
+                             <ImageView>
+                                 <image>
+                                     <Image url="@ressources/quit.png" />
+                                 </image>
+                             </ImageView>
+                         </graphic>
+                     </Button>
+                </VBox>
+            </children>
+        </StackPane>
+    </children>
+</AnchorPane>

@@ -50,7 +50,7 @@ public final class GameModel implements Observable {
     /**
      * Le nombre de nourriture à maintenir dans la partie
      */
-    private static final int FEED_IN_PARTY = 50;
+    private static final int FEED_IN_PARTY = 100;
 
     private static int CELL_SIZE;
 
@@ -79,6 +79,10 @@ public final class GameModel implements Observable {
      */
     private void addFeed(int nb) {
         for (int i = 0; i < nb; i++) {
+            int nbFeed = (int) grid.values().stream().filter(segment -> segment.isDead()).count();
+            if (nbFeed >= FEED_IN_PARTY) {
+                return;
+            }
             Position pos = generateRandomPosition();
             Segment segment = new Segment(pos, 1);
             segment.die();
@@ -190,6 +194,7 @@ public final class GameModel implements Observable {
 
             if (isInCollision(snake)) {
                 snake.die();
+                rmSegments(snake);
                 snakesToRemove.add(snake);
             }
 
@@ -209,6 +214,15 @@ public final class GameModel implements Observable {
         }
 
         notifyObservers();
+    }
+
+    private void rmSegments(Snake snake) {
+        for (int i = 0; i < snake.getSegments().size(); i++) {
+            if (i % snake.getCoeff() != 0) {
+                Position pos = snake.getSegments().get(i).getPosition();
+                grid.remove(pos);
+            }
+        }
     }
 
     /**
@@ -318,5 +332,18 @@ public final class GameModel implements Observable {
 
     public int getCellSize() {
         return CELL_SIZE;
+    }
+
+    public boolean collidesWithAnySnake(Position position, Snake currentSnake) {
+        for (Snake snake : snakes) {
+            if (snake != currentSnake && snake.collidesWith(position)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Position getClosestFood(Position headPosition) {
+        return null;
     }
 }

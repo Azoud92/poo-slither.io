@@ -40,7 +40,7 @@ public final class MouseControl implements SnakeEventControl {
 
             // Augmente ou diminue progressivement l'angle actuel du serpent pour atteindre
             // l'angle cible
-            double angleChangeSpeed = 6; // Vitesse de changement d'angle (en degrés par appel de la méthode)
+            double angleChangeSpeed = 6; // Vitesse de changement d'angle
             if (angleDifference > 0) {
                 currentAngle += Math.min(angleChangeSpeed, angleDifference);
             } else if (angleDifference < 0) {

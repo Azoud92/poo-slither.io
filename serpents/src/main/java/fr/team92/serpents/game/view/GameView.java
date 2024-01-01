@@ -54,7 +54,6 @@ public final class GameView implements Observer {
                 }
                 pane.getChildren().add(circle);
             }
-
         }
     }
 

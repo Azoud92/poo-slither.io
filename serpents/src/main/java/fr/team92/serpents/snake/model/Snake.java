@@ -41,6 +41,7 @@ public final class Snake {
     private boolean isDead;
 
     public static final double DEFAULT_SPEED = 1;
+    public static final int coeff = 30;
 
     private double speed;
 
@@ -75,7 +76,7 @@ public final class Snake {
     private void initSegments(int length, Position startPosition, Direction startDirection) {
         Position segmentPos = startPosition;
 
-        for (int i = 0; i < length * 30; i++) {
+        for (int i = 0; i < length * coeff; i++) {
             segments.add(new Segment(segmentPos, 1));
             segmentPos = segmentPos.move(startDirection.opposite(), 0.005);
         }
@@ -96,7 +97,9 @@ public final class Snake {
         double maxMoveDistance = segments.getFirst().getDiameter() * speed * lastUpdate;
 
         for (int i = segments.size() - 1; i >= 0; i--) {
-            Position oldPosition = segments.get(i).getPosition();
+            Segment seg = segments.get(i);
+            Position oldPosition = seg.getPosition();
+            double rayon = seg.getDiameter() / 2.0;
             Position newPosition;
 
             if (i > 0) {
@@ -107,15 +110,15 @@ public final class Snake {
             }
 
             // Vérifie si le segment est sorti des limites de l'écran
-            if (newPosition.x() < 0) {
-                newPosition = new Position(width + newPosition.x(), newPosition.y());
-            } else if (newPosition.x() > width) {
-                newPosition = new Position(newPosition.x() - width, newPosition.y());
+            if (newPosition.x() - rayon <= 0) {
+                newPosition = new Position(width + rayon, newPosition.y());
+            } else if (newPosition.x() + rayon >= width) {
+                newPosition = new Position(rayon, newPosition.y());
             }
-            if (newPosition.y() < 0) {
-                newPosition = new Position(newPosition.x(), height + newPosition.y());
-            } else if (newPosition.y() > height) {
-                newPosition = new Position(newPosition.x(), newPosition.y() - height);
+            if (newPosition.y() - rayon <= 0) {
+                newPosition = new Position(newPosition.x(), height + rayon);
+            } else if (newPosition.y() + rayon >= height) {
+                newPosition = new Position(newPosition.x(), rayon);
             }
 
             segments.get(i).setPosition(newPosition);
@@ -206,6 +209,7 @@ public final class Snake {
         if (isDead) {
             throw new IllegalStateException("Le serpent est déjà mort");
         }
+        isDead = true;
         for (Segment segment : segments) {
             segment.die();
         }
@@ -243,6 +247,15 @@ public final class Snake {
         if (!segments.isEmpty()) {
             segments.set(0, new Segment(position, segments.get(0).getDiameter()));
         }
+    }
+
+    public boolean collidesWith(Position position) {
+        return segments.stream()
+                .anyMatch(segment -> segment.getPosition().distanceTo(position) < segment.getDiameter() / 2);
+    }
+
+    public int getCoeff() {
+        return coeff;
     }
 
 }

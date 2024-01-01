@@ -19,6 +19,7 @@ public final class Segment {
 
     /**
      * Créer un nouveau segment à la position donnée
+     * 
      * @param position la position du segment
      */
     public Segment(Position position, double diameter) {
@@ -28,6 +29,7 @@ public final class Segment {
 
     /**
      * Déplacer le segment dans la direction donnée
+     * 
      * @param direction la direction dans laquelle déplacer le segment
      */
     public void move(Direction direction, double delta) {
@@ -36,6 +38,7 @@ public final class Segment {
 
     /**
      * Obtenir la position du segment
+     * 
      * @return la position actuelle du segment
      */
     public Position getPosition() {
@@ -44,6 +47,7 @@ public final class Segment {
 
     /**
      * Modifier la position du segment
+     * 
      * @param position la nouvelle position du segment
      */
     public void setPosition(Position position) {
@@ -52,6 +56,7 @@ public final class Segment {
 
     /**
      * Savoir si le segment est mort
+     * 
      * @return true si le segment est mort, false sinon
      */
     public boolean isDead() {
