@@ -1,7 +1,6 @@
 package fr.team92.serpents.game.controller;
 
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
@@ -23,6 +22,9 @@ import fr.team92.serpents.utils.Position;
 import javafx.animation.ScaleTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import java.io.IOException;
 
 public class HomePageController {
     @FXML
@@ -110,8 +112,18 @@ public class HomePageController {
     }
 
     @FXML
-    protected void changeControlsClicked(ActionEvent event) {
-        System.out.println("Le bouton 'Modifier les touches' a été cliqué");
+    public void changeControlsClicked(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fr/team92/serpents/game/view/ControlsView.fxml"));
+            Parent root = loader.load();
+
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.setScene(new Scene(root, currentStage.getWidth(), currentStage.getHeight()));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

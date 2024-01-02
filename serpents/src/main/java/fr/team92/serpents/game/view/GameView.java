@@ -36,8 +36,8 @@ public final class GameView implements Observer {
         Image backgroundImage = new Image(
                 getClass().getResource("/fr/team92/serpents/main/ressources/background.jpg").toExternalForm());
 
-        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.REPEAT,
-                BackgroundRepeat.REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT);
         pane.setBackground(new Background(background));
 
         model.addObserver(this);
