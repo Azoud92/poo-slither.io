@@ -5,6 +5,12 @@ import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.utils.Observable;
 import fr.team92.serpents.utils.Observer;
 import fr.team92.serpents.utils.Position;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -26,6 +32,13 @@ public final class GameView implements Observer {
         this.pane = pane;
         this.controller = controller;
         CELL_SIZE = controller.getCellSize();
+
+        Image backgroundImage = new Image(
+                getClass().getResource("/fr/team92/serpents/main/ressources/background.jpg").toExternalForm());
+
+        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.REPEAT,
+                BackgroundRepeat.REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+        pane.setBackground(new Background(background));
 
         model.addObserver(this);
         this.update();
