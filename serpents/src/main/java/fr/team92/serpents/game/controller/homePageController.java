@@ -38,6 +38,10 @@ public class HomePageController {
     @FXML
     private Button exitButton;
 
+    private String controlChoice;
+    private KeyCode leftKey;
+    private KeyCode rightKey;
+
     @FXML
     public void initialize() {
         addAnimations(singlePlayerButton);
@@ -74,29 +78,27 @@ public class HomePageController {
 
         Snake botSnake = Snake.CreateAvoidWallsBotSnake(5, new Position(20, 30), new Direction(Math.PI / 2));
 
-        Map<KeyCode, Double> keyMap1 = new HashMap<>();
-        keyMap1.put(KeyCode.RIGHT, 0.1);
-        keyMap1.put(KeyCode.LEFT, -0.1);
+        Snake playerSnake;
+        if ("keyboard".equals(controlChoice)) {
+            Map<KeyCode, Double> keyMap1 = new HashMap<>();
+            keyMap1.put(rightKey, 0.1);
+            keyMap1.put(leftKey, -0.1);
 
-        Snake humanSnake1 = Snake.CreateHumanKeyboardSnake(keyMap1, 5, new Position(35, 30),
-                new Direction(Math.PI / 2));
-
-        Map<KeyCode, Double> keyMap2 = new HashMap<>();
-        keyMap2.put(KeyCode.Q, 0.05);
-        keyMap2.put(KeyCode.D, -0.05);
-
-        Snake humanMouseSnake = Snake.CreateHumanMouseSnake(5, new Position(50, 30), new Direction(Math.PI));
+            playerSnake = Snake.CreateHumanKeyboardSnake(keyMap1, 5, new Position(35, 30),
+                    new Direction(Math.PI / 2));
+        } else {
+            playerSnake = Snake.CreateHumanMouseSnake(5, new Position(35, 30), new Direction(Math.PI / 2));
+        }
 
         Scene scene = ((Node) event.getSource()).getScene();
         Pane root = (Pane) scene.getRoot();
 
         GameModel model = new GameModel((int) scene.getWidth(), (int) scene.getHeight(), 20);
         model.addSnake(botSnake);
-        model.addSnake(humanSnake1);
-        model.addSnake(humanMouseSnake);
+        model.addSnake(playerSnake);
 
         GameController controller = new GameController(model, scene);
-        GameView view = new GameView(model, controller, root);
+        /* GameView view = */new GameView(model, controller, root);
 
         controller.gameStart();
     }
@@ -131,5 +133,17 @@ public class HomePageController {
         // Obtenir la fenêtre actuelle
         Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         currentStage.close();
+    }
+
+    public void setControlChoice(String controlChoice) {
+        this.controlChoice = controlChoice;
+    }
+
+    public void setLeftKey(KeyCode leftKey) {
+        this.leftKey = leftKey;
+    }
+
+    public void setRightKey(KeyCode rightKey) {
+        this.rightKey = rightKey;
     }
 }
