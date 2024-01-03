@@ -42,7 +42,7 @@ public final class App extends Application {
 
         GameModel model = new GameModel((int) scene.getWidth(), (int) scene.getHeight(), 10);
         model.addSnake(botSnake);
-        model.addSnake(humanSnake1);
+        //model.addSnake(humanSnake1);
         model.addSnake(humanMouseSnake);
 
         GameController controller = new GameController(model, scene);

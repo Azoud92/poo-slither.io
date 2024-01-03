@@ -12,12 +12,13 @@ public record Position(double x, double y) {
      * @return la nouvelle position
      */
     public Position move(Direction direction, double delta) {
-        double dx = Math.cos(direction.getAngle()) * delta;
-        double dy = Math.sin(direction.getAngle()) * delta;
-
+        double angleInRadians = Math.toRadians(direction.angle());
+        double dx = Math.cos(angleInRadians) * delta;
+        double dy = Math.sin(angleInRadians) * delta;
+    
         return new Position(this.x + dx, this.y + dy);
     }
-
+    
     public double distanceTo(Position other) {
         double dx = this.x - other.x;
         double dy = this.y - other.y;

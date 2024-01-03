@@ -13,17 +13,23 @@ import fr.team92.serpents.utils.Position;
 public final class AvoidWallsStrategy implements BotStrategy {
 
     private final Random random = new Random();
+    private static final double RANDOM_CHANGE_PROBABILITY = 0.1;
 
     @Override
     public Direction detMove(Snake snake, GameModel gameModel, double lastUpdate) {
         // si la direction actuelle est sure, on la retourne
-        if (!wallCollisionRisk(snake, snake.getDirection(), gameModel, lastUpdate)) {
+        if (random.nextDouble() > RANDOM_CHANGE_PROBABILITY
+                &&
+            !wallCollisionRisk(snake, snake.getDirection(), gameModel, lastUpdate)) {
             return snake.getDirection();
         }
 
-        // On génére un angle aléatoire entre 0 et 2π
-        double angle = 2 * Math.PI * random.nextDouble();
-        Direction newDirection = new Direction(angle);
+        // On génére un angle aléatoire entre 0 et 360°
+        double actualAngle = snake.getDirection().angle();
+        actualAngle += random.nextInt(-45, 45);
+        actualAngle %= 360;
+
+        Direction newDirection = new Direction(actualAngle);
 
         // on vérifie si la nouvelle direction est sûre
         if (!wallCollisionRisk(snake, newDirection, gameModel, lastUpdate)) {
