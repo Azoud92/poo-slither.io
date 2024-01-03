@@ -50,7 +50,7 @@ public final class GameModel implements Observable {
     /**
      * Le nombre de nourriture à maintenir dans la partie
      */
-    private static final int FEED_IN_PARTY = 100;
+    private static int FEED_IN_PARTY;
 
     private static int CELL_SIZE;
 
@@ -61,8 +61,9 @@ public final class GameModel implements Observable {
      * @param height  la hauteur
      * @param players les joueurs
      */
-    public GameModel(int width, int height, int cellSize) {
+    public GameModel(int width, int height, int cellSize, int nbFood) {
         CELL_SIZE = cellSize;
+        FEED_IN_PARTY = nbFood;
         this.observers = new ArrayList<>();
         this.width = width / CELL_SIZE;
         this.height = height / CELL_SIZE;
