@@ -9,7 +9,10 @@ import java.util.Set;
 
 import fr.team92.serpents.snake.controller.HumanSnakeController;
 import fr.team92.serpents.snake.controller.KeyboardControl;
+import fr.team92.serpents.snake.model.BurrowingSegmentBehavior;
+import fr.team92.serpents.snake.model.NormalSegmentBehavior;
 import fr.team92.serpents.snake.model.Segment;
+import fr.team92.serpents.snake.model.SegmentBehavior;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.GameState;
 import fr.team92.serpents.utils.Observable;
@@ -80,7 +83,14 @@ public final class GameModel implements Observable {
     private void addFeed(int nb) {
         for (int i = 0; i < nb; i++) {
             Position pos = generateRandomPosition();
-            Segment segment = new Segment(pos, 1);
+
+            SegmentBehavior behavior;
+            if (Math.random() < 0.5) {
+                behavior = new NormalSegmentBehavior();
+            } else {
+                behavior = new BurrowingSegmentBehavior();
+            }
+            Segment segment = new Segment(pos, 1, behavior);
             segment.die();
             grid.put(pos, segment);
         }
@@ -127,15 +137,18 @@ public final class GameModel implements Observable {
     }
 
     public boolean isInCollision(Snake snake) {
+        Segment headSegment = snake.getHeadSegment();
         Position headPosition = snake.getHeadPosition();
         double headRadius = snake.getHeadDiameter() / 2;
 
         return snakes.stream()
                 .filter(otherSnake -> !snake.equals(otherSnake))
-                .anyMatch(otherSnake -> otherSnake.getSegments().stream()
-                        .anyMatch(segment -> segment.getPosition().distanceTo(headPosition) < segment.getDiameter() / 2
-                                + headRadius
-                                && !segment.isDead()));
+                .flatMap(otherSnake -> otherSnake.getSegments().stream())
+                .anyMatch(otherSegment ->
+                !otherSegment.isDead() &&
+                otherSegment.getPosition().distanceTo(headPosition) < otherSegment.getDiameter() / 2
+                    + headRadius
+                && headSegment.isInCollision(otherSegment));
     }
 
     /**
@@ -171,8 +184,9 @@ public final class GameModel implements Observable {
             Segment segment = entry.getValue();
             if (segment.isDead() && snake.getHeadPosition().distanceTo(pos) < snake.getHeadDiameter() / 2
                     + segment.getDiameter() / 2) {
+                SegmentBehavior behavior = segment.getBehavior();
                 grid.remove(pos);
-                snake.addSegment();
+                snake.addSegment(behavior);
                 addFeed(1);
                 return;
             }

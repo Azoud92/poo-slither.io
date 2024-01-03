@@ -40,7 +40,7 @@ public final class Snake {
 
     private boolean isDead;
 
-    public static final double DEFAULT_SPEED = 1;
+    public static final double DEFAULT_SPEED = 1.5;
 
     private double speed;
 
@@ -76,7 +76,7 @@ public final class Snake {
         Position segmentPos = startPosition;
 
         for (int i = 0; i < length * 30; i++) {
-            segments.add(new Segment(segmentPos, 1));
+            segments.add(new Segment(segmentPos, 1, new NormalSegmentBehavior()));
             segmentPos = segmentPos.move(startDirection.opposite(), 0.005);
         }
     }
@@ -127,7 +127,7 @@ public final class Snake {
      */
     private void addNewSegments() {
         if (!segmentsToAdd.isEmpty()) {
-            segments.addLast(segmentsToAdd.getFirst());
+            segments.addFirst(segmentsToAdd.getFirst());
             segmentsToAdd.removeFirst();
         }
     }
@@ -135,11 +135,11 @@ public final class Snake {
     /**
      * Ajouter un nouveau segment au serpent
      */
-    public void addSegment() {
-        Position tailPos = segments.getLast().getPosition();
-        Segment newSegment = new Segment(tailPos, segments.getLast().getDiameter());
+    public void addSegment(SegmentBehavior behavior) {
+        Position headPos = segments.getFirst().getPosition();
+        Segment newSegment = new Segment(headPos, segments.getFirst().getDiameter(), behavior);
         segmentsToAdd.add(newSegment);
-    }
+    }    
 
     /**
      * Définir la direction du serpent
@@ -237,12 +237,6 @@ public final class Snake {
 
     public Segment getHeadSegment() {
         return segments.getFirst();
-    }
-
-    public void setHeadPosition(Position position) {
-        if (!segments.isEmpty()) {
-            segments.set(0, new Segment(position, segments.get(0).getDiameter()));
-        }
     }
 
 }
