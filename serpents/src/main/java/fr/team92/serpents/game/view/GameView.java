@@ -1,6 +1,7 @@
 package fr.team92.serpents.game.view;
 
 import fr.team92.serpents.game.controller.GameController;
+import fr.team92.serpents.snake.model.BurrowingSegmentBehavior;
 import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.utils.Observable;
 import fr.team92.serpents.utils.Observer;
@@ -63,8 +64,10 @@ public final class GameView implements Observer {
                 if (segment.isDead()) {
                     circle.setFill(Color.ORANGE);
                 } else {
-                    circle.setFill(Color.RED);
+                    circle.setFill(Color.RED);                    
                 }
+                if (segment.getBehavior() instanceof BurrowingSegmentBehavior)
+                        circle.setFill(Color.BLUE);
                 pane.getChildren().add(circle);
             }
         }

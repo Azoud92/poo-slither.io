@@ -71,10 +71,10 @@ public class SettingsController {
 
     @FXML
     public void saveButtonClicked() {
-        int numberOfBots = (int) botsSlider.getValue();
-        int numberOfFood = (int) foodSlider.getValue();
-        boolean autoCollision = autoCollisionOnRadioButton.isSelected();
-        boolean wallCrossing = wallCrossingOnRadioButton.isSelected();
+        numberOfBots = (int) botsSlider.getValue();
+        numberOfFood = (int) foodSlider.getValue();
+        boolean autoCollision = autoCollisionOnRadioButton.isSelected();// TODO: a utiliser plus tard
+        boolean wallCrossing = wallCrossingOnRadioButton.isSelected();// TODO: a utiliser plus tard
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fr/team92/serpents/game/view/homepage.fxml"));

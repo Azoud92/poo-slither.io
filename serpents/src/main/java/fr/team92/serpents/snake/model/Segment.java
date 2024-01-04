@@ -17,14 +17,17 @@ public final class Segment {
 
     private double diameter;
 
+    private SegmentBehavior behavior;
+
     /**
      * Créer un nouveau segment à la position donnée
      * 
      * @param position la position du segment
      */
-    public Segment(Position position, double diameter) {
+    public Segment(Position position, double diameter, SegmentBehavior behavior) {
         this.position = position;
         this.diameter = diameter;
+        this.behavior = behavior;
     }
 
     /**
@@ -75,6 +78,14 @@ public final class Segment {
 
     public double getDiameter() {
         return diameter;
+    }
+
+    public boolean isInCollision(Segment otherSegment) {
+        return behavior.isInCollision(this, otherSegment);
+    }
+
+    public SegmentBehavior getBehavior() {
+        return behavior;
     }
 
 }

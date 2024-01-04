@@ -1,17 +1,18 @@
 package fr.team92.serpents.utils;
 
-public class Direction {
-    private double angle;
+public record Direction(double angle) {
 
-    public Direction(double angle) {
-        this.angle = angle;
+    public Direction {
+        if (angle < 0) {
+            angle += 360;
+        } else if (angle >= 360) {
+            angle -= 360;
+        }
+        angle = angle % 360;
     }
 
     public Direction opposite() {
-        return new Direction((this.angle + Math.PI) % (2 * Math.PI));
+        return new Direction((this.angle + 180) % 360);
     }
 
-    public double getAngle() {
-        return angle;
-    }
 }

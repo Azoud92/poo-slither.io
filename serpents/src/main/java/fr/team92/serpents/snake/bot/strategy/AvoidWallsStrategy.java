@@ -1,5 +1,7 @@
 package fr.team92.serpents.snake.bot.strategy;
 
+import java.util.Random;
+
 import fr.team92.serpents.game.model.GameModel;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.Direction;
@@ -10,31 +12,32 @@ import fr.team92.serpents.utils.Position;
  */
 public final class AvoidWallsStrategy implements BotStrategy {
 
+    private final Random random = new Random();
+    private static final double RANDOM_CHANGE_PROBABILITY = 0.1;
+
     @Override
     public Direction detMove(Snake snake, GameModel gameModel, double lastUpdate) {
         // si la direction actuelle est sure, on la retourne
-        if (!wallCollisionRisk(snake, snake.getDirection(), gameModel, lastUpdate)) {
+        if (random.nextDouble() > RANDOM_CHANGE_PROBABILITY
+                &&
+                !wallCollisionRisk(snake, snake.getDirection(), gameModel, lastUpdate)) {
             return snake.getDirection();
         }
 
-        // On génére un nouvel angle qui est soit l'angle actuel plus 0.1, soit l'angle
-        // actuel moins 0.1
-        double currentAngle = snake.getDirection().getAngle();
-        double newAnglePlus = (currentAngle + 0.1) % (2 * Math.PI);
-        double newAngleMinus = (currentAngle - 0.1) % (2 * Math.PI);
-        if (newAngleMinus < 0) {
-            newAngleMinus += 2 * Math.PI;
-        }
+        // On génére un angle aléatoire entre 0 et 360°
+        double actualAngle = snake.getDirection().angle();
+        actualAngle += random.nextInt(-45, 45);
+        actualAngle %= 360;
 
-        Direction newDirectionPlus = new Direction(newAnglePlus);
-        Direction newDirectionMinus = new Direction(newAngleMinus);
+        Direction newDirection = new Direction(actualAngle);
 
         // on vérifie si la nouvelle direction est sûre
-        if (!wallCollisionRisk(snake, newDirectionPlus, gameModel, lastUpdate)) {
+        if (!wallCollisionRisk(snake, newDirection, gameModel, lastUpdate)) {
             // Si la nouvelle direction est sûre, on la retourne
-            return newDirectionPlus;
+            return newDirection;
         } else {
-            return newDirectionMinus;
+            // Si la nouvelle direction n'est pas sûre, on recommence
+            return detMove(snake, gameModel, lastUpdate);
         }
 
     }

@@ -22,13 +22,9 @@ public final class MouseControl implements SnakeEventControl {
             double dx = mouseX - snakeX;
             double dy = mouseY - snakeY;
 
-            double targetAngle = Math.atan2(dy, dx);
-            double targetAngleInDegrees = Math.toDegrees(targetAngle) - 90;
-            if (targetAngleInDegrees < 0) {
-                targetAngleInDegrees += 360;
-            }
+            double targetAngleInDegrees = (Math.toDegrees(Math.atan2(dy, dx))) % 360;
 
-            double currentAngle = snake.getDirection().getAngle();
+            double currentAngle = snake.getDirection().angle();
             double angleDifference = targetAngleInDegrees - currentAngle;
 
             // Normalise la différence d'angle à l'intervalle [-180, 180)
