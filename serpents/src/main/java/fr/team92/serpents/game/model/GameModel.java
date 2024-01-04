@@ -149,11 +149,10 @@ public final class GameModel implements Observable {
         return snakes.stream()
                 .filter(otherSnake -> !snake.equals(otherSnake))
                 .flatMap(otherSnake -> otherSnake.getSegments().stream())
-                .anyMatch(otherSegment ->
-                !otherSegment.isDead() &&
-                otherSegment.getPosition().distanceTo(headPosition) < otherSegment.getDiameter() / 2
-                    + headRadius
-                && headSegment.isInCollision(otherSegment));
+                .anyMatch(otherSegment -> !otherSegment.isDead() &&
+                        otherSegment.getPosition().distanceTo(headPosition) < otherSegment.getDiameter() / 2
+                                + headRadius
+                        && headSegment.isInCollision(otherSegment));
     }
 
     /**
@@ -246,6 +245,7 @@ public final class GameModel implements Observable {
      * @param snake le serpent
      */
     public void addSnake(Snake snake) {
+
         if (snake == null) {
             throw new IllegalArgumentException("Snake cannot be null");
         }

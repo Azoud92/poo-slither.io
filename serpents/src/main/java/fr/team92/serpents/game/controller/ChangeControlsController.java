@@ -2,7 +2,6 @@ package fr.team92.serpents.game.controller;
 
 import java.io.IOException;
 
-import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

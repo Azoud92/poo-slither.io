@@ -64,8 +64,8 @@ public class HomePageController {
         Snake playerSnake;
         if ("keyboard".equals(controlChoice)) {
             Map<KeyCode, Double> keyMap1 = new HashMap<>();
-            keyMap1.put(rightKey, 0.1);
-            keyMap1.put(leftKey, -0.1);
+            keyMap1.put(rightKey, 6.0);
+            keyMap1.put(leftKey, -6.0);
 
             playerSnake = Snake.CreateHumanKeyboardSnake(keyMap1, 5, new Position(55, 30),
                     new Direction(Math.PI / 2));
@@ -77,7 +77,6 @@ public class HomePageController {
 
         GameController controller = new GameController(model, scene);
         /* GameView view = */new GameView(model, controller, root);
-
         controller.gameStart();
     }
 

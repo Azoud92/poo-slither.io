@@ -109,15 +109,15 @@ public final class Snake {
                 newPosition = oldPosition.move(direction, maxMoveDistance);
             }
 
-            // Vérifie si le segment est sorti des limites de l'écran
-            if (newPosition.x() - rayon <= 0) {
-                newPosition = new Position(width + rayon, newPosition.y());
-            } else if (newPosition.x() + rayon >= width) {
+            // Si le segment atteint un bord, il apparaît de l'autre côté
+            if (newPosition.x() - rayon < 0) {
+                newPosition = new Position(width - rayon, newPosition.y());
+            } else if (newPosition.x() + rayon > width) {
                 newPosition = new Position(rayon, newPosition.y());
             }
-            if (newPosition.y() - rayon <= 0) {
-                newPosition = new Position(newPosition.x(), height + rayon);
-            } else if (newPosition.y() + rayon >= height) {
+            if (newPosition.y() - rayon < 0) {
+                newPosition = new Position(newPosition.x(), height - rayon);
+            } else if (newPosition.y() + rayon > height) {
                 newPosition = new Position(newPosition.x(), rayon);
             }
 

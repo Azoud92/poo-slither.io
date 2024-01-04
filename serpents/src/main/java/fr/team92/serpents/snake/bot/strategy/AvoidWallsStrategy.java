@@ -36,8 +36,8 @@ public final class AvoidWallsStrategy implements BotStrategy {
             // Si la nouvelle direction est sûre, on la retourne
             return newDirection;
         } else {
-            // Si la nouvelle direction n'est pas sûre, on recommence
-            return detMove(snake, gameModel, lastUpdate);
+            // Si la nouvelle direction n'est pas sûre, on retourne la direction actuelle
+            return snake.getDirection();
         }
 
     }

@@ -6,6 +6,7 @@ import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.utils.Observable;
 import fr.team92.serpents.utils.Observer;
 import fr.team92.serpents.utils.Position;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
@@ -53,24 +54,59 @@ public final class GameView implements Observer {
 
     private void drawSegments() {
         pane.getChildren().clear();
-        for (Segment segment : controller.getGrid().values()) {
+        Segment headSegment = controller.getHumanSnake().getSegments().getFirst();
 
+        for (Segment segment : controller.getGrid().values()) {
             Position pos = segment.getPosition();
-            double diameter = segment.getDiameter() * CELL_SIZE;
             double x = pos.x() * CELL_SIZE + CELL_SIZE / 2.0;
             double y = pos.y() * CELL_SIZE + CELL_SIZE / 2.0;
-            if (x >= 0 && x <= pane.getWidth() && y >= 0 && y <= pane.getHeight()) {
-                Circle circle = new Circle(x, y, diameter / 2.0);
-                if (segment.isDead()) {
-                    circle.setFill(Color.ORANGE);
-                } else {
-                    circle.setFill(Color.RED);                    
-                }
-                if (segment.getBehavior() instanceof BurrowingSegmentBehavior)
-                        circle.setFill(Color.BLUE);
-                pane.getChildren().add(circle);
+
+            // Dessinez le segment à sa position actuelle
+            drawSegment(segment, x, y);
+
+            // Si le segment est hors de la vue, dessinez un segment supplémentaire de
+            // l'autre côté
+            if (x <= 0) {
+                drawSegment(segment, x + pane.getWidth(), y);
+            } else if (x >= pane.getWidth()) {
+                drawSegment(segment, x - pane.getWidth(), y);
+            }
+            if (y <= 0) {
+                drawSegment(segment, x, y + pane.getHeight());
+            } else if (y >= pane.getHeight()) {
+                drawSegment(segment, x, y - pane.getHeight());
             }
         }
+
+        // Après avoir dessiné tous les segments, on ajuste la position de la vue
+        if (headSegment != null) {
+            Position headPos = headSegment.getPosition();
+            double headX = headPos.x() * CELL_SIZE + CELL_SIZE / 2.0;
+            double headY = headPos.y() * CELL_SIZE + CELL_SIZE / 2.0;
+
+            // on calcule le décalage de la tête par rapport au centre de la fenêtre
+            double offsetX = pane.getWidth() / 2 - headX;
+            double offsetY = pane.getHeight() / 2 - headY;
+
+            // on déplace tous les enfants de la fenêtre par le décalage inverse
+            for (Node child : pane.getChildren()) {
+                child.setTranslateX(offsetX);
+                child.setTranslateY(offsetY);
+            }
+        }
+    }
+
+    private void drawSegment(Segment segment, double x, double y) {
+        double diameter = segment.getDiameter() * CELL_SIZE;
+        Circle circle = new Circle(x, y, diameter / 2.0);
+        if (segment.isDead()) {
+            circle.setFill(Color.ORANGE);
+        } else {
+            circle.setFill(Color.RED);
+        }
+        if (segment.getBehavior() instanceof BurrowingSegmentBehavior)
+            circle.setFill(Color.BLUE);
+        pane.getChildren().add(circle);
     }
 
     @SuppressWarnings("unused")
