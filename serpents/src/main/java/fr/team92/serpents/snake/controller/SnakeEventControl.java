@@ -15,5 +15,5 @@ public interface SnakeEventControl {
      * @param event l'événement
      * @param i
      */
-    void handleControl(Snake snake, InputEvent event, int cellSize);
+    void handleControl(Snake snake, InputEvent event, int cellSize, double windowWidth, double windowHeight);
 }

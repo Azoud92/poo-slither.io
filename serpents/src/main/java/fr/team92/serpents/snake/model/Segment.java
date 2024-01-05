@@ -88,4 +88,8 @@ public final class Segment {
         return behavior;
     }
 
+    public void setDiameter(double d) {
+        this.diameter = d;
+    }
+
 }

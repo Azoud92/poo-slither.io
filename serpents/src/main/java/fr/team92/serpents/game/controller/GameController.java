@@ -32,6 +32,8 @@ public final class GameController {
 
     private double lastUpdate;
 
+    private Scene scene;
+
     /**
      * Constructeur du contrôleur du jeu
      * 
@@ -39,6 +41,7 @@ public final class GameController {
      * @param scene la scène JavaFX
      */
     public GameController(GameModel model, Scene scene) {
+        this.scene = scene;
         this.model = model;
         setKeyListeners(scene);
         setMouseListeners(scene);
@@ -141,7 +144,7 @@ public final class GameController {
         }
         for (Snake snake : model.getSnakes()) {
             SnakeController controller = snake.getController();
-            controller.controlSnake(snake, model, lastUpdate);
+            controller.controlSnake(snake, model, lastUpdate, scene);
         }
         model.moveSnakes(lastUpdate);
     }

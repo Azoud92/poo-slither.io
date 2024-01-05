@@ -2,6 +2,7 @@ package fr.team92.serpents.snake.controller;
 
 import fr.team92.serpents.game.model.GameModel;
 import fr.team92.serpents.snake.model.Snake;
+import javafx.scene.Scene;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -49,14 +50,16 @@ public final class HumanSnakeController implements SnakeController {
     }
 
     @Override
-    public void controlSnake(Snake snake, GameModel gameModel, double lastUpdate) {
+    public void controlSnake(Snake snake, GameModel gameModel, double lastUpdate, Scene scene) {
         if (lastEvent instanceof KeyEvent && snakeEventControl instanceof KeyboardControl) {
             if (lastEvent != null) {
-                snakeEventControl.handleControl(snake, lastEvent, gameModel.getCellSize());
+                snakeEventControl.handleControl(snake, lastEvent, gameModel.getCellSize(), scene.getWidth(),
+                        scene.getHeight());
                 lastEvent = null;
             }
         } else if (lastEvent instanceof MouseEvent && snakeEventControl instanceof MouseControl) {
-            snakeEventControl.handleControl(snake, lastEvent, gameModel.getCellSize());
+            snakeEventControl.handleControl(snake, lastEvent, gameModel.getCellSize(), scene.getWidth(),
+                    scene.getHeight());
         }
     }
 

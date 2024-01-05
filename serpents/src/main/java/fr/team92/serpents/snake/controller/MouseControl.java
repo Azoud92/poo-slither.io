@@ -10,14 +10,15 @@ import javafx.scene.input.MouseEvent;
  */
 public final class MouseControl implements SnakeEventControl {
 
-    public void handleControl(Snake snake, InputEvent event, int cellSize) {
+    public void handleControl(Snake snake, InputEvent event, int cellSize, double windowWidth, double windowHeight) {
         if (event instanceof MouseEvent) {
             MouseEvent mouseEvent = (MouseEvent) event;
             double mouseX = mouseEvent.getX();
             double mouseY = mouseEvent.getY();
 
-            double snakeX = snake.getHeadPosition().x() * cellSize;
-            double snakeY = snake.getHeadPosition().y() * cellSize;
+            // Tête du serpent est toujours au centre de la fenêtre
+            double snakeX = windowWidth / 2;
+            double snakeY = windowHeight / 2;
 
             double dx = mouseX - snakeX;
             double dy = mouseY - snakeY;

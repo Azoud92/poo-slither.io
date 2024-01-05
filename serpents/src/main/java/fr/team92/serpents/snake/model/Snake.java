@@ -111,14 +111,14 @@ public final class Snake {
 
             // Si le segment atteint un bord, il apparaît de l'autre côté
             if (newPosition.x() - rayon < 0) {
-                newPosition = new Position(width, newPosition.y());
+                newPosition = new Position(width + newPosition.x(), newPosition.y());
             } else if (newPosition.x() > width) {
-                newPosition = new Position(rayon, newPosition.y());
+                newPosition = new Position(newPosition.x() - width, newPosition.y());
             }
             if (newPosition.y() - rayon < 0) {
-                newPosition = new Position(newPosition.x(), height);
+                newPosition = new Position(newPosition.x(), height + newPosition.y());
             } else if (newPosition.y() > height) {
-                newPosition = new Position(newPosition.x(), rayon);
+                newPosition = new Position(newPosition.x(), newPosition.y() - height);
             }
 
             segments.get(i).setPosition(newPosition);
