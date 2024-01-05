@@ -361,4 +361,5 @@ public final class GameModel implements Observable {
     public Position getClosestFood(Position headPosition) {
         return null;
     }
+
 }

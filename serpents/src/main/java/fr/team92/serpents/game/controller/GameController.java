@@ -91,7 +91,6 @@ public final class GameController {
         }
 
         for (Snake snake : model.getSnakes()) {
-            System.out.println("keyPressed");
             SnakeController controller = snake.getController();
 
             if (controller instanceof HumanSnakeController) {
@@ -204,4 +203,5 @@ public final class GameController {
         }
         return null;
     }
+
 }

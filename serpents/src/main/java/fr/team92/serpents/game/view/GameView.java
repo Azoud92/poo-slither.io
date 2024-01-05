@@ -6,7 +6,6 @@ import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.utils.Observable;
 import fr.team92.serpents.utils.Observer;
 import fr.team92.serpents.utils.Position;
-import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
@@ -55,44 +54,45 @@ public final class GameView implements Observer {
     private void drawSegments() {
         pane.getChildren().clear();
         Segment headSegment = controller.getHumanSnake().getSegments().getFirst();
+        Position headPos = headSegment.getPosition();
 
         for (Segment segment : controller.getGrid().values()) {
             Position pos = segment.getPosition();
-            double x = pos.x() * CELL_SIZE + CELL_SIZE / 2.0;
-            double y = pos.y() * CELL_SIZE + CELL_SIZE / 2.0;
+            double x = (pos.x() - headPos.x()) * CELL_SIZE + pane.getWidth() / 2.0;
+            double y = (pos.y() - headPos.y()) * CELL_SIZE + pane.getHeight() / 2.0;
+            double radius = segment.getDiameter() * CELL_SIZE / 2.0;
 
-            // Dessinez le segment à sa position actuelle
-            drawSegment(segment, x, y);
+            // Si une partie du segment est à un bord de la grille, on le dessine aussi
+            // de l'autre côté
+            boolean left = x - radius < 0;
+            boolean right = x + radius > pane.getWidth();
+            boolean top = y - radius < 0;
+            boolean bottom = y + radius > pane.getHeight();
 
-            // Si le segment est hors de la vue, dessinez un segment supplémentaire de
-            // l'autre côté
-            if (x <= 0) {
+            if (left) {
                 drawSegment(segment, x + pane.getWidth(), y);
-            } else if (x >= pane.getWidth()) {
+            } else if (right) {
                 drawSegment(segment, x - pane.getWidth(), y);
             }
-            if (y <= 0) {
+            if (top) {
                 drawSegment(segment, x, y + pane.getHeight());
-            } else if (y >= pane.getHeight()) {
+            } else if (bottom) {
                 drawSegment(segment, x, y - pane.getHeight());
             }
-        }
 
-        // Après avoir dessiné tous les segments, on ajuste la position de la vue
-        if (headSegment != null) {
-            Position headPos = headSegment.getPosition();
-            double headX = headPos.x() * CELL_SIZE + CELL_SIZE / 2.0;
-            double headY = headPos.y() * CELL_SIZE + CELL_SIZE / 2.0;
-
-            // on calcule le décalage de la tête par rapport au centre de la fenêtre
-            double offsetX = pane.getWidth() / 2 - headX;
-            double offsetY = pane.getHeight() / 2 - headY;
-
-            // on déplace tous les enfants de la fenêtre par le décalage inverse
-            for (Node child : pane.getChildren()) {
-                child.setTranslateX(offsetX);
-                child.setTranslateY(offsetY);
+            // Si le segment est dans un coin, on le dessine aussi dans le coin opposé
+            if (left && top) {
+                drawSegment(segment, x + pane.getWidth(), y + pane.getHeight());
+            } else if (right && top) {
+                drawSegment(segment, x - pane.getWidth(), y + pane.getHeight());
+            } else if (right && bottom) {
+                drawSegment(segment, x - pane.getWidth(), y - pane.getHeight());
+            } else if (left && bottom) {
+                drawSegment(segment, x + pane.getWidth(), y - pane.getHeight());
             }
+
+            // Ensuite, on dessine le segment à sa position actuelle
+            drawSegment(segment, x, y);
         }
     }
 
