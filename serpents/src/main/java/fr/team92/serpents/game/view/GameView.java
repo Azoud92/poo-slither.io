@@ -1,11 +1,15 @@
 package fr.team92.serpents.game.view;
 
+import java.io.IOException;
+
 import fr.team92.serpents.game.controller.GameController;
 import fr.team92.serpents.snake.model.BurrowingSegmentBehavior;
 import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.utils.Observable;
 import fr.team92.serpents.utils.Observer;
 import fr.team92.serpents.utils.Position;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
@@ -19,8 +23,10 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
+import javafx.fxml.FXMLLoader;
 import javafx.util.Duration;
 
 public final class GameView implements Observer {
@@ -64,7 +70,7 @@ public final class GameView implements Observer {
     public void update() {
         drawSegments();
         updateScore();
-        // endGame();
+        endGame();
     }
 
     private void drawSegments() {
@@ -150,7 +156,19 @@ public final class GameView implements Observer {
         fadeTransition.setFromValue(0);
         fadeTransition.setToValue(1);
         fadeTransition.setAutoReverse(true);
-        fadeTransition.setCycleCount(Animation.INDEFINITE);
+        fadeTransition.setCycleCount(3);
+
+        fadeTransition.setOnFinished(event -> {
+            try {
+                Parent root = FXMLLoader.load(getClass().getResource("/fr/team92/serpents/game/view/homepage.fxml"));
+                Stage stage = (Stage) gameOverText.getScene().getWindow();
+                stage.setScene(new Scene(root, stage.getWidth(), stage.getHeight()));
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        });
+
         fadeTransition.play();
     }
 

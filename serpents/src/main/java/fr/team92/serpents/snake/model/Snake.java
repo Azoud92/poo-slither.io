@@ -274,7 +274,6 @@ public final class Snake {
     }
 
     public void accelerate() {
-        System.out.println("length : " + length + " MIN_LENGTH : " + MIN_LENGTH);
         if (length > MIN_LENGTH) {
             speed = speedInAcceleration;
             segments.removeLast();

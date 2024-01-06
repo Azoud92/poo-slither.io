@@ -13,11 +13,9 @@ public final class MouseControl implements SnakeEventControl {
 
     public void handleControl(Snake snake, InputEvent event, int cellSize, double windowWidth, double windowHeight) {
         if (event instanceof MouseEvent) {
-            System.out.println("Mouse event");
             MouseEvent mouseEvent = (MouseEvent) event;
             double mouseX = mouseEvent.getX();
             double mouseY = mouseEvent.getY();
-            System.out.println(mouseX + " " + mouseY);
 
             // Tête du serpent est toujours au centre de la fenêtre
             double snakeX = windowWidth / 2;
