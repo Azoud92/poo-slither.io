@@ -8,6 +8,7 @@ import fr.team92.serpents.utils.Direction;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.Node;
 
 /**
  * Contrôle du serpent par le clavier
@@ -30,10 +31,19 @@ public final class KeyboardControl implements SnakeEventControl {
 
     @Override
     public void handleControl(Snake snake, InputEvent event, int cellSize, double windowWidth, double windowHeight) {
-        Double angleChange = keyMap.get(((KeyEvent) event).getCode());
+        KeyEvent keyEvent = (KeyEvent) event;
+        Double angleChange = keyMap.get(keyEvent.getCode());
         if (angleChange != null) {
-            double newAngle = snake.getDirection().angle() + angleChange;
-            snake.setDirection(new Direction(newAngle));
+            if (angleChange == 0.0) {
+                if (keyEvent.getEventType() == KeyEvent.KEY_PRESSED) {
+                    snake.setIsAccelerating(true);
+                } else if (keyEvent.getEventType() == KeyEvent.KEY_RELEASED) {
+                    snake.setIsAccelerating(false);
+                }
+            } else {
+                double newAngle = snake.getDirection().angle() + angleChange;
+                snake.setDirection(new Direction(newAngle));
+            }
         }
     }
 

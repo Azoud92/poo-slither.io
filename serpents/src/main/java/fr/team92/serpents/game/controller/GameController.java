@@ -13,6 +13,7 @@ import fr.team92.serpents.utils.Position;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -79,7 +80,11 @@ public final class GameController {
      */
     private void setKeyListeners(Scene scene) {
         scene.setOnKeyPressed(event -> {
-            handleKeyPressed(event);
+            handleKey(event);
+        });
+
+        scene.setOnKeyReleased(event -> {
+            handleKey(event);
         });
     }
 
@@ -88,7 +93,7 @@ public final class GameController {
      * 
      * @param event l'événement clavier
      */
-    private void handleKeyPressed(KeyEvent event) {
+    private void handleKey(KeyEvent event) {
         if (model.getState() != GameState.RUNNING) {
             return;
         }
@@ -109,7 +114,20 @@ public final class GameController {
      */
     private void setMouseListeners(Scene scene) {
         scene.setOnMouseMoved(event -> {
-            handleMouseMoved(event);
+            handleMouse(event, true);
+        });
+        scene.setOnMouseDragged(event -> {
+            handleMouse(event, true);
+        });
+        scene.setOnMousePressed(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                handleMouse(event, false);
+            }
+        });
+        scene.setOnMouseReleased(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                handleMouse(event, false);
+            }
         });
     }
 
@@ -119,7 +137,7 @@ public final class GameController {
      * 
      * @param event l'événement de la souris
      */
-    private void handleMouseMoved(MouseEvent event) {
+    private void handleMouse(MouseEvent event, boolean move) {
         if (model.getState() != GameState.RUNNING) {
             return;
         }
@@ -128,7 +146,11 @@ public final class GameController {
             SnakeController controller = snake.getController();
 
             if (controller instanceof HumanSnakeController) {
-                ((HumanSnakeController) controller).setEvent(event);
+                if (move) {
+                    ((HumanSnakeController) controller).setEvent(event);
+                } else {
+                    ((HumanSnakeController) controller).setOtherMouseEvent(event);
+                }
             }
         }
     }
@@ -145,6 +167,11 @@ public final class GameController {
         for (Snake snake : model.getSnakes()) {
             SnakeController controller = snake.getController();
             controller.controlSnake(snake, model, lastUpdate, scene);
+            if (snake.getIsAccelerating()) {
+                snake.accelerate();
+            } else {
+                snake.decelerate();
+            }
         }
         model.moveSnakes(lastUpdate);
     }

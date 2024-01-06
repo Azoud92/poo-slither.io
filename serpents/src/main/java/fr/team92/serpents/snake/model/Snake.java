@@ -44,8 +44,12 @@ public final class Snake {
     public static final double DEFAULT_SPEED = 1.5;
 
     private double speed;
+    private double speedInAcceleration;
+    private double baseSpeed;
 
     private int length;
+    private final int MIN_LENGTH;
+    private boolean isAccelerating = false;
 
     /**
      * Constructeur du serpent
@@ -62,6 +66,9 @@ public final class Snake {
         this.isDead = false;
         this.speed = speed;
         this.length = length;
+        this.MIN_LENGTH = length;
+        this.speedInAcceleration = speed * 2;
+        this.baseSpeed = speed;
         initSegments(length, position, direction);
     }
 
@@ -264,5 +271,35 @@ public final class Snake {
 
     public int getLength() {
         return length;
+    }
+
+    public void accelerate() {
+        System.out.println("length : " + length + " MIN_LENGTH : " + MIN_LENGTH);
+        if (length > MIN_LENGTH) {
+            speed = speedInAcceleration;
+            segments.removeLast();
+            length--;
+        } else {
+            decelerate();
+        }
+
+    }
+
+    public void decelerate() {
+        speed = baseSpeed;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
+        this.baseSpeed = speed;
+        this.speedInAcceleration = speed * 2;
+    }
+
+    public void setIsAccelerating(boolean isAccelerating) {
+        this.isAccelerating = isAccelerating;
+    }
+
+    public boolean getIsAccelerating() {
+        return isAccelerating;
     }
 }

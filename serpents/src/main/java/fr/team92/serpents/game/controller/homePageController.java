@@ -39,6 +39,7 @@ public class HomePageController {
 
     private KeyCode leftKey;
     private KeyCode rightKey;
+    private KeyCode accelerateKey;
 
     @FXML
     public void initialize() {
@@ -66,6 +67,7 @@ public class HomePageController {
             Map<KeyCode, Double> keyMap1 = new HashMap<>();
             keyMap1.put(rightKey, 6.0);
             keyMap1.put(leftKey, -6.0);
+            keyMap1.put(accelerateKey, 0.0);
 
             playerSnake = Snake.CreateHumanKeyboardSnake(keyMap1, 5, new Position(55, 30),
                     new Direction(Math.PI / 2));
@@ -141,5 +143,9 @@ public class HomePageController {
     public void setNumberOfFood(int numberOfFood) {
         this.numberOfFood = numberOfFood;
 
+    }
+
+    public void setAccelerateKey(KeyCode accelerateKey) {
+        this.accelerateKey = accelerateKey;
     }
 }

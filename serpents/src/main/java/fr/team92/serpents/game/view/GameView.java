@@ -53,8 +53,6 @@ public final class GameView implements Observer {
 
     private void updateScore() {
         int score = controller.getScore();
-        System.out.println(score);
-        scoreText.setText("Score: " + score);
         scoreText.setX(pane.getWidth() - scoreText.getLayoutBounds().getWidth() - 20);
         scoreText.setY(20);
         if (!pane.getChildren().contains(scoreText)) {

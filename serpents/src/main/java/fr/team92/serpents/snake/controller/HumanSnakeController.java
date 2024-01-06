@@ -5,6 +5,7 @@ import fr.team92.serpents.snake.model.Snake;
 import javafx.scene.Scene;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -21,6 +22,7 @@ public final class HumanSnakeController implements SnakeController {
      * Dernier événement enregistré
      */
     private InputEvent lastEvent;
+    private MouseEvent otherMouseEvent;
 
     /**
      * Constructeur du contrôleur du serpent humain
@@ -49,6 +51,10 @@ public final class HumanSnakeController implements SnakeController {
         lastEvent = event;
     }
 
+    public void setOtherMouseEvent(MouseEvent event) {
+        otherMouseEvent = event;
+    }
+
     @Override
     public void controlSnake(Snake snake, GameModel gameModel, double lastUpdate, Scene scene) {
         if (lastEvent instanceof KeyEvent && snakeEventControl instanceof KeyboardControl) {
@@ -58,8 +64,24 @@ public final class HumanSnakeController implements SnakeController {
                 lastEvent = null;
             }
         } else if (lastEvent instanceof MouseEvent && snakeEventControl instanceof MouseControl) {
-            snakeEventControl.handleControl(snake, lastEvent, gameModel.getCellSize(), scene.getWidth(),
-                    scene.getHeight());
+            if (lastEvent != null) {
+                snakeEventControl.handleControl(snake, lastEvent, gameModel.getCellSize(), scene.getWidth(),
+                        scene.getHeight());
+                lastEvent = null;
+            }
+        } else if (otherMouseEvent != null && snakeEventControl instanceof MouseControl) {
+
+            // Gère l'accélération et la décélération du serpent
+            if (otherMouseEvent.getEventType() == MouseEvent.MOUSE_PRESSED
+                    && otherMouseEvent.getButton() == MouseButton.PRIMARY) {
+                snake.setIsAccelerating(true);
+                otherMouseEvent = null;
+            } else if (otherMouseEvent.getEventType() == MouseEvent.MOUSE_RELEASED
+                    && otherMouseEvent.getButton() == MouseButton.PRIMARY) {
+                snake.setIsAccelerating(false);
+                otherMouseEvent = null;
+            }
+
         }
     }
 

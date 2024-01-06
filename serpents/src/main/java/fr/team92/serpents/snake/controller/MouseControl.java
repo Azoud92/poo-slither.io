@@ -3,6 +3,7 @@ package fr.team92.serpents.snake.controller;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.Direction;
 import javafx.scene.input.InputEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -12,9 +13,11 @@ public final class MouseControl implements SnakeEventControl {
 
     public void handleControl(Snake snake, InputEvent event, int cellSize, double windowWidth, double windowHeight) {
         if (event instanceof MouseEvent) {
+            System.out.println("Mouse event");
             MouseEvent mouseEvent = (MouseEvent) event;
             double mouseX = mouseEvent.getX();
             double mouseY = mouseEvent.getY();
+            System.out.println(mouseX + " " + mouseY);
 
             // Tête du serpent est toujours au centre de la fenêtre
             double snakeX = windowWidth / 2;
@@ -52,6 +55,7 @@ public final class MouseControl implements SnakeEventControl {
             }
 
             snake.setDirection(new Direction(currentAngle));
+
         }
     }
 }

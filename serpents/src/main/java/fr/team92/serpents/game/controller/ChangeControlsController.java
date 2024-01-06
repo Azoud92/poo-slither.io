@@ -37,6 +37,9 @@ public class ChangeControlsController {
     private Button saveButton;
 
     @FXML
+    private TextField accelerateKeyTextField;
+
+    @FXML
     public void initialize() {
         ButtonsAnimations.addAnimations(saveButton);
 
@@ -54,30 +57,21 @@ public class ChangeControlsController {
             }
         });
 
-        leftKeyTextField.setOnKeyTyped(event -> {
-            String character = event.getCharacter();
-            event.consume();
-            leftKeyTextField.setText(character.toUpperCase());
+        leftKeyTextField.setOnKeyReleased(event -> {
+            leftKeyTextField.setText(event.getCode().toString());
         });
 
-        rightKeyTextField.setOnKeyTyped(event -> {
-            String character = event.getCharacter();
-            event.consume();
-            rightKeyTextField.setText(character.toUpperCase());
+        rightKeyTextField.setOnKeyReleased(event -> {
+            rightKeyTextField.setText(event.getCode().toString());
         });
 
-        leftKeyTextField.setOnKeyPressed(event -> {
-            event.consume();
-            ((TextField) event.getSource()).setText(event.getCode().toString());
+        accelerateKeyTextField.setOnKeyReleased(event -> {
+            accelerateKeyTextField.setText(event.getCode().toString());
         });
 
-        rightKeyTextField.setOnKeyPressed(event -> {
-            event.consume();
-            ((TextField) event.getSource()).setText(event.getCode().toString());
-        });
     }
 
-    private void loadHomePage(KeyCode leftKey, KeyCode rightKey) {
+    private void loadHomePage(KeyCode leftKey, KeyCode rightKey, KeyCode accelerateKey) {
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fr/team92/serpents/game/view/homepage.fxml"));
@@ -88,6 +82,7 @@ public class ChangeControlsController {
                 homePageController.setControlChoice("keyboard");
                 homePageController.setLeftKey(leftKey);
                 homePageController.setRightKey(rightKey);
+                homePageController.setAccelerateKey(accelerateKey);
             } else if (mouseRadioButton.isSelected()) {
                 homePageController.setControlChoice("mouse");
             }
@@ -115,22 +110,19 @@ public class ChangeControlsController {
         if (keyboardRadioButton.isSelected()) {
             String leftKey = leftKeyTextField.getText();
             String rightKey = rightKeyTextField.getText();
+            String accelerateKey = accelerateKeyTextField.getText();
 
-            if (leftKey.isEmpty() || rightKey.isEmpty()) {
-                System.out.println("Veuillez entrer des touches pour les commandes de gauche et de droite.");
-
-            } else if (leftKey.equals(rightKey)) {
-                System.out
-                        .println("Veuillez entrer des touches différentes pour les commandes de gauche et de droite.");
-            } else {
+            if (!leftKey.isEmpty() && !rightKey.isEmpty() && !accelerateKey.isEmpty() && !leftKey.equals(rightKey)
+                    && !leftKey.equals(accelerateKey) && !rightKey.equals(accelerateKey)) {
                 KeyCode leftKeyCode = keyCode(leftKey);
                 KeyCode rightKeyCode = keyCode(rightKey);
-                if (leftKeyCode != null && rightKeyCode != null) {
-                    loadHomePage(leftKeyCode, rightKeyCode);
+                KeyCode accelerateKeyCode = keyCode(accelerateKey);
+                if (leftKeyCode != null && rightKeyCode != null && accelerateKeyCode != null) {
+                    loadHomePage(leftKeyCode, rightKeyCode, accelerateKeyCode);
                 }
             }
         } else if (mouseRadioButton.isSelected()) {
-            loadHomePage(null, null);
+            loadHomePage(null, null, null);
         }
     }
 }
