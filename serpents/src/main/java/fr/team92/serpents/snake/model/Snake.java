@@ -45,6 +45,8 @@ public final class Snake {
 
     private double speed;
 
+    private int length;
+
     /**
      * Constructeur du serpent
      * 
@@ -59,6 +61,7 @@ public final class Snake {
         this.segmentsToAdd = new LinkedList<>();
         this.isDead = false;
         this.speed = speed;
+        this.length = length;
         initSegments(length, position, direction);
     }
 
@@ -132,6 +135,7 @@ public final class Snake {
         if (!segmentsToAdd.isEmpty()) {
             segments.addFirst(segmentsToAdd.getFirst());
             segmentsToAdd.removeFirst();
+            length++;
         }
     }
 
@@ -256,5 +260,9 @@ public final class Snake {
 
     public int getCoeff() {
         return coeff;
+    }
+
+    public int getLength() {
+        return length;
     }
 }

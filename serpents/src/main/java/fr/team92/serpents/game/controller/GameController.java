@@ -207,4 +207,8 @@ public final class GameController {
         return null;
     }
 
+    public int getScore() {
+        return getHumanSnake().getLength();
+    }
+
 }

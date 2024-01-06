@@ -28,6 +28,7 @@ public final class GameView implements Observer {
     private final GameController controller;
     private final Pane pane;
     private static int CELL_SIZE;
+    private static Text scoreText;
 
     public GameView(Observable model, GameController controller, Pane pane) {
         this.pane = pane;
@@ -41,18 +42,37 @@ public final class GameView implements Observer {
                 BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT);
         pane.setBackground(new Background(background));
 
+        scoreText = new Text();
+        scoreText.setFont(Font.font("Arial", 20));
+        scoreText.setFill(Color.WHITE);
+        pane.getChildren().add(scoreText);
+
         model.addObserver(this);
         this.update();
+    }
+
+    private void updateScore() {
+        int score = controller.getScore();
+        System.out.println(score);
+        scoreText.setText("Score: " + score);
+        scoreText.setX(pane.getWidth() - scoreText.getLayoutBounds().getWidth() - 20);
+        scoreText.setY(20);
+        if (!pane.getChildren().contains(scoreText)) {
+            pane.getChildren().add(scoreText);
+        }
     }
 
     @Override
     public void update() {
         drawSegments();
+        updateScore();
         // endGame();
     }
 
     private void drawSegments() {
         pane.getChildren().clear();
+        pane.getChildren().add(scoreText);
+
         Segment headSegment = controller.getHumanSnake().getSegments().getFirst();
         Position headPos = headSegment.getPosition();
 
