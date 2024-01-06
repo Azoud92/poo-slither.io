@@ -5,10 +5,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import fr.team92.serpents.game.model.GameModel;
 import fr.team92.serpents.game.view.GameView;
@@ -20,6 +22,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import java.io.IOException;
+import java.net.URL;
 
 public class HomePageController {
     @FXML
@@ -43,6 +46,7 @@ public class HomePageController {
 
     @FXML
     public void initialize() {
+
         ButtonsAnimations.addAnimations(singlePlayerButton);
         ButtonsAnimations.addAnimations(multiPlayerButton);
         ButtonsAnimations.addAnimations(optionsButton);

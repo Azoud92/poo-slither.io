@@ -41,6 +41,7 @@ public class ChangeControlsController {
 
     @FXML
     public void initialize() {
+
         ButtonsAnimations.addAnimations(saveButton);
 
         controlToggleGroup = new ToggleGroup();
