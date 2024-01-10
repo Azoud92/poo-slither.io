@@ -48,7 +48,7 @@ public final class Snake {
     private double baseSpeed;
 
     private int length;
-    private final int MIN_LENGTH;
+    private final int MIN_LENGTH = 2;
     private boolean isAccelerating = false;
 
     /**
@@ -66,7 +66,6 @@ public final class Snake {
         this.isDead = false;
         this.speed = speed;
         this.length = length;
-        this.MIN_LENGTH = length;
         this.speedInAcceleration = speed * 2;
         this.baseSpeed = speed;
         initSegments(length, position, direction);

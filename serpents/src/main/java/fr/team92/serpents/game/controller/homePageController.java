@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import fr.team92.serpents.game.model.GameMode;
 import fr.team92.serpents.game.model.GameModel;
@@ -71,31 +72,8 @@ public class HomePageController {
             model.addSnake(botSnake);
         }
 
-        Snake playerSnake1;
-        if ("keyboard".equals(controlChoice1)) {
-            Map<KeyCode, Double> keyMap1 = new HashMap<>();
-            keyMap1.put(rightKey1, 6.0);
-            keyMap1.put(leftKey1, -6.0);
-            keyMap1.put(accelerateKey1, 0.0);
-
-            playerSnake1 = Snake.CreateHumanKeyboardSnake(keyMap1, 5, new Position(55, 30),
-                    new Direction(Math.PI / 2));
-        } else {
-            playerSnake1 = Snake.CreateHumanMouseSnake(5, new Position(35, 30), new Direction(Math.PI / 2));
-        }
-
-        Snake playerSnake2;
-        if ("keyboard".equals(controlChoice2)) {
-            Map<KeyCode, Double> keyMap2 = new HashMap<>();
-            keyMap2.put(rightKey2, 6.0);
-            keyMap2.put(leftKey2, -6.0);
-            keyMap2.put(accelerateKey2, 0.0);
-
-            playerSnake2 = Snake.CreateHumanKeyboardSnake(keyMap2, 5, new Position(65, 30),
-                    new Direction(Math.PI / 2));
-        } else {
-            playerSnake2 = Snake.CreateHumanMouseSnake(5, new Position(45, 30), new Direction(Math.PI / 2));
-        }
+        Snake playerSnake1 = makePlayer(model, true);
+        Snake playerSnake2 = makePlayer(model, false);
 
         model.addSnake(playerSnake1);
         model.addSnake(playerSnake2);
@@ -113,23 +91,22 @@ public class HomePageController {
         GameModel model = new GameModel((int) scene.getWidth(), (int) scene.getHeight(), 20, numberOfFood);
 
         for (int i = 0; i < numberOfBots; i++) {
-            Snake botSnake = Snake.CreateAvoidWallsBotSnake(5, new Position(20 + i * 5, 30),
-                    new Direction(Math.PI / 2));
+            Random random = new Random();
+            Position position;
+            Snake botSnake;
+
+            do {
+                int x = random.nextInt(model.getWidth());
+                int y = random.nextInt(model.getHeight());
+                position = new Position(x, y);
+                double direction = random.nextDouble() * 2 * Math.PI;
+                botSnake = Snake.CreateAvoidWallsBotSnake(5, position, new Direction(direction));
+            } while (!model.isValidSnake(botSnake));
+
             model.addSnake(botSnake);
         }
 
-        Snake playerSnake;
-        if ("keyboard".equals(controlChoice1)) {
-            Map<KeyCode, Double> keyMap1 = new HashMap<>();
-            keyMap1.put(rightKey1, 6.0);
-            keyMap1.put(leftKey1, -6.0);
-            keyMap1.put(accelerateKey1, 0.0);
-
-            playerSnake = Snake.CreateHumanKeyboardSnake(keyMap1, 5, new Position(55, 30),
-                    new Direction(Math.PI / 2));
-        } else {
-            playerSnake = Snake.CreateHumanMouseSnake(5, new Position(35, 30), new Direction(Math.PI / 2));
-        }
+        Snake playerSnake = makePlayer(model, true);
 
         model.addSnake(playerSnake);
 
@@ -137,6 +114,73 @@ public class HomePageController {
         GameMode gameMode = new SinglePlayerMode();
         /* GameView view = */new GameView(model, controller, root, gameMode);
         controller.gameStart();
+    }
+
+    private Snake makePlayer(GameModel model, boolean isPlayer1) {
+        Snake playerSnake;
+        if (isPlayer1) {
+            if ("keyboard".equals(controlChoice1)) {
+                Map<KeyCode, Double> keyMap1 = new HashMap<>();
+                keyMap1.put(rightKey1, 6.0);
+                keyMap1.put(leftKey1, -6.0);
+                keyMap1.put(accelerateKey1, 0.0);
+
+                Random random = new Random();
+                Position position;
+                do {
+                    int x = random.nextInt(model.getWidth());
+                    int y = random.nextInt(model.getHeight());
+                    position = new Position(x, y);
+                    double direction = random.nextDouble() * 2 * Math.PI;
+                    playerSnake = Snake.CreateHumanKeyboardSnake(keyMap1, 5, position,
+                            new Direction(direction));
+                } while (!model.isValidSnake(playerSnake));
+
+            } else {
+
+                Random random = new Random();
+                Position position;
+                do {
+                    int x = random.nextInt(model.getWidth());
+                    int y = random.nextInt(model.getHeight());
+                    position = new Position(x, y);
+                    double direction = random.nextDouble() * 2 * Math.PI;
+                    playerSnake = Snake.CreateHumanMouseSnake(5, position, new Direction(direction));
+                } while (!model.isValidSnake(playerSnake));
+            }
+        } else {
+            if ("keyboard".equals(controlChoice2)) {
+                Map<KeyCode, Double> keyMap2 = new HashMap<>();
+                keyMap2.put(rightKey2, 6.0);
+                keyMap2.put(leftKey2, -6.0);
+                keyMap2.put(accelerateKey2, 0.0);
+
+                Random random = new Random();
+                Position position;
+                do {
+                    int x = random.nextInt(model.getWidth());
+                    int y = random.nextInt(model.getHeight());
+                    position = new Position(x, y);
+                    double direction = random.nextDouble() * 2 * Math.PI;
+                    playerSnake = Snake.CreateHumanKeyboardSnake(keyMap2, 5, position,
+                            new Direction(direction));
+                } while (!model.isValidSnake(playerSnake));
+
+            } else {
+
+                Random random = new Random();
+                Position position;
+                do {
+                    int x = random.nextInt(model.getWidth());
+                    int y = random.nextInt(model.getHeight());
+                    position = new Position(x, y);
+                    double direction = random.nextDouble() * 2 * Math.PI;
+                    playerSnake = Snake.CreateHumanMouseSnake(5, position, new Direction(direction));
+                } while (!model.isValidSnake(playerSnake));
+            }
+        }
+        return playerSnake;
+
     }
 
     @FXML

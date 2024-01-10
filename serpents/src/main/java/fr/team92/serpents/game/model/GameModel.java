@@ -246,16 +246,26 @@ public final class GameModel implements Observable {
      */
     public void addSnake(Snake snake) {
 
+        if (!isValidSnake(snake)) {
+            throw new IllegalArgumentException("Snake is not valid");
+        }
+        // On ajoute chaque segment si tout est bon
+        for (Segment segment : snake.getSegments()) {
+            grid.put(segment.getPosition(), segment);
+        }
+        snakes.add(snake);
+    }
+
+    public boolean isValidSnake(Snake snake) {
         if (snake == null) {
             throw new IllegalArgumentException("Snake cannot be null");
         }
         for (Segment segment : snake.getSegments()) {
             if (!isValidPosition(segment.getPosition(), segment.getDiameter())) {
-                throw new IllegalArgumentException("Invalid position");
+                return false;
             }
-            grid.put(segment.getPosition(), segment);
         }
-        snakes.add(snake);
+        return true;
     }
 
     /**
