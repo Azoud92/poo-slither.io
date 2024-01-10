@@ -42,7 +42,7 @@ public class HomePageController {
     private String controlChoice1;
     private String controlChoice2 = "keyboard";
 
-    private int numberOfBots = 1;
+    private int numberOfBots = 5;
     private int numberOfFood = 100;
 
     private KeyCode leftKey1, leftKey2 = KeyCode.LEFT;
@@ -67,8 +67,7 @@ public class HomePageController {
         GameModel model = new GameModel((int) scene.getWidth(), (int) scene.getHeight(), 20, numberOfFood);
 
         for (int i = 0; i < numberOfBots; i++) {
-            Snake botSnake = Snake.CreateAvoidWallsBotSnake(5, new Position(20 + i * 5, 30),
-                    new Direction(Math.PI / 2));
+            Snake botSnake = MakeBotSnake(model);
             model.addSnake(botSnake);
         }
 
@@ -91,18 +90,7 @@ public class HomePageController {
         GameModel model = new GameModel((int) scene.getWidth(), (int) scene.getHeight(), 20, numberOfFood);
 
         for (int i = 0; i < numberOfBots; i++) {
-            Random random = new Random();
-            Position position;
-            Snake botSnake;
-
-            do {
-                int x = random.nextInt(model.getWidth());
-                int y = random.nextInt(model.getHeight());
-                position = new Position(x, y);
-                double direction = random.nextDouble() * 2 * Math.PI;
-                botSnake = Snake.CreateAvoidWallsBotSnake(5, position, new Direction(direction));
-            } while (!model.isValidSnake(botSnake));
-
+            Snake botSnake = MakeBotSnake(model);
             model.addSnake(botSnake);
         }
 
@@ -114,6 +102,22 @@ public class HomePageController {
         GameMode gameMode = new SinglePlayerMode();
         /* GameView view = */new GameView(model, controller, root, gameMode);
         controller.gameStart();
+    }
+
+    private Snake MakeBotSnake(GameModel model) {
+        Random random = new Random();
+        Position position;
+        Snake botSnake;
+
+        do {
+            int x = random.nextInt(model.getWidth());
+            int y = random.nextInt(model.getHeight());
+            position = new Position(x, y);
+            double direction = random.nextDouble() * 2 * Math.PI;
+            botSnake = Snake.CreateAvoidWallsBotSnake(5, position, new Direction(direction));
+        } while (!model.isValidSnake(botSnake));
+
+        return botSnake;
     }
 
     private Snake makePlayer(GameModel model, boolean isPlayer1) {

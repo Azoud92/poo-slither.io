@@ -1,6 +1,9 @@
 package fr.team92.serpents.game.controller;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -203,8 +206,18 @@ public class ChangeControlsController {
                 || (leftKeyCode1 != null && rightKeyCode1 != null && accelerateKeyCode1 != null))
                 && (mouseRadioButton2.isSelected()
                         || (leftKeyCode2 != null && rightKeyCode2 != null && accelerateKeyCode2 != null))) {
-            loadHomePage(leftKeyCode1, rightKeyCode1, accelerateKeyCode1, leftKeyCode2, rightKeyCode2,
-                    accelerateKeyCode2);
+            if (keyboardRadioButton1.isSelected() && keyboardRadioButton2.isSelected()) {
+                Set<KeyCode> keys = new HashSet<>(
+                        Arrays.asList(leftKeyCode1, rightKeyCode1, accelerateKeyCode1, leftKeyCode2, rightKeyCode2,
+                                accelerateKeyCode2));
+                if (keys.size() == 6) {
+                    loadHomePage(leftKeyCode1, rightKeyCode1, accelerateKeyCode1, leftKeyCode2, rightKeyCode2,
+                            accelerateKeyCode2);
+                }
+            } else {
+                loadHomePage(leftKeyCode1, rightKeyCode1, accelerateKeyCode1, leftKeyCode2, rightKeyCode2,
+                        accelerateKeyCode2);
+            }
         }
     }
 }

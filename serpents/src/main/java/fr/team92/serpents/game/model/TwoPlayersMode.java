@@ -16,7 +16,6 @@ public final class TwoPlayersMode implements GameMode {
         CELL_SIZE = cellSize;
         pane.getChildren().clear();
         for (Segment segment : controller.getGrid().values()) {
-
             Position pos = segment.getPosition();
             double diameter = segment.getDiameter() * CELL_SIZE;
             double x = pos.x() * CELL_SIZE + CELL_SIZE / 2.0;
