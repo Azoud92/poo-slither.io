@@ -10,7 +10,10 @@ import javafx.stage.Stage;
 import java.util.HashMap;
 import java.util.Map;
 
+import fr.team92.serpents.game.model.GameMode;
 import fr.team92.serpents.game.model.GameModel;
+import fr.team92.serpents.game.model.SinglePlayerMode;
+import fr.team92.serpents.game.model.TwoPlayersMode;
 import fr.team92.serpents.game.view.GameView;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.Direction;
@@ -98,7 +101,8 @@ public class HomePageController {
         model.addSnake(playerSnake2);
 
         GameController controller = new GameController(model, scene);
-        /* GameView view = */new GameView(model, controller, root);
+        GameMode gameMode = new TwoPlayersMode();
+        /* GameView view = */new GameView(model, controller, root, gameMode);
         controller.gameStart();
     }
 
@@ -130,7 +134,8 @@ public class HomePageController {
         model.addSnake(playerSnake);
 
         GameController controller = new GameController(model, scene);
-        /* GameView view = */new GameView(model, controller, root);
+        GameMode gameMode = new SinglePlayerMode();
+        /* GameView view = */new GameView(model, controller, root, gameMode);
         controller.gameStart();
     }
 

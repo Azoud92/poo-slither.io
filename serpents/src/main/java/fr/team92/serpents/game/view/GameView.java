@@ -3,11 +3,9 @@ package fr.team92.serpents.game.view;
 import java.io.IOException;
 
 import fr.team92.serpents.game.controller.GameController;
-import fr.team92.serpents.snake.model.BurrowingSegmentBehavior;
-import fr.team92.serpents.snake.model.Segment;
+import fr.team92.serpents.game.model.GameMode;
 import fr.team92.serpents.utils.Observable;
 import fr.team92.serpents.utils.Observer;
-import fr.team92.serpents.utils.Position;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -18,13 +16,11 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.util.Duration;
@@ -35,11 +31,13 @@ public final class GameView implements Observer {
     private final Pane pane;
     private static int CELL_SIZE;
     private static Text scoreText;
+    private final GameMode gameMode;
 
-    public GameView(Observable model, GameController controller, Pane pane) {
+    public GameView(Observable model, GameController controller, Pane pane, GameMode gameMode) {
         this.pane = pane;
         this.controller = controller;
         CELL_SIZE = controller.getCellSize();
+        this.gameMode = gameMode;
 
         Image backgroundImage = new Image(
                 getClass().getResource("/fr/team92/serpents/main/ressources/background.jpg").toExternalForm());
@@ -74,63 +72,7 @@ public final class GameView implements Observer {
     }
 
     private void drawSegments() {
-        pane.getChildren().clear();
-        pane.getChildren().add(scoreText);
-
-        Segment headSegment = controller.getHumanSnake().getSegments().getFirst();
-        Position headPos = headSegment.getPosition();
-
-        for (Segment segment : controller.getGrid().values()) {
-            Position pos = segment.getPosition();
-            double x = (pos.x() - headPos.x()) * CELL_SIZE + pane.getWidth() / 2.0;
-            double y = (pos.y() - headPos.y()) * CELL_SIZE + pane.getHeight() / 2.0;
-            double radius = segment.getDiameter() * CELL_SIZE / 2.0;
-
-            // Si une partie du segment est à un bord de la grille, on le dessine aussi
-            // de l'autre côté
-            boolean left = x - radius < 0;
-            boolean right = x + radius > pane.getWidth();
-            boolean top = y - radius < 0;
-            boolean bottom = y + radius > pane.getHeight();
-
-            if (left) {
-                drawSegment(segment, x + pane.getWidth(), y);
-            } else if (right) {
-                drawSegment(segment, x - pane.getWidth(), y);
-            }
-            if (top) {
-                drawSegment(segment, x, y + pane.getHeight());
-            } else if (bottom) {
-                drawSegment(segment, x, y - pane.getHeight());
-            }
-
-            // Si le segment est dans un coin, on le dessine aussi dans le coin opposé
-            if (left && top) {
-                drawSegment(segment, x + pane.getWidth(), y + pane.getHeight());
-            } else if (right && top) {
-                drawSegment(segment, x - pane.getWidth(), y + pane.getHeight());
-            } else if (right && bottom) {
-                drawSegment(segment, x - pane.getWidth(), y - pane.getHeight());
-            } else if (left && bottom) {
-                drawSegment(segment, x + pane.getWidth(), y - pane.getHeight());
-            }
-
-            // Ensuite, on dessine le segment à sa position actuelle
-            drawSegment(segment, x, y);
-        }
-    }
-
-    private void drawSegment(Segment segment, double x, double y) {
-        double diameter = segment.getDiameter() * CELL_SIZE;
-        Circle circle = new Circle(x, y, diameter / 2.0);
-        if (segment.isDead()) {
-            circle.setFill(Color.ORANGE);
-        } else {
-            circle.setFill(Color.RED);
-        }
-        if (segment.getBehavior() instanceof BurrowingSegmentBehavior)
-            circle.setFill(Color.BLUE);
-        pane.getChildren().add(circle);
+        gameMode.drawSegments(pane, controller, CELL_SIZE);
     }
 
     @SuppressWarnings("unused")
