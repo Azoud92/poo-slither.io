@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
@@ -7,6 +8,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -19,38 +21,83 @@
                     <Image url="@../../main/ressources/background.jpg" />
                 </image>
             </ImageView>
-            <VBox alignment="CENTER" spacing="20" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
-                <Label text="Choisissez votre mode de contrôle" textAlignment="CENTER" textFill="RED">
-                    <font>
-                        <Font size="50.0" />
-                    </font>
-                </Label>
-        
-                <RadioButton fx:id="mouseRadioButton" text="Jouer à la souris" textFill="RED">
-                    <font>
+             <Label text="Choisissez votre mode de contrôle" textAlignment="CENTER" textFill="RED" StackPane.alignment="TOP_CENTER">
+                 <font>
+                     <Font size="50.0" />
+                 </font>
+            <StackPane.margin>
+               <Insets top="100.0" />
+            </StackPane.margin>
+             </Label>
+         <HBox AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+            <children>
+                  <VBox alignment="CENTER" prefHeight="1080.0" spacing="20" HBox.hgrow="ALWAYS">
+                  <Label text="Joueur 1 :" textFill="RED" underline="true">
+                     <font>
                         <Font size="20.0" />
-                    </font>
-                </RadioButton>
-                <RadioButton fx:id="keyboardRadioButton" contentDisplay="CENTER" text="Jouer au clavier" textFill="RED">
-                    <font>
+                     </font>
+                  </Label>
+                    <RadioButton fx:id="mouseRadioButton1" text="Jouer à la souris" textFill="RED">
+                          <font>
+                              <Font size="20.0" />
+                          </font>
+                      </RadioButton>
+                      <RadioButton fx:id="keyboardRadioButton1" contentDisplay="CENTER" text="Jouer au clavier" textFill="RED">
+                          <font>
+                              <Font size="20.0" />
+                          </font>
+                      </RadioButton>
+              
+                         
+                      <VBox fx:id="keyboardControls1" alignment="CENTER" visible="false" HBox.hgrow="ALWAYS">
+                          <Label text="Choisissez vos touches de contrôle" textAlignment="CENTER" textFill="WHITE">
+                              <font>
+                                  <Font size="20.0" />
+                              </font>
+                          </Label>
+                          <TextField fx:id="leftKeyTextField1" promptText="Tourner à gauche" style="-fx-font-size: 15px; -fx-padding: 10px; -fx-background-color: #ffffff; -fx-border-color: #000000; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-min-width: 140px; -fx-max-width: 140px; -fx-pref-width: 140px; -fx-pref-height: 40px; -fx-alignment: center;" />
+                          <TextField fx:id="rightKeyTextField1" promptText="Tourner à droite" style="-fx-font-size: 15px; -fx-padding: 10px; -fx-background-color: #ffffff; -fx-border-color: #000000; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-min-width: 140px; -fx-max-width: 140px; -fx-pref-width: 140px; -fx-pref-height: 40px; -fx-alignment: center;" />
+                          <TextField fx:id="accelerateKeyTextField1" promptText="Accélérer" style="-fx-font-size: 15px; -fx-padding: 10px; -fx-background-color: #ffffff; -fx-border-color: #000000; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-min-width: 140px; -fx-max-width: 140px; -fx-pref-width: 140px; -fx-pref-height: 40px; -fx-alignment: center;" />
+                      </VBox>
+                  </VBox>
+                  <VBox alignment="CENTER" prefHeight="1080.0" spacing="20" HBox.hgrow="ALWAYS">
+                  <Label text="Joueur 2 :" textFill="RED" underline="true">
+                     <font>
                         <Font size="20.0" />
-                    </font>
-                </RadioButton>
-                <VBox fx:id="keyboardControls" alignment="CENTER" visible="false">
-                    <Label text="Choisissez vos touches de contrôle" textAlignment="CENTER" textFill="WHITE">
-                        <font>
-                            <Font size="20.0" />
-                        </font>
-                    </Label>
-                    <TextField fx:id="leftKeyTextField" promptText="Tourner à gauche" style="-fx-font-size: 15px; -fx-padding: 10px; -fx-background-color: #ffffff; -fx-border-color: #000000; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-min-width: 140px; -fx-max-width: 140px; -fx-pref-width: 140px; -fx-pref-height: 40px; -fx-alignment: center;" />
-                    <TextField fx:id="rightKeyTextField" promptText="Tourner à droite" style="-fx-font-size: 15px; -fx-padding: 10px; -fx-background-color: #ffffff; -fx-border-color: #000000; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-min-width: 140px; -fx-max-width: 140px; -fx-pref-width: 140px; -fx-pref-height: 40px; -fx-alignment: center;" />
-                    <TextField fx:id="accelerateKeyTextField" promptText="Accélérer" style="-fx-font-size: 15px; -fx-padding: 10px; -fx-background-color: #ffffff; -fx-border-color: #000000; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-min-width: 140px; -fx-max-width: 140px; -fx-pref-width: 140px; -fx-pref-height: 40px; -fx-alignment: center;" />
-                </VBox>
-                <Button fx:id="saveButton" onAction="#saveButtonClicked" style="-fx-background-color: black;" text="Sauvegarder" textFill="WHITE">
-                <font>
-                <Font size="25.0" />
-                </font></Button>
-            </VBox>
+                     </font>
+                  </Label>
+
+                               <RadioButton fx:id="mouseRadioButton2" text="Jouer à la souris" textFill="RED">
+                          <font>
+                              <Font size="20.0" />
+                          </font>
+                      </RadioButton>
+                      <RadioButton fx:id="keyboardRadioButton2" contentDisplay="CENTER" text="Jouer au clavier" textFill="RED">
+                          <font>
+                              <Font size="20.0" />
+                          </font>
+                      </RadioButton>
+                      <VBox fx:id="keyboardControls2" alignment="CENTER" visible="false">
+                          <Label text="Choisissez vos touches de contrôle" textAlignment="CENTER" textFill="WHITE">
+                              <font>
+                                  <Font size="20.0" />
+                              </font>
+                          </Label>
+                          <TextField fx:id="leftKeyTextField2" promptText="Tourner à gauche" style="-fx-font-size: 15px; -fx-padding: 10px; -fx-background-color: #ffffff; -fx-border-color: #000000; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-min-width: 140px; -fx-max-width: 140px; -fx-pref-width: 140px; -fx-pref-height: 40px; -fx-alignment: center;" />
+                          <TextField fx:id="rightKeyTextField2" promptText="Tourner à droite" style="-fx-font-size: 15px; -fx-padding: 10px; -fx-background-color: #ffffff; -fx-border-color: #000000; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-min-width: 140px; -fx-max-width: 140px; -fx-pref-width: 140px; -fx-pref-height: 40px; -fx-alignment: center;" />
+                          <TextField fx:id="accelerateKeyTextField2" promptText="Accélérer" style="-fx-font-size: 15px; -fx-padding: 10px; -fx-background-color: #ffffff; -fx-border-color: #000000; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-min-width: 140px; -fx-max-width: 140px; -fx-pref-width: 140px; -fx-pref-height: 40px; -fx-alignment: center;" />
+                      </VBox>
+                  </VBox>
+            </children>
+         </HBox>
+             <Button fx:id="saveButton" alignment="CENTER" onAction="#saveButtonClicked" style="-fx-background-color: black;" text="Sauvegarder" textFill="WHITE" StackPane.alignment="BOTTOM_CENTER">
+             <font>
+             <Font size="25.0" />
+             </font>
+            <StackPane.margin>
+               <Insets bottom="200.0" />
+            </StackPane.margin>
+         </Button>
         </StackPane>
     </children>
 </AnchorPane>

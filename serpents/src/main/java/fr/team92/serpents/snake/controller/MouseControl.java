@@ -3,7 +3,6 @@ package fr.team92.serpents.snake.controller;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.Direction;
 import javafx.scene.input.InputEvent;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 /**

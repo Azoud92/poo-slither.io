@@ -30,7 +30,7 @@ public final class App extends Application {
             stage.setScene(scene);
             stage.sizeToScene();
 
-            stage.setMinWidth(750);
+            stage.setMinWidth(800);
             stage.setMaxWidth(scene.getWidth());
             stage.setMinHeight(750);
             stage.setMaxHeight(scene.getHeight());

@@ -8,7 +8,6 @@ import fr.team92.serpents.utils.Direction;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.Node;
 
 /**
  * Contrôle du serpent par le clavier
