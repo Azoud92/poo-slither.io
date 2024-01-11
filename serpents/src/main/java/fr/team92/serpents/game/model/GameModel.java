@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import fr.team92.serpents.game.controller.GameController;
 import fr.team92.serpents.snake.controller.HumanSnakeController;
 import fr.team92.serpents.snake.controller.KeyboardControl;
 import fr.team92.serpents.snake.model.BurrowingSegmentBehavior;

@@ -238,4 +238,27 @@ public final class GameController {
         return getHumanSnake().getLength();
     }
 
+    public Snake getPlayer1() {
+        for (Snake snake : model.getSnakes()) {
+            if (snake.getController() instanceof HumanSnakeController) {
+                return snake;
+            }
+        }
+        throw new IllegalStateException("Player 1 does not exist");
+    }
+
+    public Snake getPlayer2() {
+        boolean foundFirstPlayer = false;
+        for (Snake snake : model.getSnakes()) {
+            if (snake.getController() instanceof HumanSnakeController) {
+                if (foundFirstPlayer) {
+                    return snake;
+                } else {
+                    foundFirstPlayer = true;
+                }
+            }
+        }
+        throw new IllegalStateException("Player 2 does not exist");
+    }
+
 }

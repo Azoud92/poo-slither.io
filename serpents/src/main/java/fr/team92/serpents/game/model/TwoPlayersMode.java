@@ -7,14 +7,15 @@ import fr.team92.serpents.utils.Position;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 
 public final class TwoPlayersMode implements GameMode {
-    int CELL_SIZE;
+    private static int CELL_SIZE;
 
     @Override
     public void drawSegments(Pane pane, GameController controller, int cellSize) {
         CELL_SIZE = cellSize;
-        pane.getChildren().clear();
+        pane.getChildren().removeIf(node -> node instanceof Circle);
         for (Segment segment : controller.getGrid().values()) {
             Position pos = segment.getPosition();
             double diameter = segment.getDiameter() * CELL_SIZE;
@@ -32,6 +33,15 @@ public final class TwoPlayersMode implements GameMode {
                 pane.getChildren().add(circle);
             }
         }
+    }
+
+    @Override
+    public void updateScore(Text scoreText, GameController controller, Pane pane) {
+        int score1 = controller.getPlayer1().getLength();
+        int score2 = controller.getPlayer2().getLength();
+
+        scoreText.setText(String.format("Joueur 1 - Score : %d\nJoueur 2 - Score : %d", score1, score2));
+
     }
 
 }

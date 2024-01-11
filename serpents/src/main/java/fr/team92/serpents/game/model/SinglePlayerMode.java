@@ -7,13 +7,14 @@ import fr.team92.serpents.utils.Position;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 
 public final class SinglePlayerMode implements GameMode {
-    int CELL_SIZE;
+    private static int CELL_SIZE;
 
     @Override
     public void drawSegments(Pane pane, GameController controller, int cellSize) {
-        pane.getChildren().clear();
+        pane.getChildren().removeIf(node -> node instanceof Circle);
 
         Segment headSegment = controller.getHumanSnake().getSegments().getFirst();
         Position headPos = headSegment.getPosition();
@@ -70,6 +71,12 @@ public final class SinglePlayerMode implements GameMode {
         if (segment.getBehavior() instanceof BurrowingSegmentBehavior)
             circle.setFill(Color.BLUE);
         pane.getChildren().add(circle);
+    }
+
+    @Override
+    public void updateScore(Text scoreText, GameController controller, Pane pane) {
+        scoreText.setText("Score : " + controller.getScore());
+
     }
 
 }

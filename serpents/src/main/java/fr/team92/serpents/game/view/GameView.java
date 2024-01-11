@@ -14,6 +14,7 @@ import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -23,6 +24,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.util.Duration;
 
 public final class GameView implements Observer {
@@ -31,6 +33,7 @@ public final class GameView implements Observer {
     private final Pane pane;
     private static int CELL_SIZE;
     private static Text scoreText;
+    private final HBox hbox = new HBox();
     private final GameMode gameMode;
 
     public GameView(Observable model, GameController controller, Pane pane, GameMode gameMode) {
@@ -49,19 +52,19 @@ public final class GameView implements Observer {
         scoreText = new Text();
         scoreText.setFont(Font.font("Arial", 20));
         scoreText.setFill(Color.WHITE);
-        pane.getChildren().add(scoreText);
+        scoreText.setTextAlignment(TextAlignment.CENTER);
+
+        hbox.setAlignment(Pos.TOP_RIGHT);
+        hbox.getChildren().add(scoreText);
+        pane.getChildren().add(hbox);
+        hbox.toFront();
 
         model.addObserver(this);
         this.update();
     }
 
     private void updateScore() {
-        int score = controller.getScore();
-        scoreText.setX(pane.getWidth() - scoreText.getLayoutBounds().getWidth() - 20);
-        scoreText.setY(20);
-        if (!pane.getChildren().contains(scoreText)) {
-            pane.getChildren().add(scoreText);
-        }
+        gameMode.updateScore(scoreText, controller, pane);
     }
 
     @Override
@@ -73,9 +76,9 @@ public final class GameView implements Observer {
 
     private void drawSegments() {
         gameMode.drawSegments(pane, controller, CELL_SIZE);
+        hbox.toFront();
     }
 
-    @SuppressWarnings("unused")
     private void endGame() {
         if (!controller.gameFinished())
             return;

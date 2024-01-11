@@ -64,6 +64,7 @@ public class HomePageController {
     protected void twoPlayerClicked(ActionEvent event) {
         Scene scene = ((Node) event.getSource()).getScene();
         Pane root = (Pane) scene.getRoot();
+        root.getChildren().clear();
         GameModel model = new GameModel((int) scene.getWidth(), (int) scene.getHeight(), 20, numberOfFood);
 
         for (int i = 0; i < numberOfBots; i++) {
@@ -87,6 +88,7 @@ public class HomePageController {
     protected void singlePlayerClicked(ActionEvent event) {
         Scene scene = ((Node) event.getSource()).getScene();
         Pane root = (Pane) scene.getRoot();
+        root.getChildren().clear();
         GameModel model = new GameModel((int) scene.getWidth(), (int) scene.getHeight(), 20, numberOfFood);
 
         for (int i = 0; i < numberOfBots; i++) {
