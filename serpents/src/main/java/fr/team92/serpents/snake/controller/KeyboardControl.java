@@ -3,6 +3,7 @@ package fr.team92.serpents.snake.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import fr.team92.serpents.game.model.GameMode;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.Direction;
 import javafx.scene.input.InputEvent;
@@ -29,7 +30,8 @@ public final class KeyboardControl implements SnakeEventControl {
     }
 
     @Override
-    public void handleControl(Snake snake, InputEvent event, int cellSize, double windowWidth, double windowHeight) {
+    public void handleControl(Snake snake, InputEvent event, GameMode gameMode, int cellSize, double windowWidth,
+            double windowHeight) {
         KeyEvent keyEvent = (KeyEvent) event;
         Double angleChange = keyMap.get(keyEvent.getCode());
         if (angleChange != null) {

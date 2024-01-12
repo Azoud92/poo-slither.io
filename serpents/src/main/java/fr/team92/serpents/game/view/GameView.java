@@ -124,4 +124,8 @@ public final class GameView implements Observer {
     public static void setCellSize(int cellSize) {
         CELL_SIZE = cellSize;
     }
+
+    public GameMode getGameMode() {
+        return gameMode;
+    }
 }

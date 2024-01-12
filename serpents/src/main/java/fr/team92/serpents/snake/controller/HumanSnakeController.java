@@ -59,13 +59,15 @@ public final class HumanSnakeController implements SnakeController {
     public void controlSnake(Snake snake, GameModel gameModel, double lastUpdate, Scene scene) {
         if (lastEvent instanceof KeyEvent && snakeEventControl instanceof KeyboardControl) {
             if (lastEvent != null) {
-                snakeEventControl.handleControl(snake, lastEvent, gameModel.getCellSize(), scene.getWidth(),
+                snakeEventControl.handleControl(snake, lastEvent, gameModel.getGameMode(), gameModel.getCellSize(),
+                        scene.getWidth(),
                         scene.getHeight());
                 lastEvent = null;
             }
         } else if (lastEvent instanceof MouseEvent && snakeEventControl instanceof MouseControl) {
             if (lastEvent != null) {
-                snakeEventControl.handleControl(snake, lastEvent, gameModel.getCellSize(), scene.getWidth(),
+                snakeEventControl.handleControl(snake, lastEvent, gameModel.getGameMode(), gameModel.getCellSize(),
+                        scene.getWidth(),
                         scene.getHeight());
                 lastEvent = null;
             }
