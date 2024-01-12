@@ -152,6 +152,7 @@ public final class Snake {
         Position headPos = segments.getFirst().getPosition();
         Segment newSegment = new Segment(headPos, segments.getFirst().getDiameter(), behavior);
         segmentsToAdd.add(newSegment);
+        addNewSegments();
     }
 
     /**

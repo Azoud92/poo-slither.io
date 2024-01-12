@@ -1,5 +1,7 @@
 package fr.team92.serpents.game.model;
 
+import java.util.ArrayList;
+
 import fr.team92.serpents.game.controller.GameController;
 import fr.team92.serpents.snake.model.BurrowingSegmentBehavior;
 import fr.team92.serpents.snake.model.Segment;
@@ -11,6 +13,7 @@ import javafx.scene.text.Text;
 
 public final class SinglePlayerMode implements GameMode {
     private static int CELL_SIZE;
+    ArrayList<Circle> snakeCircles = new ArrayList<>();
 
     @Override
     public void drawSegments(Pane pane, GameController controller, int cellSize) {
@@ -58,19 +61,33 @@ public final class SinglePlayerMode implements GameMode {
             // Ensuite, on dessine le segment à sa position actuelle
             drawSegment(pane, segment, x, y);
         }
+
+        // ajout des cercles des serpents après les segments morts pour qu'ils soient au
+        // dessus dans l'affichage
+        for (Circle circle : snakeCircles) {
+            pane.getChildren().add(circle);
+        }
+        snakeCircles.clear();
     }
 
     private void drawSegment(Pane pane, Segment segment, double x, double y) {
         double diameter = segment.getDiameter() * CELL_SIZE;
         Circle circle = new Circle(x, y, diameter / 2.0);
-        if (segment.isDead()) {
+        if (segment.getBehavior() instanceof BurrowingSegmentBehavior) {
+            circle.setFill(Color.BLUE);
+        } else if (segment.isDead()) {
             circle.setFill(Color.ORANGE);
-        } else {
+        }
+        if (!(segment.getBehavior() instanceof BurrowingSegmentBehavior) && !segment.isDead()) {
             circle.setFill(Color.RED);
         }
-        if (segment.getBehavior() instanceof BurrowingSegmentBehavior)
-            circle.setFill(Color.BLUE);
-        pane.getChildren().add(circle);
+
+        if (!segment.isDead()) {
+            snakeCircles.add(circle);
+        } else {
+            pane.getChildren().add(circle);
+        }
+
     }
 
     @Override

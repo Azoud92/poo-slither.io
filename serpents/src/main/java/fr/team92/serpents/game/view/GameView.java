@@ -88,7 +88,7 @@ public final class GameView implements Observer {
         gameOverRect.setFill(Color.BLACK);
         gameOverRect.setOpacity(0.7);
 
-        Text gameOverText = new Text("La partie est terminée ! L'un des serpents a perdu");
+        Text gameOverText = new Text("La partie est terminée ! Plus de serpents humains en jeu!");
         gameOverText.setFont(Font.font("Arial", 28));
         gameOverText.setFill(Color.WHITE);
         gameOverText.setTextAlignment(TextAlignment.CENTER);
@@ -101,7 +101,7 @@ public final class GameView implements Observer {
         fadeTransition.setFromValue(0);
         fadeTransition.setToValue(1);
         fadeTransition.setAutoReverse(true);
-        fadeTransition.setCycleCount(3);
+        fadeTransition.setCycleCount(2);
 
         fadeTransition.setOnFinished(event -> {
             try {

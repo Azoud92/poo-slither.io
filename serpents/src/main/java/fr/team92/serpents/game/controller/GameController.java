@@ -238,7 +238,7 @@ public final class GameController {
         return getHumanSnake().getLength();
     }
 
-    public Snake getPlayer1() {
+    public Snake getPlayer1() {// TODO : a changer
         for (Snake snake : model.getSnakes()) {
             if (snake.getController() instanceof HumanSnakeController) {
                 return snake;
@@ -247,7 +247,7 @@ public final class GameController {
         throw new IllegalStateException("Player 1 does not exist");
     }
 
-    public Snake getPlayer2() {
+    public Snake getPlayer2() { // TODO: a changer
         boolean foundFirstPlayer = false;
         for (Snake snake : model.getSnakes()) {
             if (snake.getController() instanceof HumanSnakeController) {
