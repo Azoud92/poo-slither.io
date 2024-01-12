@@ -3,8 +3,10 @@ package fr.team92.serpents.game.network;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 import com.google.gson.JsonObject;
 
@@ -59,8 +61,8 @@ public class ClientConnection {
     public synchronized void connect() {
         try {
             socket = new Socket(address, port);
-            out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
             
             // Envoi d'un message de connexion au serveur
             JsonObject connectionMsg = new JsonObject();
@@ -81,6 +83,11 @@ public class ClientConnection {
      */
     public synchronized void disconnect() {
         try {
+            // Envoi d'un message de déconnexion au serveur
+            JsonObject disconnectionMsg = new JsonObject();
+            disconnectionMsg.addProperty("type", "disconnection");
+            send(disconnectionMsg.toString());
+
             if (out != null) {
                 out.close();
             }

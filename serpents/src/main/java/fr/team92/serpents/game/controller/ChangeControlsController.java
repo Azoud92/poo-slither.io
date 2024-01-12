@@ -1,6 +1,9 @@
 package fr.team92.serpents.game.controller;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,79 +20,128 @@ import javafx.stage.Stage;
 public class ChangeControlsController {
 
     @FXML
-    private RadioButton mouseRadioButton;
+    private RadioButton mouseRadioButton1;
+    @FXML
+    private RadioButton mouseRadioButton2;
 
     @FXML
-    private RadioButton keyboardRadioButton;
+    private RadioButton keyboardRadioButton1;
+    @FXML
+    private RadioButton keyboardRadioButton2;
 
-    private ToggleGroup controlToggleGroup;
+    private ToggleGroup controlToggleGroup1;
+    private ToggleGroup controlToggleGroup2;
 
     @FXML
-    private TextField leftKeyTextField;
+    private TextField leftKeyTextField1;
 
     @FXML
-    private TextField rightKeyTextField;
+    private TextField rightKeyTextField1;
 
     @FXML
-    private VBox keyboardControls;
+    private TextField accelerateKeyTextField1;
+
+    @FXML
+    private VBox keyboardControls1;
+
+    @FXML
+    private TextField leftKeyTextField2;
+
+    @FXML
+    private TextField rightKeyTextField2;
+
+    @FXML
+    private TextField accelerateKeyTextField2;
+
+    @FXML
+    private VBox keyboardControls2;
 
     @FXML
     private Button saveButton;
 
     @FXML
     public void initialize() {
+
         ButtonsAnimations.addAnimations(saveButton);
 
-        controlToggleGroup = new ToggleGroup();
-        mouseRadioButton.setToggleGroup(controlToggleGroup);
-        keyboardRadioButton.setToggleGroup(controlToggleGroup);
+        controlToggleGroup1 = new ToggleGroup();
+        mouseRadioButton1.setToggleGroup(controlToggleGroup1);
+        keyboardRadioButton1.setToggleGroup(controlToggleGroup1);
 
-        mouseRadioButton.setSelected(true);// TODO: a adapter plus tard
+        mouseRadioButton1.setSelected(true);// TODO: a adapter plus tard
 
-        controlToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == keyboardRadioButton) {
-                keyboardControls.setVisible(true);
+        controlToggleGroup1.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == keyboardRadioButton1) {
+                keyboardControls1.setVisible(true);
             } else {
-                keyboardControls.setVisible(false);
+                keyboardControls1.setVisible(false);
             }
         });
 
-        leftKeyTextField.setOnKeyTyped(event -> {
-            String character = event.getCharacter();
-            event.consume();
-            leftKeyTextField.setText(character.toUpperCase());
+        leftKeyTextField1.setOnKeyReleased(event -> {
+            leftKeyTextField1.setText(event.getCode().toString());
         });
 
-        rightKeyTextField.setOnKeyTyped(event -> {
-            String character = event.getCharacter();
-            event.consume();
-            rightKeyTextField.setText(character.toUpperCase());
+        rightKeyTextField1.setOnKeyReleased(event -> {
+            rightKeyTextField1.setText(event.getCode().toString());
         });
 
-        leftKeyTextField.setOnKeyPressed(event -> {
-            event.consume();
-            ((TextField) event.getSource()).setText(event.getCode().toString());
+        accelerateKeyTextField1.setOnKeyReleased(event -> {
+            accelerateKeyTextField1.setText(event.getCode().toString());
         });
 
-        rightKeyTextField.setOnKeyPressed(event -> {
-            event.consume();
-            ((TextField) event.getSource()).setText(event.getCode().toString());
+        controlToggleGroup2 = new ToggleGroup();
+        mouseRadioButton2.setToggleGroup(controlToggleGroup2);
+        keyboardRadioButton2.setToggleGroup(controlToggleGroup2);
+
+        mouseRadioButton2.setSelected(true);// TODO: a adapter plus tard
+
+        controlToggleGroup2.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == keyboardRadioButton2) {
+                keyboardControls2.setVisible(true);
+            } else {
+                keyboardControls2.setVisible(false);
+            }
         });
+
+        leftKeyTextField2.setOnKeyReleased(event -> {
+            leftKeyTextField2.setText(event.getCode().toString());
+        });
+
+        rightKeyTextField2.setOnKeyReleased(event -> {
+            rightKeyTextField2.setText(event.getCode().toString());
+        });
+
+        accelerateKeyTextField2.setOnKeyReleased(event -> {
+            accelerateKeyTextField2.setText(event.getCode().toString());
+        });
+
     }
 
-    private void loadHomePage(KeyCode leftKey, KeyCode rightKey) {
+    private void loadHomePage(KeyCode leftKey1, KeyCode rightKey1, KeyCode accelerateKey1, KeyCode leftKey2,
+            KeyCode rightKey2, KeyCode accelerateKey2) {
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fr/team92/serpents/game/view/homepage.fxml"));
             Parent root = loader.load();
 
             HomePageController homePageController = loader.getController();
-            if (keyboardRadioButton.isSelected()) {
-                homePageController.setControlChoice("keyboard");
-                homePageController.setLeftKey(leftKey);
-                homePageController.setRightKey(rightKey);
-            } else if (mouseRadioButton.isSelected()) {
-                homePageController.setControlChoice("mouse");
+            if (keyboardRadioButton1.isSelected()) {
+                homePageController.setControlChoice("keyboard", true);
+                homePageController.setLeftKey(leftKey1, true);
+                homePageController.setRightKey(rightKey1, true);
+                homePageController.setAccelerateKey(accelerateKey1, true);
+            } else if (mouseRadioButton1.isSelected()) {
+                homePageController.setControlChoice("mouse", true);
+            }
+
+            if (keyboardRadioButton2.isSelected()) {
+                homePageController.setControlChoice("keyboard", false);
+                homePageController.setLeftKey(leftKey2, false);
+                homePageController.setRightKey(rightKey2, false);
+                homePageController.setAccelerateKey(accelerateKey2, false);
+            } else if (mouseRadioButton2.isSelected()) {
+                homePageController.setControlChoice("mouse", false);
             }
 
             Stage appStage = (Stage) saveButton.getScene().getWindow();
@@ -112,25 +164,60 @@ public class ChangeControlsController {
 
     @FXML
     public void saveButtonClicked() {
-        if (keyboardRadioButton.isSelected()) {
-            String leftKey = leftKeyTextField.getText();
-            String rightKey = rightKeyTextField.getText();
+        if (mouseRadioButton1.isSelected() && mouseRadioButton2.isSelected()) {
+            return;
+        }
 
-            if (leftKey.isEmpty() || rightKey.isEmpty()) {
-                System.out.println("Veuillez entrer des touches pour les commandes de gauche et de droite.");
+        KeyCode leftKeyCode1 = null;
+        KeyCode rightKeyCode1 = null;
+        KeyCode accelerateKeyCode1 = null;
 
-            } else if (leftKey.equals(rightKey)) {
-                System.out
-                        .println("Veuillez entrer des touches différentes pour les commandes de gauche et de droite.");
-            } else {
-                KeyCode leftKeyCode = keyCode(leftKey);
-                KeyCode rightKeyCode = keyCode(rightKey);
-                if (leftKeyCode != null && rightKeyCode != null) {
-                    loadHomePage(leftKeyCode, rightKeyCode);
-                }
+        if (keyboardRadioButton1.isSelected()) {
+            String leftKey1 = leftKeyTextField1.getText();
+            String rightKey1 = rightKeyTextField1.getText();
+            String accelerateKey1 = accelerateKeyTextField1.getText();
+
+            if (!leftKey1.isEmpty() && !rightKey1.isEmpty() && !accelerateKey1.isEmpty() && !leftKey1.equals(rightKey1)
+                    && !leftKey1.equals(accelerateKey1) && !rightKey1.equals(accelerateKey1)) {
+                leftKeyCode1 = keyCode(leftKey1);
+                rightKeyCode1 = keyCode(rightKey1);
+                accelerateKeyCode1 = keyCode(accelerateKey1);
             }
-        } else if (mouseRadioButton.isSelected()) {
-            loadHomePage(null, null);
+        }
+
+        KeyCode leftKeyCode2 = null;
+        KeyCode rightKeyCode2 = null;
+        KeyCode accelerateKeyCode2 = null;
+
+        if (keyboardRadioButton2.isSelected()) {
+            String leftKey2 = leftKeyTextField2.getText();
+            String rightKey2 = rightKeyTextField2.getText();
+            String accelerateKey2 = accelerateKeyTextField2.getText();
+
+            if (!leftKey2.isEmpty() && !rightKey2.isEmpty() && !accelerateKey2.isEmpty() && !leftKey2.equals(rightKey2)
+                    && !leftKey2.equals(accelerateKey2) && !rightKey2.equals(accelerateKey2)) {
+                leftKeyCode2 = keyCode(leftKey2);
+                rightKeyCode2 = keyCode(rightKey2);
+                accelerateKeyCode2 = keyCode(accelerateKey2);
+            }
+        }
+
+        if ((mouseRadioButton1.isSelected()
+                || (leftKeyCode1 != null && rightKeyCode1 != null && accelerateKeyCode1 != null))
+                && (mouseRadioButton2.isSelected()
+                        || (leftKeyCode2 != null && rightKeyCode2 != null && accelerateKeyCode2 != null))) {
+            if (keyboardRadioButton1.isSelected() && keyboardRadioButton2.isSelected()) {
+                Set<KeyCode> keys = new HashSet<>(
+                        Arrays.asList(leftKeyCode1, rightKeyCode1, accelerateKeyCode1, leftKeyCode2, rightKeyCode2,
+                                accelerateKeyCode2));
+                if (keys.size() == 6) {
+                    loadHomePage(leftKeyCode1, rightKeyCode1, accelerateKeyCode1, leftKeyCode2, rightKeyCode2,
+                            accelerateKeyCode2);
+                }
+            } else {
+                loadHomePage(leftKeyCode1, rightKeyCode1, accelerateKeyCode1, leftKeyCode2, rightKeyCode2,
+                        accelerateKeyCode2);
+            }
         }
     }
 }

@@ -1,5 +1,7 @@
 package fr.team92.serpents.snake.controller;
 
+import fr.team92.serpents.game.model.GameMode;
+import fr.team92.serpents.game.model.SinglePlayerMode;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.Direction;
 import javafx.scene.input.InputEvent;
@@ -10,15 +12,26 @@ import javafx.scene.input.MouseEvent;
  */
 public final class MouseControl implements SnakeEventControl {
 
-    public void handleControl(Snake snake, InputEvent event, int cellSize, double windowWidth, double windowHeight) {
+    public void handleControl(Snake snake, InputEvent event, GameMode gameMode, int cellSize, double windowWidth,
+            double windowHeight) {
         if (event instanceof MouseEvent) {
             MouseEvent mouseEvent = (MouseEvent) event;
             double mouseX = mouseEvent.getX();
             double mouseY = mouseEvent.getY();
 
-            // Tête du serpent est toujours au centre de la fenêtre
-            double snakeX = windowWidth / 2;
-            double snakeY = windowHeight / 2;
+            double snakeX;
+            double snakeY;
+
+            // Si le mode de jeu est solo, la tête du serpent est toujours au centre de la
+            // fenêtre
+            // Sinon, elle peut être n'importe où dans la fenêtre
+            if (gameMode instanceof SinglePlayerMode) {
+                snakeX = windowWidth / 2;
+                snakeY = windowHeight / 2;
+            } else {
+                snakeX = snake.getHeadPosition().x() * cellSize;
+                snakeY = snake.getHeadPosition().y() * cellSize;
+            }
 
             double dx = mouseX - snakeX;
             double dy = mouseY - snakeY;
@@ -52,6 +65,7 @@ public final class MouseControl implements SnakeEventControl {
             }
 
             snake.setDirection(new Direction(currentAngle));
+
         }
     }
 }

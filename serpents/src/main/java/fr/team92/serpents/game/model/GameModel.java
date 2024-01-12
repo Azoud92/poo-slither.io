@@ -229,6 +229,9 @@ public final class GameModel implements Observable {
         if (snakes.size() == 1) {
             state = GameState.FINISHED;
         }
+        if (snakes.stream().map(s -> s.getController()).filter(c -> c instanceof HumanSnakeController).count() == 0) {
+            state = GameState.FINISHED;
+        }
 
         notifyObservers();
     }
@@ -249,16 +252,26 @@ public final class GameModel implements Observable {
      */
     public void addSnake(Snake snake) {
 
+        if (!isValidSnake(snake)) {
+            throw new IllegalArgumentException("Snake is not valid");
+        }
+        // On ajoute chaque segment si tout est bon
+        for (Segment segment : snake.getSegments()) {
+            grid.put(segment.getPosition(), segment);
+        }
+        snakes.add(snake);
+    }
+
+    public boolean isValidSnake(Snake snake) {
         if (snake == null) {
             throw new IllegalArgumentException("Snake cannot be null");
         }
         for (Segment segment : snake.getSegments()) {
             if (!isValidPosition(segment.getPosition(), segment.getDiameter())) {
-                throw new IllegalArgumentException("Invalid position");
+                return false;
             }
-            grid.put(segment.getPosition(), segment);
         }
-        snakes.add(snake);
+        return true;
     }
 
     /**
@@ -396,6 +409,10 @@ public final class GameModel implements Observable {
         return snakes.stream()
             .flatMap(snake -> snake.getSegments().stream())
             .anyMatch(segment -> segment.getPosition().distanceTo(position) < minDistance);
+    }
+
+    public GameMode getGameMode() {
+        return observers.get(0).getGameMode();
     }
 
 }

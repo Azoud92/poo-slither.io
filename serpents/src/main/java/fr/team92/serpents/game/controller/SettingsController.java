@@ -63,10 +63,12 @@ public class SettingsController {
         ToggleGroup autoCollisionGroup = new ToggleGroup();
         autoCollisionOnRadioButton.setToggleGroup(autoCollisionGroup);
         autoCollisionOffRadioButton.setToggleGroup(autoCollisionGroup);
+        autoCollisionOnRadioButton.setSelected(true); // TODO: a adapter plus tard
 
         ToggleGroup wallCrossingGroup = new ToggleGroup();
         wallCrossingOnRadioButton.setToggleGroup(wallCrossingGroup);
         wallCrossingOffRadioButton.setToggleGroup(wallCrossingGroup);
+        wallCrossingOnRadioButton.setSelected(true); // TODO: a adapter plus tard
     }
 
     @FXML

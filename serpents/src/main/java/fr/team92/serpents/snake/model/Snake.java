@@ -69,6 +69,12 @@ public final class Snake implements SerializableToJSON {
     public static final double MIN_DISTANCE_INIT = 20;
 
     private double speed;
+    private double speedInAcceleration;
+    private double baseSpeed;
+
+    private int length;
+    private final int MIN_LENGTH = 2;
+    private boolean isAccelerating = false;
 
     /**
      * Constructeur du serpent
@@ -84,6 +90,9 @@ public final class Snake implements SerializableToJSON {
         this.segmentsToAdd = new LinkedList<>();
         this.isDead = false;
         this.speed = speed;
+        this.length = length;
+        this.speedInAcceleration = speed * 2;
+        this.baseSpeed = speed;
         initSegments(length, position, direction);
     }
 
@@ -157,6 +166,7 @@ public final class Snake implements SerializableToJSON {
         if (!segmentsToAdd.isEmpty()) {
             segments.addFirst(segmentsToAdd.getFirst());
             segmentsToAdd.removeFirst();
+            length++;
         }
     }
 
@@ -167,6 +177,7 @@ public final class Snake implements SerializableToJSON {
         Position headPos = segments.getFirst().getPosition();
         Segment newSegment = new Segment(headPos, segments.getFirst().getDiameter(), behavior);
         segmentsToAdd.add(newSegment);
+        addNewSegments();
     }
 
     /**
@@ -286,6 +297,39 @@ public final class Snake implements SerializableToJSON {
 
     public int getCoeff() {
         return coeff;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public void accelerate() {
+        if (length > MIN_LENGTH) {
+            speed = speedInAcceleration;
+            segments.removeLast();
+            length--;
+        } else {
+            decelerate();
+        }
+
+    }
+
+    public void decelerate() {
+        speed = baseSpeed;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
+        this.baseSpeed = speed;
+        this.speedInAcceleration = speed * 2;
+    }
+
+    public void setIsAccelerating(boolean isAccelerating) {
+        this.isAccelerating = isAccelerating;
+    }
+
+    public boolean getIsAccelerating() {
+        return isAccelerating;
     }
 
     @Override

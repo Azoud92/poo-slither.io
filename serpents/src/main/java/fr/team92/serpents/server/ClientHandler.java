@@ -3,14 +3,18 @@ package fr.team92.serpents.server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import fr.team92.serpents.game.model.GameMode;
+import fr.team92.serpents.game.network.ClientMessageType;
 import fr.team92.serpents.snake.controller.NetworkSnakeController;
 import fr.team92.serpents.snake.controller.SnakeController;
 import fr.team92.serpents.snake.model.Segment;
@@ -20,7 +24,9 @@ import fr.team92.serpents.utils.Observer;
 import fr.team92.serpents.utils.Position;
 
 /**
- * Représente un client connecté au serveur.
+ * Gère la communication entre un client et le serveur.
+ * Cette classe est responsable de recevoir les messages du client,
+ * traiter ces messages, et envoyer des réponses appropriées.
  */
 public class ClientHandler extends Thread implements Observer {
 
@@ -71,25 +77,24 @@ public class ClientHandler extends Thread implements Observer {
     }
 
     /**
-     * Démarre le thread client.
-     * Reste dans une boucle infinie tant que le client n'est pas déconnecté, recevant les données envoyées par le client.
+     * Configure les flux d'entrée / sortie et traite les messages entrants dans une boucle.
+     * Reste actif jusqu'à ce que le client se déconnecte ou qu'une erreur survienne.
      */
     @Override
     public void run() {
         try {
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), StandardCharsets.UTF_8), true);
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
 
             String inputLine;
             while (!Thread.currentThread().isInterrupted() && in != null && (inputLine = in.readLine()) != null) {
                 // Traitement des données reçues du client
-                System.out.println("[INFORMATION] Données reçues du client (IP " + clientSocket.getInetAddress().getHostAddress() + ") : " + inputLine);
-                send("Message reçu : " + inputLine);
+                System.out.println("[INFORMATION] Données reçues du client (IP " + clientSocket.getInetAddress().getHostAddress() + ") : " + inputLine);                
                 handle_message(inputLine);
             }
         } catch (IOException e) {
             if (!Thread.currentThread().isInterrupted())
-                System.err.println("[ERREUR] " + Error.CLIENT_THREAD_EXECUTION_ERROR + " (IP " + clientSocket.getInetAddress().getHostAddress() + ") : " + e.getMessage());
+                System.err.println(ServerError.CLIENT_THREAD_EXECUTION_ERROR + " (IP " + clientSocket.getInetAddress().getHostAddress() + ") : " + e.getMessage());
         }
         finally {
             closeConnection();
@@ -97,7 +102,8 @@ public class ClientHandler extends Thread implements Observer {
     }
 
     /**
-     * Crée un serpent pour le client
+     * Crée et ajoute un serpent pour le client au jeu.
+     * Si aucune position de départ valide n'est trouvée, un message d'erreur est envoyé au client.
      */
     private synchronized void createSnake() {
         Direction startDirection = Direction.random();
@@ -106,14 +112,14 @@ public class ClientHandler extends Thread implements Observer {
             Snake.SEGMENT_DIAMETER, Snake.INIT_LENGTH, Snake.SEGMENT_SPACING, startDirection);
 
         if (startPosition == null) {
-            System.err.println("[ERREUR] " + Error.NO_FREE_POSITION_FOR_SNAKE);
-            // On envoie au client un message d'erreur            
-            send(gson.toJson(Error.NO_FREE_POSITION_FOR_SNAKE.toJSON()));
+            System.err.println(ServerError.NO_FREE_POSITION_FOR_SNAKE);
+            // On envoie au client un message d'erreur
+            send(gson.toJson(ServerError.NO_FREE_POSITION_FOR_SNAKE.toJSON()));
             closeConnection();
             return;
         }
 
-        snake = Snake.CreateNetworkSnake(Snake.INIT_LENGTH, startPosition, startDirection);
+        snake = Snake.CreateNetworkSnake(Snake.INIT_LENGTH, startPosition, startDirection);        
         server.addSnake(snake);
 
         System.out.println("[INFORMATION] Serpent créé (IP " + clientSocket.getInetAddress().getHostAddress() + ")");
@@ -122,7 +128,9 @@ public class ClientHandler extends Thread implements Observer {
     }
 
     /**
-     * Traite le message reçu du client
+     * Traite un message individuel reçu du client.
+     * Réagit en fonction du type de message (connexion, déconnexion, taille de fenêtre, etc.).
+     * 
      * @param msg Message reçu du client
      */
     private synchronized void handle_message(String msg) {
@@ -130,32 +138,38 @@ public class ClientHandler extends Thread implements Observer {
         ClientMessageType type = ClientMessageType.valueOf(json.get("type").getAsString().toUpperCase());
 
         switch (type) {
-            case CONNECTION:
-                if (snake == null && width != -1 && height != -1) {
+            case CONNECTION:                
+                if (snake == null) {                    
                     createSnake();
                 }
                 else {
-                    System.err.println("[ERREUR] " + Error.SNAKE_ALREADY_CREATED);
-                    gson.toJson(Error.SNAKE_ALREADY_CREATED.toJSON());
+                    System.err.println(ServerError.SNAKE_ALREADY_CREATED);
+                    gson.toJson(ServerError.SNAKE_ALREADY_CREATED.toJSON());
                     closeConnection();
                 }
                 break;
+
+            case DISCONNECTION:
+                closeConnection();
+                break;
+
             case WINDOW_SIZE:
                 double width = json.get("width").getAsDouble();
                 double height = json.get("height").getAsDouble();
 
                 if (width <= 0 || height <= 0 || width > server.getWidth() || height > server.getHeight()) {
-                    System.err.println("[ERREUR] " + Error.INVALID_WINDOW_SIZE);
-                    gson.toJson(Error.INVALID_WINDOW_SIZE.toJSON());
+                    System.err.println(ServerError.INVALID_WINDOW_SIZE);
+                    gson.toJson(ServerError.INVALID_WINDOW_SIZE.toJSON());
                     closeConnection();
-                    return;
+                    break;
                 }
                 this.width = width;
                 this.height = height;
                 break;
+
             case DIRECTION:
                 if (snake == null) {
-                    return;
+                    break;
                 }
 
                 double newAngle = json.get("angle").getAsDouble();
@@ -164,29 +178,33 @@ public class ClientHandler extends Thread implements Observer {
                 SnakeController controller = snake.getController();
                 if (controller != null && controller instanceof NetworkSnakeController) {
                     ((NetworkSnakeController) controller).addCommand(newDirection);
-                }                
+                }
                 break;
+
             default:
-                System.err.println("[ERREUR] " + Error.UNKNOWN_RECEIVED_MESSAGE);
+                System.err.println(ServerError.UNKNOWN_RECEIVED_MESSAGE);
                 break;
         }
-
     }
 
     /**
-     * Envoie des données au client
+     * Envoie des données au client connecté.
+     * Si le flux de sortie n'est pas initialisé, une erreur est affichée
+     * 
+     * @param data Données à envoyer
      */
     private synchronized void send(String data) {
         if (out != null) {
             out.println(data);
         }
         else {
-            System.err.println("[ERREUR] " + Error.DATA_SEND_ERROR + " (IP " + clientSocket.getInetAddress().getHostAddress() + ")");
+            System.err.println(ServerError.DATA_SEND_ERROR + " (IP " + clientSocket.getInetAddress().getHostAddress() + ")");
         }
     }
 
     /**
-     * Ferme la connexion client et supprime le client de la liste des clients connectés au serveur
+     * Ferme proprement la connexion avec le client.
+     * Ferme les flux d'entrée / sortie et informe le serveur de la déconnexion du client.
      */
     public synchronized void closeConnection() {
         try {
@@ -205,19 +223,26 @@ public class ClientHandler extends Thread implements Observer {
             server.removeClientHandler(this);
             System.out.println("[INFORMATION] Connexion client fermée (IP " + clientSocket.getInetAddress().getHostAddress() + ")");
         } catch (IOException e) {
-            System.err.println("[ERREUR] " + Error.CLIENT_CONNECTION_CLOSE_ERROR + " (IP " + clientSocket.getInetAddress().getHostAddress() + ") : " + e.getMessage());
+            System.err.println(ServerError.CLIENT_CONNECTION_CLOSE_ERROR + " (IP " + clientSocket.getInetAddress().getHostAddress() + ") : " + e.getMessage());
         }
     }
 
+    /**
+     * Met à jour l'état du client basé sur les changements dans le jeu.
+     * Envoie les segments visibles au client basé sur la position actuelle du serpent.
+     */
     @Override
-    public void update() {
-        if (snake == null) {
+    public synchronized void update() {
+        if (snake == null || width < 0 || height < 0) {
             return;
         }
 
         Map<Position, Segment> grid = server.getGrid();
 
-        // Créer un JsonArray pour stocker les segments visibles
+        JsonObject message = new JsonObject();
+        message.addProperty("type", ServerMessageType.VISIBLE_SEGMENTS.toString().toLowerCase());
+
+        // On crée un JsonArray pour stocker les segments visibles
         JsonArray segmentsInView = new JsonArray();
 
         Position headPosition = snake.getHeadPosition();
@@ -246,8 +271,16 @@ public class ClientHandler extends Thread implements Observer {
             }
         }
 
+        message.add("array", segmentsInView);
+
         // On envoie les segments visibles au client
-        send(segmentsInView.toString());
+        send(message.toString());
+    }
+
+    @Override
+    public GameMode getGameMode() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getGameMode'");
     }
 
 }

@@ -9,7 +9,7 @@ import fr.team92.serpents.utils.Direction;
 import javafx.scene.Scene;
 
 /**
- * Contrôle un serpent réseau
+ * Représente un contrôleur de serpent réseau pour le serveur.
  */
 public final class NetworkSnakeController implements SnakeController {
 

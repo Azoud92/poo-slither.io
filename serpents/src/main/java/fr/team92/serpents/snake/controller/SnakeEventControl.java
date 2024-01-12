@@ -1,5 +1,6 @@
 package fr.team92.serpents.snake.controller;
 
+import fr.team92.serpents.game.model.GameMode;
 import fr.team92.serpents.snake.model.Snake;
 import javafx.scene.input.InputEvent;
 
@@ -15,5 +16,6 @@ public interface SnakeEventControl {
      * @param event l'événement
      * @param i
      */
-    void handleControl(Snake snake, InputEvent event, int cellSize, double windowWidth, double windowHeight);
+    void handleControl(Snake snake, InputEvent event, GameMode gameMode, int cellSize, double windowWidth,
+            double windowHeight);
 }

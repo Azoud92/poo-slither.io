@@ -9,9 +9,13 @@ import javafx.stage.Stage;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
+import fr.team92.serpents.game.model.GameMode;
 import fr.team92.serpents.game.model.GameModel;
 import fr.team92.serpents.game.network.ClientConnection;
+import fr.team92.serpents.game.model.SinglePlayerMode;
+import fr.team92.serpents.game.model.TwoPlayersMode;
 import fr.team92.serpents.game.view.GameView;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.Direction;
@@ -26,6 +30,8 @@ public class HomePageController {
     @FXML
     private Button singlePlayerButton;
     @FXML
+    private Button twoPlayerButton;
+    @FXML
     private Button multiPlayerButton;
     @FXML
     private Button optionsButton;
@@ -34,16 +40,21 @@ public class HomePageController {
     @FXML
     private Button exitButton;
 
-    private String controlChoice;
-    private int numberOfBots = 1;
+    private String controlChoice1;
+    private String controlChoice2 = "keyboard";
+
+    private int numberOfBots = 5;
     private int numberOfFood = 100;
 
-    private KeyCode leftKey;
-    private KeyCode rightKey;
+    private KeyCode leftKey1, leftKey2 = KeyCode.LEFT;
+    private KeyCode rightKey1, rightKey2 = KeyCode.RIGHT;
+    private KeyCode accelerateKey1, accelerateKey2 = KeyCode.UP;
 
     @FXML
     public void initialize() {
+
         ButtonsAnimations.addAnimations(singlePlayerButton);
+        ButtonsAnimations.addAnimations(twoPlayerButton);
         ButtonsAnimations.addAnimations(multiPlayerButton);
         ButtonsAnimations.addAnimations(optionsButton);
         ButtonsAnimations.addAnimations(changeControlsButton);
@@ -51,34 +62,132 @@ public class HomePageController {
     }
 
     @FXML
-    protected void singlePlayerClicked(ActionEvent event) {
+    protected void twoPlayerClicked(ActionEvent event) {
         Scene scene = ((Node) event.getSource()).getScene();
         Pane root = (Pane) scene.getRoot();
+        root.getChildren().clear();
         GameModel model = new GameModel((int) scene.getWidth(), (int) scene.getHeight(), 20, numberOfFood);
 
         for (int i = 0; i < numberOfBots; i++) {
-            Snake botSnake = Snake.CreateAvoidWallsBotSnake(5, new Position(20 + i * 5, 30),
-                    new Direction(Math.PI / 2));
+            Snake botSnake = MakeBotSnake(model);
             model.addSnake(botSnake);
         }
 
-        Snake playerSnake;
-        if ("keyboard".equals(controlChoice)) {
-            Map<KeyCode, Double> keyMap1 = new HashMap<>();
-            keyMap1.put(rightKey, 6.0);
-            keyMap1.put(leftKey, -6.0);
+        Snake playerSnake1 = makePlayer(model, true);
+        Snake playerSnake2 = makePlayer(model, false);
 
-            playerSnake = Snake.CreateHumanKeyboardSnake(keyMap1, 5, new Position(55, 30),
-                    new Direction(Math.PI / 2));
-        } else {
-            playerSnake = Snake.CreateHumanMouseSnake(5, new Position(35, 30), new Direction(Math.PI / 2));
+        model.addSnake(playerSnake1);
+        model.addSnake(playerSnake2);
+
+        GameController controller = new GameController(model, scene);
+        GameMode gameMode = new TwoPlayersMode();
+        /* GameView view = */new GameView(model, controller, root, gameMode);
+        controller.gameStart();
+    }
+
+    @FXML
+    protected void singlePlayerClicked(ActionEvent event) {
+        Scene scene = ((Node) event.getSource()).getScene();
+        Pane root = (Pane) scene.getRoot();
+        root.getChildren().clear();
+        GameModel model = new GameModel((int) scene.getWidth(), (int) scene.getHeight(), 20, numberOfFood);
+
+        for (int i = 0; i < numberOfBots; i++) {
+            Snake botSnake = MakeBotSnake(model);
+            model.addSnake(botSnake);
         }
+
+        Snake playerSnake = makePlayer(model, true);
 
         model.addSnake(playerSnake);
 
         GameController controller = new GameController(model, scene);
-        /* GameView view = */new GameView(model, controller, root);
+        GameMode gameMode = new SinglePlayerMode();
+        /* GameView view = */new GameView(model, controller, root, gameMode);
         controller.gameStart();
+    }
+
+    private Snake MakeBotSnake(GameModel model) {
+        Random random = new Random();
+        Position position;
+        Snake botSnake;
+
+        do {
+            int x = random.nextInt(model.getWidth());
+            int y = random.nextInt(model.getHeight());
+            position = new Position(x, y);
+            double direction = random.nextDouble() * 2 * Math.PI;
+            botSnake = Snake.CreateAvoidWallsBotSnake(5, position, new Direction(direction));
+        } while (!model.isValidSnake(botSnake));
+
+        return botSnake;
+    }
+
+    private Snake makePlayer(GameModel model, boolean isPlayer1) {
+        Snake playerSnake;
+        if (isPlayer1) {
+            if ("keyboard".equals(controlChoice1)) {
+                Map<KeyCode, Double> keyMap1 = new HashMap<>();
+                keyMap1.put(rightKey1, 6.0);
+                keyMap1.put(leftKey1, -6.0);
+                keyMap1.put(accelerateKey1, 0.0);
+
+                Random random = new Random();
+                Position position;
+                do {
+                    int x = random.nextInt(model.getWidth());
+                    int y = random.nextInt(model.getHeight());
+                    position = new Position(x, y);
+                    double direction = random.nextDouble() * 2 * Math.PI;
+                    playerSnake = Snake.CreateHumanKeyboardSnake(keyMap1, 5, position,
+                            new Direction(direction));
+                } while (!model.isValidSnake(playerSnake));
+
+            } else {
+
+                Random random = new Random();
+                Position position;
+                do {
+                    int x = random.nextInt(model.getWidth());
+                    int y = random.nextInt(model.getHeight());
+                    position = new Position(x, y);
+                    double direction = random.nextDouble() * 2 * Math.PI;
+                    playerSnake = Snake.CreateHumanMouseSnake(5, position, new Direction(direction));
+                } while (!model.isValidSnake(playerSnake));
+            }
+        } else {
+            if ("keyboard".equals(controlChoice2)) {
+                Map<KeyCode, Double> keyMap2 = new HashMap<>();
+                keyMap2.put(rightKey2, 6.0);
+                keyMap2.put(leftKey2, -6.0);
+                keyMap2.put(accelerateKey2, 0.0);
+
+                Random random = new Random();
+                Position position;
+                do {
+                    int x = random.nextInt(model.getWidth());
+                    int y = random.nextInt(model.getHeight());
+                    position = new Position(x, y);
+                    double direction = random.nextDouble() * 2 * Math.PI;
+                    playerSnake = Snake.CreateHumanKeyboardSnake(keyMap2, 5, position,
+                            new Direction(direction));
+                } while (!model.isValidSnake(playerSnake));
+
+            } else {
+
+                Random random = new Random();
+                Position position;
+                do {
+                    int x = random.nextInt(model.getWidth());
+                    int y = random.nextInt(model.getHeight());
+                    position = new Position(x, y);
+                    double direction = random.nextDouble() * 2 * Math.PI;
+                    playerSnake = Snake.CreateHumanMouseSnake(5, position, new Direction(direction));
+                } while (!model.isValidSnake(playerSnake));
+            }
+        }
+        return playerSnake;
+
     }
 
     @FXML
@@ -86,9 +195,6 @@ public class HomePageController {
         System.out.println("Le bouton 'Multijoueur' a été cliqué");
         ClientConnection clientConnection = new ClientConnection(13000, "localhost");
         clientConnection.connect();
-        for (int i = 0; i < 10; i++) {
-            clientConnection.send("Test " + i);
-        }
         //clientConnection.disconnect();
     }
 
@@ -129,16 +235,28 @@ public class HomePageController {
         currentStage.close();
     }
 
-    public void setControlChoice(String controlChoice) {
-        this.controlChoice = controlChoice;
+    public void setControlChoice(String controlChoice, boolean isPlayer1) {
+        if (isPlayer1) {
+            this.controlChoice1 = controlChoice;
+        } else {
+            this.controlChoice2 = controlChoice;
+        }
     }
 
-    public void setLeftKey(KeyCode leftKey) {
-        this.leftKey = leftKey;
+    public void setLeftKey(KeyCode leftKey, boolean isPlayer1) {
+        if (isPlayer1) {
+            this.leftKey1 = leftKey;
+        } else {
+            this.leftKey2 = leftKey;
+        }
     }
 
-    public void setRightKey(KeyCode rightKey) {
-        this.rightKey = rightKey;
+    public void setRightKey(KeyCode rightKey, boolean isPlayer1) {
+        if (isPlayer1) {
+            this.rightKey1 = rightKey;
+        } else {
+            this.rightKey2 = rightKey;
+        }
     }
 
     public void setNumberOfBots(int numberOfBots) {
@@ -148,5 +266,13 @@ public class HomePageController {
     public void setNumberOfFood(int numberOfFood) {
         this.numberOfFood = numberOfFood;
 
+    }
+
+    public void setAccelerateKey(KeyCode accelerateKey, boolean isPlayer1) {
+        if (isPlayer1) {
+            this.accelerateKey1 = accelerateKey;
+        } else {
+            this.accelerateKey2 = accelerateKey;
+        }
     }
 }

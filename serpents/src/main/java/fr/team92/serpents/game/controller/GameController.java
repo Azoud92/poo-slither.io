@@ -2,8 +2,6 @@ package fr.team92.serpents.game.controller;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import fr.team92.serpents.game.model.GameModel;
 import fr.team92.serpents.snake.controller.HumanSnakeController;
@@ -12,9 +10,9 @@ import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.GameState;
 import fr.team92.serpents.utils.Position;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -27,10 +25,7 @@ public final class GameController {
      */
     private final GameModel model;
 
-    /**
-     * Le timer du jeu
-     */
-    private Timer gameLoop;
+    private GameLoop gameLoop;
 
     private double lastUpdate;
 
@@ -47,39 +42,36 @@ public final class GameController {
         this.model = model;
         setKeyListeners(scene);
         setMouseListeners(scene);
+        gameLoop = new OfflineGameLoop(() -> loopTask());
     }
 
     public GameController(GameModel model) {
         this.model = model;
+        gameLoop = new ServerGameLoop(() -> loopTask());
+    }
+
+    private void loopTask() {
+        if (model.getState() != GameState.RUNNING) {
+            gameLoop.stop();
+            return;
+        }
+        else if (model.getState() == GameState.RUNNING) {
+            double elapsedTimeInSeconds = (System.nanoTime() - lastUpdate) / 1_000_000_000.0;
+            updateGame(elapsedTimeInSeconds);
+            lastUpdate = System.nanoTime();
+        }
     }
 
     public void gameStart() {
         if (model.getState() != GameState.WAITING)
             throw new IllegalStateException("Game is not waiting to start");
-        if (gameLoop != null)
+        if (gameLoop.isRunning())
             throw new IllegalStateException("Game loop already started");
         model.gameStart();
-        lastUpdate = System.currentTimeMillis();
-
-        gameLoop = new Timer();
-        gameLoop.schedule(new TimerTask() {
-
-            @Override
-            public void run() {
-                Platform.runLater(() -> {
-                    if (model.getState() != GameState.RUNNING) {
-                        gameLoop.cancel();
-                    } else if (model.getState() == GameState.RUNNING) {
-                        long now = System.currentTimeMillis();
-                        double elapsedTimeInSeconds = (now - lastUpdate) / 1000.0;
-                        updateGame(elapsedTimeInSeconds);
-                        lastUpdate = now;
-                    }
-                });
-            }
-            
-        }, 0, 1000 / 60);
+        lastUpdate = System.nanoTime();
+        gameLoop.start();
     }
+
 
     /**
      * Ajoute les écouteurs d'événements clavier
@@ -88,7 +80,11 @@ public final class GameController {
      */
     private void setKeyListeners(Scene scene) {
         scene.setOnKeyPressed(event -> {
-            handleKeyPressed(event);
+            handleKey(event);
+        });
+
+        scene.setOnKeyReleased(event -> {
+            handleKey(event);
         });
     }
 
@@ -97,7 +93,7 @@ public final class GameController {
      * 
      * @param event l'événement clavier
      */
-    private void handleKeyPressed(KeyEvent event) {
+    private void handleKey(KeyEvent event) {
         if (model.getState() != GameState.RUNNING) {
             return;
         }
@@ -118,7 +114,20 @@ public final class GameController {
      */
     private void setMouseListeners(Scene scene) {
         scene.setOnMouseMoved(event -> {
-            handleMouseMoved(event);
+            handleMouse(event, true);
+        });
+        scene.setOnMouseDragged(event -> {
+            handleMouse(event, true);
+        });
+        scene.setOnMousePressed(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                handleMouse(event, false);
+            }
+        });
+        scene.setOnMouseReleased(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                handleMouse(event, false);
+            }
         });
     }
 
@@ -128,7 +137,7 @@ public final class GameController {
      * 
      * @param event l'événement de la souris
      */
-    private void handleMouseMoved(MouseEvent event) {
+    private void handleMouse(MouseEvent event, boolean move) {
         if (model.getState() != GameState.RUNNING) {
             return;
         }
@@ -137,7 +146,11 @@ public final class GameController {
             SnakeController controller = snake.getController();
 
             if (controller instanceof HumanSnakeController) {
-                ((HumanSnakeController) controller).setEvent(event);
+                if (move) {
+                    ((HumanSnakeController) controller).setEvent(event);
+                } else {
+                    ((HumanSnakeController) controller).setOtherMouseEvent(event);
+                }
             }
         }
     }
@@ -154,6 +167,11 @@ public final class GameController {
         for (Snake snake : model.getSnakes()) {
             SnakeController controller = snake.getController();
             controller.controlSnake(snake, model, lastUpdate, scene);
+            if (snake.getIsAccelerating()) {
+                snake.accelerate();
+            } else {
+                snake.decelerate();
+            }
         }
         model.moveSnakes(lastUpdate);
     }
@@ -214,6 +232,33 @@ public final class GameController {
             }
         }
         return null;
+    }
+
+    public int getScore() {
+        return getHumanSnake().getLength();
+    }
+
+    public Snake getPlayer1() {// TODO : a changer
+        for (Snake snake : model.getSnakes()) {
+            if (snake.getController() instanceof HumanSnakeController) {
+                return snake;
+            }
+        }
+        throw new IllegalStateException("Player 1 does not exist");
+    }
+
+    public Snake getPlayer2() { // TODO: a changer
+        boolean foundFirstPlayer = false;
+        for (Snake snake : model.getSnakes()) {
+            if (snake.getController() instanceof HumanSnakeController) {
+                if (foundFirstPlayer) {
+                    return snake;
+                } else {
+                    foundFirstPlayer = true;
+                }
+            }
+        }
+        throw new IllegalStateException("Player 2 does not exist");
     }
 
 }

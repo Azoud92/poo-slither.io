@@ -23,7 +23,7 @@ import fr.team92.serpents.utils.Position;
 public final class Server {
 
     /**
-     * Port par défaut sur lequel le serveur écoute les connexions des clients
+     * Définit le port par défaut pour l'écoute des connexions entrantes des clients
      */
     private static final int DEFAULT_PORT = 13000;
 
@@ -33,17 +33,17 @@ public final class Server {
     private final int port;
 
     /**
-     * Socket du serveur (pour écouter les connexions des clients)
+     * ServerSocket utilisé pour écouter et accepter les connexions entrantes des clients
      */
     private ServerSocket serverSocket;
 
     /**
-     * Liste des clients connectés
+     * Liste gérant les clients connectés au serveur
      */
     private final List<ClientHandler> clientsHandlers;
 
     /**
-     * Pool de threads pour exécuter les ClientHandler
+     * Pool de threads pour gérer l'exécution des tâches ClientHandler en parallèle
      */
     private final ExecutorService executorService;
 
@@ -72,15 +72,17 @@ public final class Server {
         this.gameModel = new GameModel(WIDTH, HEIGHT, CELL_SIZE, NB_FOOD);
         this.gameController = new GameController(gameModel);
         this.gameController.gameStart();
+
+        // On arrête le serveur proprement lorsque l'utilisateur appuie sur Ctrl+C, le ferme...
+        Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }
 
     /**
-     * Démarre le serveur et attend les connexions des clients.
-     * Reste dans une boucle infinie tant que le serveur n'est pas arrêté, acceptant les nouvelles connexions clientes.
+     * Démarre le serveur pour écouter et accepter les connexions des clients.
+     * Le serveur fonctionne en continu jusqu'à ce qu'il soit explicitement arrêté
      */
     private synchronized void start() {
-        try {
-            serverSocket = new ServerSocket(port);
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("[INFORMATION] Serveur démarré sur le port " + port
                 + ". En attente de connexions...");
             while (!serverSocket.isClosed()) {
@@ -103,12 +105,12 @@ public final class Server {
     }
 
     /**
-     * Arrête le serveur en fermant le socket lié et tous les ClientHandler actifs
+     * Arrête le serveur en fermant le ServerSocket et en interrompant tous les ClientHandler actifs
      */
     private synchronized void stop() {
         try {
             if (serverSocket == null || serverSocket.isClosed()) {
-                System.out.println("[ERREUR] Erreur lors de l'arrêt du serveur : celui-ci n'est pas démarré");
+                System.err.println("[ERREUR] Erreur lors de l'arrêt du serveur : celui-ci n'est pas démarré");
                 return;
             }
             System.out.println("[INFORMATION] Arrêt du serveur...");
@@ -128,27 +130,40 @@ public final class Server {
     /**
      * Retire un client de la liste des clients connectés.
      * Cette méthode est appelée par un ClientHandler lorsqu'il se termine ou lorsque la connexion est interrompue.
+     * 
+     * @param clientHandler Client à retirer
      */
-    public synchronized void removeClientHandler(ClientHandler clientHandler) {
-        gameModel.removeObserver(clientHandler);
-        clientsHandlers.remove(clientHandler);
+    public void removeClientHandler(ClientHandler clientHandler) {
+        if (clientHandler == null) return;
+        synchronized (gameModel) {
+            gameModel.removeObserver(clientHandler);
+        }
+        synchronized (clientsHandlers) {
+            clientsHandlers.remove(clientHandler);
+        }        
     }
 
     /**
      * Ajoute un serpent au modèle du jeu
      * @param snake Serpent à ajouter
      */
-    public synchronized void addSnake(Snake snake) {
-        gameModel.addSnake(snake);
+    public void addSnake(Snake snake) {
+        if (snake == null) return;
+        synchronized (gameModel) {
+            gameModel.addSnake(snake);
+        }
     }
 
     /**
      * Retire un serpent du modèle du jeu
      * @param snake Serpent à retirer
      */
-    public synchronized void removeSnake(Snake snake) {
-        if (!snake.isDead()) snake.die();
-        gameModel.removeSnake(snake);
+    public void removeSnake(Snake snake) {
+        if (snake == null) return;
+        synchronized (gameModel) {
+            if (!snake.isDead()) snake.die();
+            gameModel.removeSnake(snake);
+        }
     }
 
     /**
@@ -160,17 +175,22 @@ public final class Server {
      * @param startDirection Direction initiale du serpent
      * @return Position libre pour un serpent
      */
-    public Position getFreePositionForSnake(double minDistanceInit, double segmentDiameter, int initLength,
-            double segmentSpacing, Direction startDirection) {
-        return gameModel.getFreePositionForSnake(minDistanceInit, segmentDiameter, initLength, segmentSpacing, startDirection);
+    public Position getFreePositionForSnake(double minDistanceInit, double segmentDiameter, 
+            int initLength, double segmentSpacing, Direction startDirection) {
+
+        synchronized (gameModel) {
+            return gameModel.getFreePositionForSnake(minDistanceInit, segmentDiameter, initLength, segmentSpacing, startDirection);
+        }
     }
 
     /**
      * Retourne une copie du dictionnaire des positions occupées par les serpents et la nourriture sur la grille de jeu
      * @return Copie du dictionnaire des positions occupées par les serpents et la nourriture sur la grille de jeu
      */
-    public synchronized Map<Position, Segment> getGrid() {
-        return gameModel.getGrid();
+    public Map<Position, Segment> getGrid() {
+        synchronized (gameModel) {
+            return gameModel.getGrid();
+        }
     }
 
     /**
@@ -197,7 +217,7 @@ public final class Server {
         }
         catch (NumberFormatException e) {
             System.err.println("[ERREUR] Le port spécifié n'est pas valide");
-        }        
+        }
     }
 
 }
