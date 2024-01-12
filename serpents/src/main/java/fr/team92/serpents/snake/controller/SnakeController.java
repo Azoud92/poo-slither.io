@@ -7,7 +7,7 @@ import javafx.scene.Scene;
 /**
  * Contrôleur de serpent
  */
-public sealed interface SnakeController permits HumanSnakeController, BotController {
+public sealed interface SnakeController permits HumanSnakeController, BotController, NetworkSnakeController {
 
     /**
      * Contrôle du serpent

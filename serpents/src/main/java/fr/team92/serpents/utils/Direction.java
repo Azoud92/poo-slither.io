@@ -1,6 +1,8 @@
 package fr.team92.serpents.utils;
 
-public record Direction(double angle) {
+import com.google.gson.JsonObject;
+
+public record Direction(double angle) implements SerializableToJSON {
 
     public Direction {
         if (angle < 0) {
@@ -13,6 +15,19 @@ public record Direction(double angle) {
 
     public Direction opposite() {
         return new Direction((this.angle + 180) % 360);
+    }
+
+    public static Direction random() {
+        return new Direction(Math.random() * 360);
+    }
+
+    @Override
+    public JsonObject toJSON() {
+        JsonObject json = new JsonObject();
+        json.addProperty("type", "direction");
+        json.addProperty("angle", angle);
+
+        return json;
     }
 
 }

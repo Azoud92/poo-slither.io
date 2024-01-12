@@ -13,4 +13,9 @@ public class NormalSegmentBehavior implements SegmentBehavior {
                 + otherSegment.getDiameter() / 2;
     }
 
+    @Override
+    public String getName() {
+        return "normal";
+    }
+
 }

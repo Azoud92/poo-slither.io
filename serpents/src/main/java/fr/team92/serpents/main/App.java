@@ -18,17 +18,17 @@ public final class App extends Application {
 
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/fr/team92/serpents/game/view/homepage.fxml"));
-            Scene scene = new Scene(root, 1200, 800);
+            Scene scene = new Scene(root, 1000, 600);
 
             stage.setTitle("Serpents");
             stage.setScene(scene);
             stage.sizeToScene();
 
-            stage.setResizable(false);
+            /*stage.setResizable(false);
             stage.setMinWidth(scene.getWidth());
             stage.setMaxWidth(scene.getWidth());
             stage.setMinHeight(scene.getHeight());
-            stage.setMaxHeight(scene.getHeight());
+            stage.setMaxHeight(scene.getHeight());*/
 
             stage.show();
         } catch (IOException e) {

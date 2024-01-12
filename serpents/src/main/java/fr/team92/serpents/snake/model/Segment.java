@@ -1,12 +1,15 @@
 package fr.team92.serpents.snake.model;
 
+import com.google.gson.JsonObject;
+
 import fr.team92.serpents.utils.Direction;
 import fr.team92.serpents.utils.Position;
+import fr.team92.serpents.utils.SerializableToJSON;
 
 /**
  * Un segment représente une partie d'un serpent
  */
-public final class Segment {
+public final class Segment implements SerializableToJSON {
 
     /**
      * La position actuelle du segment
@@ -90,6 +93,17 @@ public final class Segment {
 
     public void setDiameter(double d) {
         this.diameter = d;
+    }
+
+    @Override
+    public JsonObject toJSON() {
+        JsonObject json = new JsonObject();
+        json.addProperty("type", "segment");
+        json.add("position", position.toJSON());
+        json.addProperty("diameter", diameter);
+        json.addProperty("behavior", behavior.getName());
+        
+        return json;
     }
 
 }

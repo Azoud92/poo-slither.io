@@ -12,4 +12,9 @@ public class BurrowingSegmentBehavior implements SegmentBehavior {
         return false;
     }
 
+    @Override
+    public String getName() {
+        return "burrowing";
+    }   
+
 }

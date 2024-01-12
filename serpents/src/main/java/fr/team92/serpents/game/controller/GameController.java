@@ -2,6 +2,8 @@ package fr.team92.serpents.game.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import fr.team92.serpents.game.model.GameModel;
 import fr.team92.serpents.snake.controller.HumanSnakeController;
@@ -10,7 +12,7 @@ import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.GameState;
 import fr.team92.serpents.utils.Position;
-import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -28,7 +30,7 @@ public final class GameController {
     /**
      * Le timer du jeu
      */
-    private AnimationTimer gameLoop;
+    private Timer gameLoop;
 
     private double lastUpdate;
 
@@ -47,29 +49,36 @@ public final class GameController {
         setMouseListeners(scene);
     }
 
+    public GameController(GameModel model) {
+        this.model = model;
+    }
+
     public void gameStart() {
         if (model.getState() != GameState.WAITING)
             throw new IllegalStateException("Game is not waiting to start");
         if (gameLoop != null)
             throw new IllegalStateException("Game loop already started");
         model.gameStart();
-        lastUpdate = System.nanoTime();
+        lastUpdate = System.currentTimeMillis();
 
-        gameLoop = new AnimationTimer() {
+        gameLoop = new Timer();
+        gameLoop.schedule(new TimerTask() {
 
             @Override
-            public void handle(long now) {
-                if (model.getState() != GameState.RUNNING) {
-                    this.stop();
-                } else if (model.getState() == GameState.RUNNING) {
-                    double elapsedTimeInSeconds = (now - lastUpdate) / 1_000_000_000.0;
-                    updateGame(elapsedTimeInSeconds);
-                    lastUpdate = now;
-                }
+            public void run() {
+                Platform.runLater(() -> {
+                    if (model.getState() != GameState.RUNNING) {
+                        gameLoop.cancel();
+                    } else if (model.getState() == GameState.RUNNING) {
+                        long now = System.currentTimeMillis();
+                        double elapsedTimeInSeconds = (now - lastUpdate) / 1000.0;
+                        updateGame(elapsedTimeInSeconds);
+                        lastUpdate = now;
+                    }
+                });
             }
-
-        };
-        gameLoop.start();
+            
+        }, 0, 1000 / 60);
     }
 
     /**

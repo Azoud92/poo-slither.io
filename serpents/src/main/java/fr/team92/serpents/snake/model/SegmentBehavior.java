@@ -4,5 +4,6 @@ public interface SegmentBehavior {
     
     void applyEffect(Snake snake, Segment segment);
     boolean isInCollision(Segment segment, Segment otherSegment);
+    String getName();
 
 }

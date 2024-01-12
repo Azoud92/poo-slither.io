@@ -4,19 +4,24 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import fr.team92.serpents.snake.bot.factory.AvoidWallsBotFactory;
 import fr.team92.serpents.snake.controller.HumanSnakeController;
 import fr.team92.serpents.snake.controller.KeyboardControl;
 import fr.team92.serpents.snake.controller.MouseControl;
+import fr.team92.serpents.snake.controller.NetworkSnakeController;
 import fr.team92.serpents.snake.controller.SnakeController;
 import fr.team92.serpents.utils.Direction;
 import fr.team92.serpents.utils.Position;
+import fr.team92.serpents.utils.SerializableToJSON;
 import javafx.scene.input.KeyCode;
 
 /**
  * Représente un serpent
  */
-public final class Snake {
+public final class Snake implements SerializableToJSON {
 
     /**
      * La liste des segments du serpent
@@ -42,6 +47,26 @@ public final class Snake {
 
     public static final int coeff = 30;
     public static final double DEFAULT_SPEED = 1.5;
+
+    /**
+     * Diamètre d'un segment de serpent
+     */
+    public static final double SEGMENT_DIAMETER = 1;
+
+    /**
+     * Longueur du serpent lors de l'initialisation
+     */
+    public static final int INIT_LENGTH = 5;
+
+    /**
+     * Espacement entre les segments du serpent
+     */
+    public static final double SEGMENT_SPACING = 0.5;
+
+    /**
+     * Distance minimale avec les autres serpents lors de l'initialisation
+     */
+    public static final double MIN_DISTANCE_INIT = 20;
 
     private double speed;
 
@@ -235,6 +260,11 @@ public final class Snake {
         return new Snake(controller, length, position, direction);
     }
 
+    public static Snake CreateNetworkSnake(int length, Position position, Direction direction) {
+        SnakeController controller = new NetworkSnakeController();
+        return new Snake(controller, length, position, direction);
+    }
+
     public double getHeadDiameter() {
         return segments.getFirst().getDiameter();
     }
@@ -256,5 +286,22 @@ public final class Snake {
 
     public int getCoeff() {
         return coeff;
+    }
+
+    @Override
+    public JsonObject toJSON() {
+        JsonObject json = new JsonObject();
+        json.addProperty("type", "snake");
+
+        JsonArray segmentsArray = new JsonArray();
+        for (Segment segment : segments) {
+            segmentsArray.add(segment.toJSON());
+        }
+
+        json.add("segments", segmentsArray);
+        json.add("direction", direction.toJSON());
+        json.addProperty("speed", speed);
+        
+        return json;
     }
 }

@@ -1,9 +1,11 @@
 package fr.team92.serpents.utils;
 
+import com.google.gson.JsonObject;
+
 /**
  * Représente une position dans le jeu
  */
-public record Position(double x, double y) {
+public record Position(double x, double y) implements SerializableToJSON {
 
     /**
      * Déplace la position dans la direction donnée
@@ -42,6 +44,16 @@ public record Position(double x, double y) {
         double dx = this.x - newPosition.x;
         double dy = this.y - newPosition.y;
         return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    @Override
+    public JsonObject toJSON() {
+        JsonObject json = new JsonObject();
+        json.addProperty("type", "position");
+        json.addProperty("x", x);
+        json.addProperty("y", y);
+
+        return json;
     }
 
 }

@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.team92.serpents.game.model.GameModel;
+import fr.team92.serpents.game.network.ClientConnection;
 import fr.team92.serpents.game.view.GameView;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.Direction;
@@ -81,8 +82,14 @@ public class HomePageController {
     }
 
     @FXML
-    protected void multiplayerClicked(ActionEvent event) {
+    protected void multiplayerClicked(ActionEvent event) throws InterruptedException {
         System.out.println("Le bouton 'Multijoueur' a été cliqué");
+        ClientConnection clientConnection = new ClientConnection(13000, "localhost");
+        clientConnection.connect();
+        for (int i = 0; i < 10; i++) {
+            clientConnection.send("Test " + i);
+        }
+        //clientConnection.disconnect();
     }
 
     @FXML
