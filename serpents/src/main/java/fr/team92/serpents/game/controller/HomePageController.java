@@ -40,7 +40,7 @@ public class HomePageController {
     @FXML
     private Button exitButton;
 
-    private String controlChoice1;
+    private String controlChoice1 = "mouse";
     private String controlChoice2 = "keyboard";
 
     private int numberOfBots = 5;
@@ -193,9 +193,13 @@ public class HomePageController {
     @FXML
     protected void multiplayerClicked(ActionEvent event) throws InterruptedException {
         System.out.println("Le bouton 'Multijoueur' a été cliqué");
-        ClientConnection clientConnection = new ClientConnection(13000, "localhost");
-        double width = ((Node) event.getSource()).getScene().getWidth();
-        double height = ((Node) event.getSource()).getScene().getHeight();
+        Scene scene = ((Node) event.getSource()).getScene();
+        Pane root = (Pane) scene.getRoot();
+        root.getChildren().clear();
+
+        ClientConnection clientConnection = new ClientConnection(scene, 13000, "localhost");
+        double width = scene.getWidth();
+        double height = scene.getHeight();
         if (controlChoice1.equals("keyboard")) {
             clientConnection.setKeyMap(leftKey1, rightKey1, accelerateKey1);
         } else {

@@ -17,10 +17,10 @@ public record Position(double x, double y) implements SerializableToJSON {
         double angleInRadians = Math.toRadians(direction.angle());
         double dx = Math.cos(angleInRadians) * delta;
         double dy = Math.sin(angleInRadians) * delta;
-    
+
         return new Position(this.x + dx, this.y + dy);
     }
-    
+
     public double distanceTo(Position other) {
         double dx = this.x - other.x;
         double dy = this.y - other.y;
@@ -54,6 +54,10 @@ public record Position(double x, double y) implements SerializableToJSON {
         json.addProperty("y", y);
 
         return json;
+    }
+
+    public static Position fromJSON(JsonObject json) {
+        return new Position(json.get("x").getAsDouble(), json.get("y").getAsDouble());
     }
 
 }

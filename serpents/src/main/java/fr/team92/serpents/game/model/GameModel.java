@@ -374,18 +374,19 @@ public final class GameModel implements Observable {
         return false;
     }
 
-    public Position getFreePositionForSnake(double minDistance, double diameter, double length, double spacing, Direction dir) {
+    public Position getFreePositionForSnake(double minDistance, double diameter, double length, double spacing,
+            Direction dir) {
         Set<Position> occupiedPositions = grid.values().stream()
                 .filter(segment -> !segment.isDead())
                 .map(Segment::getPosition)
                 .collect(Collectors.toSet());
-        
+
         Random random = new Random();
         Position potentialPos;
 
         for (int i = 0; i < 1000; i++) {
             potentialPos = new Position(random.nextDouble() * width, random.nextDouble() * height);
-            
+
             if (isPositionFreeForSnake(potentialPos, minDistance, diameter, length, dir, spacing, occupiedPositions)) {
                 return potentialPos;
             }
@@ -394,11 +395,13 @@ public final class GameModel implements Observable {
         throw new IllegalStateException("Aucune position libre trouvée");
     }
 
-    private boolean isPositionFreeForSnake(Position headPosition, double minDistance, double diameter, double length, Direction dir, double spacing, Set<Position> occupiedPositions) {
+    private boolean isPositionFreeForSnake(Position headPosition, double minDistance, double diameter, double length,
+            Direction dir, double spacing, Set<Position> occupiedPositions) {
         for (int i = 0; i < length; i++) {
             double totalDistance = i * (diameter + spacing);
             Position segmentPosition = headPosition.move(dir.opposite(), totalDistance);
-            if (occupiedPositions.contains(segmentPosition) || isPositionTooCloseToOtherSnakes(segmentPosition, minDistance)) {
+            if (occupiedPositions.contains(segmentPosition)
+                    || isPositionTooCloseToOtherSnakes(segmentPosition, minDistance)) {
                 return false;
             }
         }
@@ -407,8 +410,8 @@ public final class GameModel implements Observable {
 
     private boolean isPositionTooCloseToOtherSnakes(Position position, double minDistance) {
         return snakes.stream()
-            .flatMap(snake -> snake.getSegments().stream())
-            .anyMatch(segment -> segment.getPosition().distanceTo(position) < minDistance);
+                .flatMap(snake -> snake.getSegments().stream())
+                .anyMatch(segment -> segment.getPosition().distanceTo(position) < minDistance);
     }
 
     public GameMode getGameMode() {

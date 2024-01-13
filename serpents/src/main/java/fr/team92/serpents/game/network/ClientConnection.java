@@ -9,15 +9,18 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import fr.team92.serpents.server.ServerMessageType;
-import fr.team92.serpents.snake.controller.NetworkSnakeController;
-import fr.team92.serpents.snake.controller.SnakeController;
+import fr.team92.serpents.snake.model.BurrowingSegmentBehavior;
+import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.utils.Direction;
+import fr.team92.serpents.utils.Position;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.Pane;
 
 /**
  * Représente un client connecté au serveur.
@@ -76,14 +79,16 @@ public class ClientConnection {
      * @param port
      * @param address
      */
-    public ClientConnection(Parent root, int port, String address) {
+    public ClientConnection(Scene scene, int port, String address) {
         this.port = port;
         this.address = address;
         this.gson = new Gson();
-        this.gameController = new GameControllerNetwork(root, this);
         this.gameModel = new GameModelNetwork();
-        Pane pane = (Pane) root;
-        this.gameView = new GameViewNetwork(pane, gameController, gameModel);
+        this.gameController = new GameControllerNetwork(scene, this);
+        gameController.setModel(gameModel);
+        this.gameView = new GameViewNetwork(gameController);
+        gameModel.addObserver(gameView);
+
     }
 
     /**
@@ -122,13 +127,6 @@ public class ClientConnection {
         send(windowSizeMsg.toString());
     }
 
-    public synchronized void changeDirection(String direction) {
-        JsonObject directionMsg = new JsonObject();
-        directionMsg.addProperty("type", "directionChange");
-        directionMsg.addProperty("direction", direction);
-        send(directionMsg.toString());
-    }
-
     /**
      * Déconnecte le client du serveur. Ferme les flux d'entrée et de sortie, et le
      * socket.
@@ -159,27 +157,67 @@ public class ClientConnection {
         }
     }
 
-    private void handle_message(String msg) {
+    private synchronized void handle_message(String msg) {
         JsonObject json = gson.fromJson(msg, JsonObject.class);
-        ServerMessageType type = ServerMessageType.valueOf(json.get("type").getAsString());
-
+        ServerMessageType type = ServerMessageType.valueOf(json.get("type").getAsString().toUpperCase());
+        System.out.println(type);
         switch (type) {
-            case SNAKE:
-                SnakeController snakeController = new NetworkSnakeController();
-                // Le serveur a indiqué que le serpent a été créé
-                // Vous pouvez extraire les informations du serpent du message et les utiliser
-                // pour créer le serpent dans votre jeu
-                // Par exemple :
-                double snakeX = json.get("head").getAsJsonObject().get("x").getAsDouble();
-                double snakeY = json.get("head").getAsJsonObject().get("y").getAsDouble();
-
-                break;
             case DIRECTION:
 
                 double newAngle = json.get("angle").getAsDouble();
                 direction = new Direction(newAngle);
                 break;
-            // ... autres cas ...
+
+            case HEAD_POS:
+                System.out.println("HEAD_POS");
+                double headX = json.get("x").getAsDouble();
+                double headY = json.get("y").getAsDouble();
+
+                gameController.setHeadPos(new Position(headX, headY));
+                break;
+
+            case CELL_SIZE:
+                int cellSize = json.get("cellSize").getAsInt();
+                gameController.setCellSize(cellSize);
+                break;
+
+            case ERROR:
+                String errorMessage = json.get("message").getAsString();
+                System.err.println("[ERREUR] Message d'erreur du serveur : " + errorMessage);
+                break;
+
+            case VISIBLE_SEGMENTS:
+                JsonArray segmentsArray = json.get("segments").getAsJsonArray();
+                for (JsonElement segmentElement : segmentsArray) {
+                    JsonObject segmentObject = segmentElement.getAsJsonObject();
+                    Position position = gson.fromJson(segmentObject.get("position"), Position.class);
+                    Segment segment = gson.fromJson(segmentObject.get("segment"), Segment.class);
+                    segment.setPosition(position);
+                    gameModel.addSegment(segment);
+                }
+                break;
+
+            case SNAKE:
+                JsonArray snakeArray = json.get("segments").getAsJsonArray();
+                for (JsonElement segmentElement : snakeArray) {
+                    JsonObject segmentObject = segmentElement.getAsJsonObject();
+                    int diameter = segmentObject.get("diameter").getAsInt();
+                    Position position = gson.fromJson(segmentObject.get("position"), Position.class);
+                    try {
+                        segmentObject.get("behavior").getAsString();
+                        Segment segment = new Segment(position, diameter, new BurrowingSegmentBehavior());
+                        segment.setPosition(position);
+                        gameModel.addSegment(segment);
+                    } catch (Exception e) {
+                        Segment segment = new Segment(position, diameter, null);
+                        segment.setPosition(position);
+                        gameModel.addSegment(segment);
+                    }
+                }
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -199,13 +237,12 @@ public class ClientConnection {
     /**
      * Ecoute les données envoyées par le serveur
      */
-    private void listen() {
+    private synchronized void listen() {
         try {
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
                 // Traitement des données reçues du serveur
                 handle_message(inputLine);
-                System.out.println("[INFORMATION] Données reçues du serveur : " + inputLine);
             }
         } catch (IOException e) {
             System.err.println("[ERREUR] Erreur lors de l'écoute du serveur : " + e.getMessage());
@@ -237,15 +274,15 @@ public class ClientConnection {
         send(directionMsg.toString());
     }
 
-    public void sendAccel() {
+    public synchronized void sendAccel() {
         JsonObject accelMsg = new JsonObject();
-        accelMsg.addProperty("type", "accelStart");
+        accelMsg.addProperty("type", "accelerate");
         send(accelMsg.toString());
     }
 
-    public void stopAccel() {
+    public synchronized void stopAccel() {
         JsonObject stopAccelMsg = new JsonObject();
-        stopAccelMsg.addProperty("type", "accelStop");
+        stopAccelMsg.addProperty("type", "decelerate");
         send(stopAccelMsg.toString());
     }
 

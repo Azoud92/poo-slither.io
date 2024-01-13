@@ -16,13 +16,6 @@ public enum ServerMessageType {
     ERROR,
 
     /**
-     * Représente un serpent envoyé par le serveur.
-     * Utilisé pour envoyer les informations du serpent du joueur au client afin
-     * qu'il puisse l'afficher.
-     */
-    SNAKE,
-
-    /**
      * Représente un tableau contenant la liste positions associées aux segments
      * visibles envoyé par le serveur.
      * Utilisé pour envoyer les informations des segments visibles au client afin
@@ -30,9 +23,24 @@ public enum ServerMessageType {
      */
     VISIBLE_SEGMENTS,
 
+    /**
+     * Représente le serpent envoyé par le serveur.
+     */
+    SNAKE,
+
     /*
      * Représente la direction du serpent envoyé par le serveur.
      */
-    DIRECTION;
+    DIRECTION,
+
+    /**
+     * Représente la position de la tête du serpent envoyé par le serveur.
+     */
+    HEAD_POS,
+
+    /**
+     * Représente la taille de la fenêtre de jeu envoyé par le serveur.
+     */
+    CELL_SIZE;
 
 }

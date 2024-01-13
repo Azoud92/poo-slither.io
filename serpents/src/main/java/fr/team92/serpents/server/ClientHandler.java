@@ -257,6 +257,7 @@ public class ClientHandler extends Thread implements Observer {
      */
     @Override
     public synchronized void update() {
+        System.out.println("UPDATE");
         if (snake == null || width < 0 || height < 0) {
             return;
         }
@@ -266,7 +267,11 @@ public class ClientHandler extends Thread implements Observer {
         JsonObject message = new JsonObject();
         message.addProperty("type", ServerMessageType.VISIBLE_SEGMENTS.toString().toLowerCase());
 
-        message.add("direction", gson.toJsonTree(snake.getDirection()));
+        message.addProperty("direction", gson.toJsonTree(snake.getDirection()).toString().toLowerCase());
+
+        message.addProperty("head_pos", gson.toJsonTree(snake.getHeadPosition()).toString().toLowerCase());
+
+        message.addProperty("cell_size", Snake.SEGMENT_DIAMETER);
 
         // On crée un JsonArray pour stocker les segments visibles
         JsonArray segmentsInView = new JsonArray();

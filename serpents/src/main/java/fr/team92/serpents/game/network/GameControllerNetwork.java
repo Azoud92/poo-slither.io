@@ -1,23 +1,30 @@
 package fr.team92.serpents.game.network;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.utils.Direction;
-import javafx.scene.Parent;
+import fr.team92.serpents.utils.Position;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.Pane;
 
 public class GameControllerNetwork {
     private final ClientConnection clientConnection;
     private final Scene scene;
+    private GameModelNetwork model;
     private final Map<KeyCode, Double> keyMap = new HashMap<>();
     private boolean isMouse = true;
     private boolean isAccelerating = false;
+    private int cellSize;
+    private Position headPos;
 
-    public GameControllerNetwork(Parent root, ClientConnection clientConnection) {
+    public GameControllerNetwork(Scene scene, ClientConnection clientConnection) {
         this.clientConnection = clientConnection;
-        scene = new Scene(root, clientConnection.getWidth(), clientConnection.getHeight());
+        this.scene = scene;
         setKeyListeners(scene);
         setMouseListeners(scene);
     }
@@ -58,6 +65,9 @@ public class GameControllerNetwork {
     private void setMouseListeners(Scene scene) {
         scene.setOnMouseMoved(event -> {
             if (isMouse) {
+                if (clientConnection.getDirection() == null) {
+                    return;
+                }
                 double mouseX = event.getSceneX();
                 double mouseY = event.getSceneY();
                 Direction dir = calculateMouseDir(mouseX, mouseY);
@@ -66,6 +76,9 @@ public class GameControllerNetwork {
         });
         scene.setOnMouseDragged(event -> {
             if (isMouse) {
+                if (clientConnection.getDirection() == null) {
+                    return;
+                }
                 double mouseX = event.getSceneX();
                 double mouseY = event.getSceneY();
                 Direction dir = calculateMouseDir(mouseX, mouseY);
@@ -124,4 +137,34 @@ public class GameControllerNetwork {
         return new Direction(currentAngle);
 
     }
+
+    public synchronized List<Segment> getSegments() {
+        return model.getSegments();
+    }
+
+    public int getCellSize() {
+        return cellSize;
+    }
+
+    public Position getHeadPos() {
+        return headPos;
+    }
+
+    public void setCellSize(int size) {
+        cellSize = size;
+
+    }
+
+    public void setHeadPos(Position pos) {
+        headPos = pos;
+    }
+
+    public Pane getPane() {
+        return (Pane) scene.getRoot();
+    }
+
+    public void setModel(GameModelNetwork model) {
+        this.model = model;
+    }
+
 }

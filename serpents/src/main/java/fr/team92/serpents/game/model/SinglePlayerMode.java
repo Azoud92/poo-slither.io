@@ -13,7 +13,7 @@ import javafx.scene.text.Text;
 
 public final class SinglePlayerMode implements GameMode {
     private static int CELL_SIZE;
-    ArrayList<Circle> snakeCircles = new ArrayList<>();
+    private static ArrayList<Circle> snakeCircles = new ArrayList<>();
 
     @Override
     public void drawSegments(Pane pane, GameController controller, int cellSize) {

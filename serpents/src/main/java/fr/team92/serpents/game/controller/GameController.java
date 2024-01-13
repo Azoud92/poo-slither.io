@@ -171,6 +171,7 @@ public final class GameController {
                 snake.decelerate();
             }
         }
+        model.notifyAll();
         model.moveSnakes(lastUpdate);
     }
 

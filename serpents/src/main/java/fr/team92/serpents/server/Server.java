@@ -18,7 +18,8 @@ import fr.team92.serpents.utils.Position;
 
 /**
  * Représente le serveur de jeu, qui écoute et les connexions des clients.
- * Le serveur gère l'état du jeu. Il délègue la gestion des clients à la classe ClientHandler.
+ * Le serveur gère l'état du jeu. Il délègue la gestion des clients à la classe
+ * ClientHandler.
  */
 public final class Server {
 
@@ -33,7 +34,8 @@ public final class Server {
     private final int port;
 
     /**
-     * ServerSocket utilisé pour écouter et accepter les connexions entrantes des clients
+     * ServerSocket utilisé pour écouter et accepter les connexions entrantes des
+     * clients
      */
     private ServerSocket serverSocket;
 
@@ -58,7 +60,8 @@ public final class Server {
     private final GameController gameController;
 
     /**
-     * Largeur et hauteur de la zone de jeu, taille d'une cellule et nombre de nourriture
+     * Largeur et hauteur de la zone de jeu, taille d'une cellule et nombre de
+     * nourriture
      */
     private final static int WIDTH = 5000, HEIGHT = 5000, CELL_SIZE = 20, NB_FOOD = 1000;
 
@@ -67,13 +70,15 @@ public final class Server {
      */
     public Server(int port) {
         this.port = port;
-        this.clientsHandlers = new CopyOnWriteArrayList<>(); // Permet de parcourir la liste des clients connectés sans risque de ConcurrentModificationException
+        this.clientsHandlers = new CopyOnWriteArrayList<>(); // Permet de parcourir la liste des clients connectés sans
+                                                             // risque de ConcurrentModificationException
         this.executorService = Executors.newCachedThreadPool();
         this.gameModel = new GameModel(WIDTH, HEIGHT, CELL_SIZE, NB_FOOD);
         this.gameController = new GameController(gameModel);
         this.gameController.gameStart();
 
-        // On arrête le serveur proprement lorsque l'utilisateur appuie sur Ctrl+C, le ferme...
+        // On arrête le serveur proprement lorsque l'utilisateur appuie sur Ctrl+C, le
+        // ferme...
         Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }
 
@@ -84,28 +89,27 @@ public final class Server {
     private synchronized void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("[INFORMATION] Serveur démarré sur le port " + port
-                + ". En attente de connexions...");
+                    + ". En attente de connexions...");
             while (!serverSocket.isClosed()) {
                 // Traitement de la connexion du client
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("[INFORMATION] Connexion établie (IP "
-                    + clientSocket.getInetAddress().getHostAddress() + ")");
+                        + clientSocket.getInetAddress().getHostAddress() + ")");
                 ClientHandler clientHandler = new ClientHandler(clientSocket, this);
                 clientsHandlers.add(clientHandler);
                 gameModel.addObserver(clientHandler);
                 executorService.execute(clientHandler);
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.err.println("[ERREUR] Erreur lors du démarrage du serveur : " + e.getMessage());
-        }
-        finally {
+        } finally {
             stop();
         }
     }
 
     /**
-     * Arrête le serveur en fermant le ServerSocket et en interrompant tous les ClientHandler actifs
+     * Arrête le serveur en fermant le ServerSocket et en interrompant tous les
+     * ClientHandler actifs
      */
     private synchronized void stop() {
         try {
@@ -121,34 +125,37 @@ public final class Server {
             }
             clientsHandlers.clear();
             System.out.println("[INFORMATION] Serveur arrêté");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.err.println("[ERREUR] Erreur lors de l'arrêt du serveur : " + e.getMessage());
         }
     }
 
     /**
      * Retire un client de la liste des clients connectés.
-     * Cette méthode est appelée par un ClientHandler lorsqu'il se termine ou lorsque la connexion est interrompue.
+     * Cette méthode est appelée par un ClientHandler lorsqu'il se termine ou
+     * lorsque la connexion est interrompue.
      * 
      * @param clientHandler Client à retirer
      */
     public void removeClientHandler(ClientHandler clientHandler) {
-        if (clientHandler == null) return;
+        if (clientHandler == null)
+            return;
         synchronized (gameModel) {
             gameModel.removeObserver(clientHandler);
         }
         synchronized (clientsHandlers) {
             clientsHandlers.remove(clientHandler);
-        }        
+        }
     }
 
     /**
      * Ajoute un serpent au modèle du jeu
+     * 
      * @param snake Serpent à ajouter
      */
     public void addSnake(Snake snake) {
-        if (snake == null) return;
+        if (snake == null)
+            return;
         synchronized (gameModel) {
             gameModel.addSnake(snake);
         }
@@ -156,36 +163,46 @@ public final class Server {
 
     /**
      * Retire un serpent du modèle du jeu
+     * 
      * @param snake Serpent à retirer
      */
     public void removeSnake(Snake snake) {
-        if (snake == null) return;
+        if (snake == null)
+            return;
         synchronized (gameModel) {
-            if (!snake.isDead()) snake.die();
+            if (!snake.isDead())
+                snake.die();
             gameModel.removeSnake(snake);
         }
     }
 
     /**
-     * Retourne une position libre pour un serpent (pour le placer lorsqu'il rejoint la partie)
-     * @param minDistanceInit Distance minimale entre la tête du serpent et les autres serpents
+     * Retourne une position libre pour un serpent (pour le placer lorsqu'il rejoint
+     * la partie)
+     * 
+     * @param minDistanceInit Distance minimale entre la tête du serpent et les
+     *                        autres serpents
      * @param segmentDiameter Diamètre d'un segment du serpent
-     * @param initLength Longueur initiale du serpent
-     * @param segmentSpacing Espacement entre les segments du serpent
-     * @param startDirection Direction initiale du serpent
+     * @param initLength      Longueur initiale du serpent
+     * @param segmentSpacing  Espacement entre les segments du serpent
+     * @param startDirection  Direction initiale du serpent
      * @return Position libre pour un serpent
      */
-    public Position getFreePositionForSnake(double minDistanceInit, double segmentDiameter, 
+    public Position getFreePositionForSnake(double minDistanceInit, double segmentDiameter,
             int initLength, double segmentSpacing, Direction startDirection) {
 
         synchronized (gameModel) {
-            return gameModel.getFreePositionForSnake(minDistanceInit, segmentDiameter, initLength, segmentSpacing, startDirection);
+            return gameModel.getFreePositionForSnake(minDistanceInit, segmentDiameter, initLength, segmentSpacing,
+                    startDirection);
         }
     }
 
     /**
-     * Retourne une copie du dictionnaire des positions occupées par les serpents et la nourriture sur la grille de jeu
-     * @return Copie du dictionnaire des positions occupées par les serpents et la nourriture sur la grille de jeu
+     * Retourne une copie du dictionnaire des positions occupées par les serpents et
+     * la nourriture sur la grille de jeu
+     * 
+     * @return Copie du dictionnaire des positions occupées par les serpents et la
+     *         nourriture sur la grille de jeu
      */
     public Map<Position, Segment> getGrid() {
         synchronized (gameModel) {
@@ -195,6 +212,7 @@ public final class Server {
 
     /**
      * Retourne la largeur de la zone de jeu
+     * 
      * @return Largeur de la zone de jeu
      */
     public double getWidth() {
@@ -203,6 +221,7 @@ public final class Server {
 
     /**
      * Retourne la hauteur de la zone de jeu
+     * 
      * @return Hauteur de la zone de jeu
      */
     public double getHeight() {
@@ -214,8 +233,7 @@ public final class Server {
             int port = args.length > 0 ? Integer.parseInt(args[0]) : DEFAULT_PORT;
             Server server = new Server(port);
             server.start();
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             System.err.println("[ERREUR] Le port spécifié n'est pas valide");
         }
     }
