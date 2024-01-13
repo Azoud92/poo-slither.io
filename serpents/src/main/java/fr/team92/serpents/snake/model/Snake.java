@@ -345,7 +345,7 @@ public final class Snake implements SerializableToJSON {
         json.add("segments", segmentsArray);
         json.add("direction", direction.toJSON());
         json.addProperty("speed", speed);
-        
+
         return json;
     }
 }

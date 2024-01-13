@@ -54,7 +54,7 @@ public class ClientHandler extends Thread implements Observer {
      * Serpent contrôlé par le client
      */
     private Snake snake;
-   
+
     /*
      * Objet Gson pour sérialiser / désérialiser les données JSON
      */
@@ -77,8 +77,10 @@ public class ClientHandler extends Thread implements Observer {
     }
 
     /**
-     * Configure les flux d'entrée / sortie et traite les messages entrants dans une boucle.
-     * Reste actif jusqu'à ce que le client se déconnecte ou qu'une erreur survienne.
+     * Configure les flux d'entrée / sortie et traite les messages entrants dans une
+     * boucle.
+     * Reste actif jusqu'à ce que le client se déconnecte ou qu'une erreur
+     * survienne.
      */
     @Override
     public void run() {
@@ -89,27 +91,29 @@ public class ClientHandler extends Thread implements Observer {
             String inputLine;
             while (!Thread.currentThread().isInterrupted() && in != null && (inputLine = in.readLine()) != null) {
                 // Traitement des données reçues du client
-                System.out.println("[INFORMATION] Données reçues du client (IP " + clientSocket.getInetAddress().getHostAddress() + ") : " + inputLine);                
+                System.out.println("[INFORMATION] Données reçues du client (IP "
+                        + clientSocket.getInetAddress().getHostAddress() + ") : " + inputLine);
                 handle_message(inputLine);
             }
         } catch (IOException e) {
             if (!Thread.currentThread().isInterrupted())
-                System.err.println(ServerError.CLIENT_THREAD_EXECUTION_ERROR + " (IP " + clientSocket.getInetAddress().getHostAddress() + ") : " + e.getMessage());
-        }
-        finally {
+                System.err.println(ServerError.CLIENT_THREAD_EXECUTION_ERROR + " (IP "
+                        + clientSocket.getInetAddress().getHostAddress() + ") : " + e.getMessage());
+        } finally {
             closeConnection();
         }
     }
 
     /**
      * Crée et ajoute un serpent pour le client au jeu.
-     * Si aucune position de départ valide n'est trouvée, un message d'erreur est envoyé au client.
+     * Si aucune position de départ valide n'est trouvée, un message d'erreur est
+     * envoyé au client.
      */
     private synchronized void createSnake() {
         Direction startDirection = Direction.random();
 
-        Position startPosition = server.getFreePositionForSnake(Snake.MIN_DISTANCE_INIT, 
-            Snake.SEGMENT_DIAMETER, Snake.INIT_LENGTH, Snake.SEGMENT_SPACING, startDirection);
+        Position startPosition = server.getFreePositionForSnake(Snake.MIN_DISTANCE_INIT,
+                Snake.SEGMENT_DIAMETER, Snake.INIT_LENGTH, Snake.SEGMENT_SPACING, startDirection);
 
         if (startPosition == null) {
             System.err.println(ServerError.NO_FREE_POSITION_FOR_SNAKE);
@@ -119,7 +123,7 @@ public class ClientHandler extends Thread implements Observer {
             return;
         }
 
-        snake = Snake.CreateNetworkSnake(Snake.INIT_LENGTH, startPosition, startDirection);        
+        snake = Snake.CreateNetworkSnake(Snake.INIT_LENGTH, startPosition, startDirection);
         server.addSnake(snake);
 
         System.out.println("[INFORMATION] Serpent créé (IP " + clientSocket.getInetAddress().getHostAddress() + ")");
@@ -129,7 +133,8 @@ public class ClientHandler extends Thread implements Observer {
 
     /**
      * Traite un message individuel reçu du client.
-     * Réagit en fonction du type de message (connexion, déconnexion, taille de fenêtre, etc.).
+     * Réagit en fonction du type de message (connexion, déconnexion, taille de
+     * fenêtre, etc.).
      * 
      * @param msg Message reçu du client
      */
@@ -138,11 +143,10 @@ public class ClientHandler extends Thread implements Observer {
         ClientMessageType type = ClientMessageType.valueOf(json.get("type").getAsString().toUpperCase());
 
         switch (type) {
-            case CONNECTION:                
-                if (snake == null) {                    
+            case CONNECTION:
+                if (snake == null) {
                     createSnake();
-                }
-                else {
+                } else {
                     System.err.println(ServerError.SNAKE_ALREADY_CREATED);
                     gson.toJson(ServerError.SNAKE_ALREADY_CREATED.toJSON());
                     closeConnection();
@@ -181,6 +185,22 @@ public class ClientHandler extends Thread implements Observer {
                 }
                 break;
 
+            case ACCELERATE:
+                if (snake == null) {
+                    break;
+                }
+
+                snake.setIsAccelerating(true);
+                break;
+
+            case DECELERATE:
+                if (snake == null) {
+                    break;
+                }
+
+                snake.setIsAccelerating(false);
+                break;
+
             default:
                 System.err.println(ServerError.UNKNOWN_RECEIVED_MESSAGE);
                 break;
@@ -196,15 +216,16 @@ public class ClientHandler extends Thread implements Observer {
     private synchronized void send(String data) {
         if (out != null) {
             out.println(data);
-        }
-        else {
-            System.err.println(ServerError.DATA_SEND_ERROR + " (IP " + clientSocket.getInetAddress().getHostAddress() + ")");
+        } else {
+            System.err.println(
+                    ServerError.DATA_SEND_ERROR + " (IP " + clientSocket.getInetAddress().getHostAddress() + ")");
         }
     }
 
     /**
      * Ferme proprement la connexion avec le client.
-     * Ferme les flux d'entrée / sortie et informe le serveur de la déconnexion du client.
+     * Ferme les flux d'entrée / sortie et informe le serveur de la déconnexion du
+     * client.
      */
     public synchronized void closeConnection() {
         try {
@@ -221,15 +242,18 @@ public class ClientHandler extends Thread implements Observer {
                 server.removeSnake(snake);
             }
             server.removeClientHandler(this);
-            System.out.println("[INFORMATION] Connexion client fermée (IP " + clientSocket.getInetAddress().getHostAddress() + ")");
+            System.out.println("[INFORMATION] Connexion client fermée (IP "
+                    + clientSocket.getInetAddress().getHostAddress() + ")");
         } catch (IOException e) {
-            System.err.println(ServerError.CLIENT_CONNECTION_CLOSE_ERROR + " (IP " + clientSocket.getInetAddress().getHostAddress() + ") : " + e.getMessage());
+            System.err.println(ServerError.CLIENT_CONNECTION_CLOSE_ERROR + " (IP "
+                    + clientSocket.getInetAddress().getHostAddress() + ") : " + e.getMessage());
         }
     }
 
     /**
      * Met à jour l'état du client basé sur les changements dans le jeu.
-     * Envoie les segments visibles au client basé sur la position actuelle du serpent.
+     * Envoie les segments visibles au client basé sur la position actuelle du
+     * serpent.
      */
     @Override
     public synchronized void update() {
@@ -241,6 +265,8 @@ public class ClientHandler extends Thread implements Observer {
 
         JsonObject message = new JsonObject();
         message.addProperty("type", ServerMessageType.VISIBLE_SEGMENTS.toString().toLowerCase());
+
+        message.add("direction", gson.toJsonTree(snake.getDirection()));
 
         // On crée un JsonArray pour stocker les segments visibles
         JsonArray segmentsInView = new JsonArray();
@@ -257,9 +283,9 @@ public class ClientHandler extends Thread implements Observer {
 
             // On gère les cas où le serpent est proche des bords
             double distanceX = Math.min(Math.abs(headPosition.x() - segmentPosition.x()),
-                                        modelWidth - Math.abs(headPosition.x() - segmentPosition.x()));
+                    modelWidth - Math.abs(headPosition.x() - segmentPosition.x()));
             double distanceY = Math.min(Math.abs(headPosition.y() - segmentPosition.y()),
-                                        modelHeight - Math.abs(headPosition.y() - segmentPosition.y()));
+                    modelHeight - Math.abs(headPosition.y() - segmentPosition.y()));
 
             // On vérifie si le segment est dans le champ de vision
             if (distanceX <= width / 2 && distanceY <= height / 2) {

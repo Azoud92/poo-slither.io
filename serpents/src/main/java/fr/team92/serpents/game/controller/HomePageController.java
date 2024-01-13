@@ -194,8 +194,15 @@ public class HomePageController {
     protected void multiplayerClicked(ActionEvent event) throws InterruptedException {
         System.out.println("Le bouton 'Multijoueur' a été cliqué");
         ClientConnection clientConnection = new ClientConnection(13000, "localhost");
-        clientConnection.connect();
-        //clientConnection.disconnect();
+        double width = ((Node) event.getSource()).getScene().getWidth();
+        double height = ((Node) event.getSource()).getScene().getHeight();
+        if (controlChoice1.equals("keyboard")) {
+            clientConnection.setKeyMap(leftKey1, rightKey1, accelerateKey1);
+        } else {
+            clientConnection.setKeyMap(null, null, null);
+        }
+        clientConnection.connect(width, height);
+        // clientConnection.disconnect();
     }
 
     @FXML

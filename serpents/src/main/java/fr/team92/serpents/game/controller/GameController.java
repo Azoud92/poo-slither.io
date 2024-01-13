@@ -54,8 +54,7 @@ public final class GameController {
         if (model.getState() != GameState.RUNNING) {
             gameLoop.stop();
             return;
-        }
-        else if (model.getState() == GameState.RUNNING) {
+        } else if (model.getState() == GameState.RUNNING) {
             double elapsedTimeInSeconds = (System.nanoTime() - lastUpdate) / 1_000_000_000.0;
             updateGame(elapsedTimeInSeconds);
             lastUpdate = System.nanoTime();
@@ -71,7 +70,6 @@ public final class GameController {
         lastUpdate = System.nanoTime();
         gameLoop.start();
     }
-
 
     /**
      * Ajoute les écouteurs d'événements clavier
