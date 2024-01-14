@@ -3,44 +3,58 @@ package fr.team92.serpents.game.controller;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
- * Représente la boucle de jeu pour la partie serveur (utilisant un ExecutorService)
+ * Cette classe représente la boucle de jeu pour la partie serveur.
+ * Elle utilise un ScheduledExecutorService pour gérer la boucle de jeu.
  */
 public final class ServerGameLoop implements GameLoop {
 
     /**
-     * ExecutorService utilisé pour exécuter la boucle de jeu
+     * Le ScheduledExecutorService utilisé pour exécuter la boucle de jeu.
      */
     private ScheduledExecutorService executorService;
 
     /**
-     * Runnable à exécuter à chaque rafraichissement
+     * Le Runnable à exécuter à chaque rafraîchissement de la boucle de jeu.
      */
-    private final Runnable runnable;
+    private final Consumer<Long> runnable;
 
     /**
-     * Taux de rafraichissement du jeu (en FPS)
+     * Le taux de rafraîchissement du jeu, en images par seconde (FPS).
      */
     private static final int rate = 60;
 
     /**
-     * Indique si la boucle de jeu est en cours d'exécution
+     * Un booléen indiquant si la boucle de jeu est en cours d'exécution.
      */
     private boolean running;
 
     /**
-     * Initialise une boucle de jeu pour la partie serveur en ligne 
-     * @param runnable le runnable à exécuter à chaque rafraichissement
+     * Le temps depuis la dernière mise à jour de la boucle de jeu.
      */
-    public ServerGameLoop(Runnable runnable) {
+    private long lastUpdate = 0;
+
+    /**
+     * Crée une nouvelle boucle de jeu pour la partie serveur.
+     * @param runnable le code à exécuter à chaque rafraîchissement de la boucle de jeu.
+     */
+    public ServerGameLoop(Consumer<Long> runnable) {
         this.runnable = runnable;
     }
 
     @Override
     public void start() {
         executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.scheduleAtFixedRate(runnable, 0, 1000 / rate, TimeUnit.MILLISECONDS);
+        executorService.scheduleAtFixedRate(() -> {
+            long now = System.nanoTime();
+            if (lastUpdate > 0) {
+                long deltaTime = now - lastUpdate;
+                runnable.accept(deltaTime);
+            }
+            lastUpdate = now;
+        }, 0, 1000 / rate, TimeUnit.MILLISECONDS);
         running = true;
     }
 

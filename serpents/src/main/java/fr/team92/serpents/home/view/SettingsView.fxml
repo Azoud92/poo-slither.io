@@ -14,7 +14,7 @@
 <?import javafx.scene.control.TextField?>
 
 
-<AnchorPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.team92.serpents.game.controller.SettingsController">
+<AnchorPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.team92.serpents.home.controller.SettingsController">
     <children>
         <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
@@ -38,16 +38,6 @@
                         <Label text="Nombre de nourriture :" textFill="WHITE" />
                         <Slider fx:id="foodSlider" min="1" max="200" value="100"/>
                         <Label fx:id="foodValueLabel" text="50" textFill="WHITE" />
-                    </HBox>
-                    <HBox alignment="CENTER" spacing="10">
-                        <Label text="Auto-collision :" textFill="WHITE" />
-                        <RadioButton fx:id="autoCollisionOnRadioButton" text="On" />
-                        <RadioButton fx:id="autoCollisionOffRadioButton" text="Off" />
-                    </HBox>
-                    <HBox alignment="CENTER" spacing="10">
-                        <Label text="Traversement des murs :" textFill="WHITE" />
-                        <RadioButton fx:id="wallCrossingOnRadioButton" text="On" />
-                        <RadioButton fx:id="wallCrossingOffRadioButton" text="Off" />
                     </HBox>
                     <Button fx:id="saveButton" text="Sauvegarder" onAction="#saveButtonClicked" style="-fx-background-color: black;" textFill="WHITE">
                         <font>

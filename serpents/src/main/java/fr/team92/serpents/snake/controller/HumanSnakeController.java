@@ -51,6 +51,10 @@ public final class HumanSnakeController implements SnakeController {
         lastEvent = event;
     }
 
+    /**
+     * Définir le dernier événement de souris enregistré
+     * @param event l'événement
+     */
     public void setOtherMouseEvent(MouseEvent event) {
         otherMouseEvent = event;
     }
@@ -83,7 +87,6 @@ public final class HumanSnakeController implements SnakeController {
                 snake.setIsAccelerating(false);
                 otherMouseEvent = null;
             }
-
         }
     }
 

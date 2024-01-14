@@ -3,7 +3,7 @@ package fr.team92.serpents.snake.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import fr.team92.serpents.game.model.GameMode;
+import fr.team92.serpents.game.view.GameMode;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.Direction;
 import javafx.scene.input.InputEvent;
@@ -42,7 +42,7 @@ public final class KeyboardControl implements SnakeEventControl {
                     snake.setIsAccelerating(false);
                 }
             } else {
-                double newAngle = snake.getDirection().angle() + angleChange;
+                double newAngle = snake.getDirection().getAngle() + angleChange;
                 snake.setDirection(new Direction(newAngle));
             }
         }

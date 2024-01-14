@@ -1,13 +1,12 @@
 package fr.team92.serpents.game.controller;
 
-import java.util.List;
 import java.util.Map;
 
 import fr.team92.serpents.game.model.GameModel;
 import fr.team92.serpents.snake.controller.HumanSnakeController;
 import fr.team92.serpents.snake.controller.SnakeController;
-import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.snake.model.Snake;
+import fr.team92.serpents.snake.model.segments.Segment;
 import fr.team92.serpents.utils.GameState;
 import fr.team92.serpents.utils.Position;
 import javafx.scene.Scene;
@@ -16,24 +15,28 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 /**
- * Représente le contrôleur du jeu
+ * Représente le contrôleur du jeu. Cette classe est responsable de la gestion des entrées de l'utilisateur
+ * et de la mise à jour de l'état du jeu.
  */
 public final class GameController {
 
     /**
-     * Le modèle du jeu
+     * Le modèle du jeu. Contient l'état actuel du jeu.
      */
     private final GameModel model;
 
+    /**
+     * La boucle de jeu. Appelle la méthode de mise à jour à chaque itération.
+     */
     private GameLoop gameLoop;
 
-    private double lastUpdate;
-
+    /**
+     * La scène JavaFX. Utilisée pour gérer les entrées de l'utilisateur.
+     */
     private Scene scene;
 
     /**
-     * Constructeur du contrôleur du jeu
-     * 
+     * Initialise le contrôleur du jeu hors ligne
      * @param model le modèle du jeu
      * @param scene la scène JavaFX
      */
@@ -42,40 +45,65 @@ public final class GameController {
         this.model = model;
         setKeyListeners(scene);
         setMouseListeners(scene);
-        gameLoop = new OfflineGameLoop(() -> loopTask());
+        gameLoop = new OfflineGameLoop(this::loopTask);
     }
 
+    /**
+     * Initialise le contrôleur du jeu en ligne
+     * @param model le modèle du jeu
+     */
     public GameController(GameModel model) {
         this.model = model;
-        gameLoop = new ServerGameLoop(() -> loopTask());
+        gameLoop = new ServerGameLoop(this::loopTask);
     }
 
-    private void loopTask() {
+    /**
+     * La tâche à exécuter à chaque itération de la boucle de jeu
+     * @param deltaTime le temps écoulé depuis la dernière itération
+     */
+    private void loopTask(long deltaTime) {
         if (model.getState() != GameState.RUNNING) {
             gameLoop.stop();
             return;
         }
         else if (model.getState() == GameState.RUNNING) {
-            double elapsedTimeInSeconds = (System.nanoTime() - lastUpdate) / 1_000_000_000.0;
-            updateGame(elapsedTimeInSeconds);
-            lastUpdate = System.nanoTime();
+            double deltaTimeInSeconds = deltaTime / 1_000_000_000.0;
+            updateGame(deltaTimeInSeconds);
         }
     }
 
+    /**
+     * Met à jour l'état du jeu
+     * @param lastUpdate le temps écoulé depuis la dernière itération
+     */
+    private void updateGame(double lastUpdate) {
+        if (model.getState() != GameState.RUNNING) {
+            return;
+        }
+        for (Snake snake : model.getSnakes()) {
+            SnakeController controller = snake.getController();
+            controller.controlSnake(snake, model, lastUpdate, scene);
+            if (snake.isAccelerating()) {
+                snake.accelerate();
+            } else {
+                snake.decelerate();
+            }
+        }
+        model.moveSnakes(lastUpdate);
+    }
+
+    /**
+     * Démarre le jeu
+     */
     public void gameStart() {
-        if (model.getState() != GameState.WAITING)
-            throw new IllegalStateException("Game is not waiting to start");
-        if (gameLoop.isRunning())
-            throw new IllegalStateException("Game loop already started");
+        if (model.getState() != GameState.WAITING || gameLoop.isRunning())
+            throw new IllegalStateException("La partie a déjà été lancée");
         model.gameStart();
-        lastUpdate = System.nanoTime();
         gameLoop.start();
     }
 
-
     /**
      * Ajoute les écouteurs d'événements clavier
-     * 
      * @param scene la scène JavaFX
      */
     private void setKeyListeners(Scene scene) {
@@ -90,7 +118,6 @@ public final class GameController {
 
     /**
      * Applique les actions du joueur courant en fonction de l'événement clavier
-     * 
      * @param event l'événement clavier
      */
     private void handleKey(KeyEvent event) {
@@ -108,8 +135,7 @@ public final class GameController {
     }
 
     /**
-     * Ajoute les écouteurs d'événements de la souris
-     * 
+     * Ajoute les écouteurs d'événements souris
      * @param scene la scène JavaFX
      */
     private void setMouseListeners(Scene scene) {
@@ -132,10 +158,9 @@ public final class GameController {
     }
 
     /**
-     * Applique les actions du joueur courant en fonction de l'événement de la
-     * souris
-     * 
-     * @param event l'événement de la souris
+     * Applique les actions du joueur courant en fonction de l'événement souris
+     * @param event l'événement souris
+     * @param move true si l'événement est un mouvement de souris, false sinon
      */
     private void handleMouse(MouseEvent event, boolean move) {
         if (model.getState() != GameState.RUNNING) {
@@ -156,29 +181,7 @@ public final class GameController {
     }
 
     /**
-     * Met à jour le jeu
-     * 
-     * @param controller le contrôleur du serpent
-     */
-    private void updateGame(double lastUpdate) {
-        if (model.getState() != GameState.RUNNING) {
-            return;
-        }
-        for (Snake snake : model.getSnakes()) {
-            SnakeController controller = snake.getController();
-            controller.controlSnake(snake, model, lastUpdate, scene);
-            if (snake.getIsAccelerating()) {
-                snake.accelerate();
-            } else {
-                snake.decelerate();
-            }
-        }
-        model.moveSnakes(lastUpdate);
-    }
-
-    /**
      * Obtenir la largeur de la grille
-     * 
      * @return la largeur de la grille
      */
     public int getWidth() {
@@ -187,7 +190,6 @@ public final class GameController {
 
     /**
      * Obtenir la hauteur de la grille
-     * 
      * @return la hauteur de la grille
      */
     public int getHeight() {
@@ -196,35 +198,32 @@ public final class GameController {
 
     /**
      * Obtenir la grille
-     * 
      * @return la grille
      */
     public Map<Position, Segment> getGrid() {
-        return model.getGrid();
+        return model.getSnakesSegmentsGrid();
     }
 
     /**
-     * Vérifier si la partie est finie
-     * 
-     * @return true si la partie est finie, false sinon
+     * Vérifie si la partie est terminée
+     * @return true si la partie est terminée, false sinon
      */
     public boolean gameFinished() {
         return model.getState() == GameState.FINISHED;
     }
 
     /**
-     * Obtenir la liste des serpents
-     * 
-     * @return la liste des serpents
+     * Obtenir la taille d'une cellule de la grille
+     * @return la taille d'une cellule de la grille
      */
-    public List<Snake> getSnakes() {
-        return model.getSnakes();
-    }
-
     public int getCellSize() {
         return model.getCellSize();
     }
 
+    /**
+     * Obtenir le premier joueur humain trouvé
+     * @return le premier joueur humain trouvé
+     */
     public Snake getHumanSnake() {
         for (Snake snake : model.getSnakes()) {
             if (snake.getController() instanceof HumanSnakeController) {
@@ -234,7 +233,14 @@ public final class GameController {
         return null;
     }
 
+    /**
+     * Obtenir le score des joueurs humains
+     * @return le score des joueurs humains
+     */
     public int getScore() {
+        if (getHumanSnake() == null) {
+            return 0;
+        }
         return getHumanSnake().getLength();
     }
 

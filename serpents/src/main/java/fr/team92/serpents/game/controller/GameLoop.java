@@ -1,7 +1,8 @@
 package fr.team92.serpents.game.controller;
 
 /**
- * Représente la boucle de jeu
+ * Cette interface représente une boucle de jeu. 
+ * Elle définit les méthodes de base nécessaires pour contrôler une boucle de jeu.
  */
 public interface GameLoop {
 

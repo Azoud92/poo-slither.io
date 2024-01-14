@@ -39,8 +39,8 @@ public final class NetworkSnakeController implements SnakeController {
         Direction targetDirection = commandQueue.peek(); // Récupère la prochaine direction sans la retirer
 
         if (targetDirection != null) {
-            double currentAngle = currentDirection.angle();
-            double targetAngle = targetDirection.angle();
+            double currentAngle = currentDirection.getAngle();
+            double targetAngle = targetDirection.getAngle();
 
             double angleDifference = targetAngle - currentAngle;
             // Normalisation de la différence d'angle dans l'intervalle [-180, 180]

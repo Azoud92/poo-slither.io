@@ -13,12 +13,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import fr.team92.serpents.game.model.GameMode;
 import fr.team92.serpents.game.network.ClientMessageType;
+import fr.team92.serpents.game.view.GameMode;
 import fr.team92.serpents.snake.controller.NetworkSnakeController;
 import fr.team92.serpents.snake.controller.SnakeController;
-import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.snake.model.Snake;
+import fr.team92.serpents.snake.model.segments.Segment;
 import fr.team92.serpents.utils.Direction;
 import fr.team92.serpents.utils.Observer;
 import fr.team92.serpents.utils.Position;
@@ -109,7 +109,7 @@ public class ClientHandler extends Thread implements Observer {
         Direction startDirection = Direction.random();
 
         Position startPosition = server.getFreePositionForSnake(Snake.MIN_DISTANCE_INIT, 
-            Snake.SEGMENT_DIAMETER, Snake.INIT_LENGTH, Snake.SEGMENT_SPACING, startDirection);
+            Segment.DEFAULT_DIAMETER, Snake.INIT_LENGTH, Snake.SEGMENT_SPACING, startDirection);
 
         if (startPosition == null) {
             System.err.println(ServerError.NO_FREE_POSITION_FOR_SNAKE);
@@ -216,9 +216,6 @@ public class ClientHandler extends Thread implements Observer {
             }
             if (clientSocket != null && !clientSocket.isClosed()) {
                 clientSocket.close();
-            }
-            if (snake != null) {
-                server.removeSnake(snake);
             }
             server.removeClientHandler(this);
             System.out.println("[INFORMATION] Connexion client fermée (IP " + clientSocket.getInetAddress().getHostAddress() + ")");

@@ -3,7 +3,6 @@ package fr.team92.serpents.game.view;
 import java.io.IOException;
 
 import fr.team92.serpents.game.controller.GameController;
-import fr.team92.serpents.game.model.GameMode;
 import fr.team92.serpents.utils.Observable;
 import fr.team92.serpents.utils.Observer;
 import javafx.scene.Parent;
@@ -27,19 +26,47 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.util.Duration;
 
+/**
+ * Cette classe représente la vue du jeu.
+ * Elle implémente l'interface Observer.
+ */
 public final class GameView implements Observer {
 
+    /**
+     * Le contrôleur du jeu.
+     */
     private final GameController controller;
+
+    /**
+     * Le Pane sur lequel le jeu est dessiné.
+     */
     private final Pane pane;
-    private static int CELL_SIZE;
+
+    /**
+     * Le texte affichant le score.
+     */
     private static Text scoreText;
+
+    /**
+     * Le HBox contenant le texte du score.
+     */
     private final HBox hbox = new HBox();
+
+    /**
+     * Le mode de jeu actuel.
+     */
     private final GameMode gameMode;
 
+    /**
+     * Initialise la vue du jeu.
+     * @param model le modèle du jeu
+     * @param controller le contrôleur du jeu
+     * @param pane le Pane sur lequel le jeu est dessiné
+     * @param gameMode le mode de jeu actuel
+     */
     public GameView(Observable model, GameController controller, Pane pane, GameMode gameMode) {
         this.pane = pane;
         this.controller = controller;
-        CELL_SIZE = controller.getCellSize();
         this.gameMode = gameMode;
 
         Image backgroundImage = new Image(
@@ -63,10 +90,16 @@ public final class GameView implements Observer {
         this.update();
     }
 
+    /**
+     * Met à jour le score affiché.
+     */
     private void updateScore() {
         gameMode.updateScore(scoreText, controller, pane);
     }
 
+    /**
+     * Met à jour la vue du jeu.
+     */
     @Override
     public void update() {
         drawSegments();
@@ -74,11 +107,17 @@ public final class GameView implements Observer {
         endGame();
     }
 
+    /**
+     * Dessine les segments du serpent sur le plateau de jeu.
+     */
     private void drawSegments() {
-        gameMode.drawSegments(pane, controller, CELL_SIZE);
+        gameMode.drawSegments(pane, controller);
         hbox.toFront();
     }
 
+    /**
+     * Affiche un écran de fin de partie si la partie est terminée.
+     */
     private void endGame() {
         if (!controller.gameFinished())
             return;
@@ -105,11 +144,10 @@ public final class GameView implements Observer {
 
         fadeTransition.setOnFinished(event -> {
             try {
-                Parent root = FXMLLoader.load(getClass().getResource("/fr/team92/serpents/game/view/homepage.fxml"));
+                Parent root = FXMLLoader.load(getClass().getResource("/fr/team92/serpents/home/view/Homepage.fxml"));
                 Stage stage = (Stage) gameOverText.getScene().getWindow();
                 stage.setScene(new Scene(root, stage.getWidth(), stage.getHeight()));
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         });
@@ -117,14 +155,11 @@ public final class GameView implements Observer {
         fadeTransition.play();
     }
 
-    public static int getCellSize() {
-        return CELL_SIZE;
-    }
-
-    public static void setCellSize(int cellSize) {
-        CELL_SIZE = cellSize;
-    }
-
+    /**
+     * Obtenir le mode de jeu actuel.
+     * @return le mode de jeu actuel
+     */
+    @Override
     public GameMode getGameMode() {
         return gameMode;
     }

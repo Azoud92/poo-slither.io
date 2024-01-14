@@ -13,6 +13,7 @@ public interface BotStrategy {
      * Détermine le déplacement du serpent
      * @param snake serpent à contrôler
      * @param gameModel modèle du jeu
+     * @param lastUpdate dernier temps de mise à jour
      * @return direction du déplacement
      */
     Direction detMove(Snake snake, GameModel gameModel, double lastUpdate);

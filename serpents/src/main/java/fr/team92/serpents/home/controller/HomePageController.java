@@ -1,4 +1,4 @@
-package fr.team92.serpents.game.controller;
+package fr.team92.serpents.home.controller;
 
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -11,12 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import fr.team92.serpents.game.model.GameMode;
+import fr.team92.serpents.game.controller.GameController;
 import fr.team92.serpents.game.model.GameModel;
 import fr.team92.serpents.game.network.ClientConnection;
-import fr.team92.serpents.game.model.SinglePlayerMode;
-import fr.team92.serpents.game.model.TwoPlayersMode;
+import fr.team92.serpents.game.view.GameMode;
 import fr.team92.serpents.game.view.GameView;
+import fr.team92.serpents.game.view.SinglePlayerMode;
+import fr.team92.serpents.game.view.TwoPlayersMode;
+import fr.team92.serpents.home.model.SettingsModel;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.Direction;
 import fr.team92.serpents.utils.Position;
@@ -46,9 +48,9 @@ public class HomePageController {
     private int numberOfBots = 5;
     private int numberOfFood = 100;
 
-    private KeyCode leftKey1, leftKey2 = KeyCode.LEFT;
-    private KeyCode rightKey1, rightKey2 = KeyCode.RIGHT;
-    private KeyCode accelerateKey1, accelerateKey2 = KeyCode.UP;
+    private KeyCode leftKey1 = KeyCode.LEFT, leftKey2 = KeyCode.Q;
+    private KeyCode rightKey1 = KeyCode.RIGHT, rightKey2 = KeyCode.D;
+    private KeyCode accelerateKey1 = KeyCode.UP, accelerateKey2 = KeyCode.SPACE;
 
     @FXML
     public void initialize() {
@@ -59,6 +61,11 @@ public class HomePageController {
         ButtonsAnimations.addAnimations(optionsButton);
         ButtonsAnimations.addAnimations(changeControlsButton);
         ButtonsAnimations.addAnimations(exitButton);
+        SettingsModel settings = SettingsModel.loadSettings();
+        if (settings != null) {
+            numberOfBots = settings.getNumberOfBots();
+            numberOfFood = settings.getNumberOfFood();
+        }
     }
 
     @FXML
@@ -117,7 +124,7 @@ public class HomePageController {
             int y = random.nextInt(model.getHeight());
             position = new Position(x, y);
             double direction = random.nextDouble() * 2 * Math.PI;
-            botSnake = Snake.CreateAvoidWallsBotSnake(5, position, new Direction(direction));
+            botSnake = Snake.CreateAvoidWallsBotSnake(Snake.INIT_LENGTH, position, new Direction(direction));
         } while (!model.isValidSnake(botSnake));
 
         return botSnake;
@@ -139,7 +146,7 @@ public class HomePageController {
                     int y = random.nextInt(model.getHeight());
                     position = new Position(x, y);
                     double direction = random.nextDouble() * 2 * Math.PI;
-                    playerSnake = Snake.CreateHumanKeyboardSnake(keyMap1, 5, position,
+                    playerSnake = Snake.CreateHumanKeyboardSnake(keyMap1, Snake.INIT_LENGTH, position,
                             new Direction(direction));
                 } while (!model.isValidSnake(playerSnake));
 
@@ -152,7 +159,7 @@ public class HomePageController {
                     int y = random.nextInt(model.getHeight());
                     position = new Position(x, y);
                     double direction = random.nextDouble() * 2 * Math.PI;
-                    playerSnake = Snake.CreateHumanMouseSnake(5, position, new Direction(direction));
+                    playerSnake = Snake.CreateHumanMouseSnake(Snake.INIT_LENGTH, position, new Direction(direction));
                 } while (!model.isValidSnake(playerSnake));
             }
         } else {
@@ -169,7 +176,7 @@ public class HomePageController {
                     int y = random.nextInt(model.getHeight());
                     position = new Position(x, y);
                     double direction = random.nextDouble() * 2 * Math.PI;
-                    playerSnake = Snake.CreateHumanKeyboardSnake(keyMap2, 5, position,
+                    playerSnake = Snake.CreateHumanKeyboardSnake(keyMap2, Snake.INIT_LENGTH, position,
                             new Direction(direction));
                 } while (!model.isValidSnake(playerSnake));
 
@@ -202,7 +209,7 @@ public class HomePageController {
     public void changeControlsClicked(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fr/team92/serpents/game/view/ControlsView.fxml"));
+                    getClass().getResource("/fr/team92/serpents/home/view/ControlsView.fxml"));
             Parent root = loader.load();
 
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -217,7 +224,7 @@ public class HomePageController {
     protected void optionsButtonClicked(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fr/team92/serpents/game/view/SettingsView.fxml"));
+                    getClass().getResource("/fr/team92/serpents/home/view/SettingsView.fxml"));
             Parent root = loader.load();
 
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();

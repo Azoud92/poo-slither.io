@@ -1,31 +1,43 @@
 package fr.team92.serpents.game.controller;
 
+import java.util.function.Consumer;
+
 import javafx.animation.AnimationTimer;
 
 /**
- * Représente la boucle de jeu pour la partie client hors ligne (utilisant un AnimationTimer de JavaFX)
+ * Cette classe représente la boucle de jeu pour le mode hors ligne.
+ * Elle utilise un AnimationTimer de JavaFX pour gérer la boucle de jeu.
  */
 public final class OfflineGameLoop implements GameLoop {
 
     /**
-     * AnimationTimer de JavaFX
+     * L'AnimationTimer de JavaFX utilisé pour gérer la boucle de jeu.
      */
     private final AnimationTimer animationTimer;
 
     /**
-     * Indique si la boucle de jeu est en cours d'exécution
+     * Un booléen indiquant si la boucle de jeu est en cours d'exécution.
      */
     private boolean running;
 
     /**
-     * Initialise une boucle de jeu pour la partie client hors ligne
-     * @param runnable le runnable à exécuter à chaque rafraichissement
+     * Le temps depuis la dernière mise à jour de la boucle de jeu.
      */
-    public OfflineGameLoop(Runnable runnable) {
+    private long lastUpdate = 0;
+
+    /**
+     * Crée une nouvelle boucle de jeu pour le mode hors ligne.
+     * @param runnable le code à exécuter à chaque mise à jour de la boucle de jeu
+     */
+    public OfflineGameLoop(Consumer<Long> runnable) {
         animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                runnable.run();
+                if (lastUpdate > 0) {
+                    long deltaTime = now - lastUpdate;
+                    runnable.accept(deltaTime);
+                }
+                lastUpdate = now;
             }
         };
     }

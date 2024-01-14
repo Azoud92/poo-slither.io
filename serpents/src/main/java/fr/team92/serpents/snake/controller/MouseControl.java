@@ -1,7 +1,7 @@
 package fr.team92.serpents.snake.controller;
 
-import fr.team92.serpents.game.model.GameMode;
-import fr.team92.serpents.game.model.SinglePlayerMode;
+import fr.team92.serpents.game.view.GameMode;
+import fr.team92.serpents.game.view.SinglePlayerMode;
 import fr.team92.serpents.snake.model.Snake;
 import fr.team92.serpents.utils.Direction;
 import javafx.scene.input.InputEvent;
@@ -12,8 +12,10 @@ import javafx.scene.input.MouseEvent;
  */
 public final class MouseControl implements SnakeEventControl {
 
+    @Override
     public void handleControl(Snake snake, InputEvent event, GameMode gameMode, int cellSize, double windowWidth,
             double windowHeight) {
+
         if (event instanceof MouseEvent) {
             MouseEvent mouseEvent = (MouseEvent) event;
             double mouseX = mouseEvent.getX();
@@ -38,7 +40,7 @@ public final class MouseControl implements SnakeEventControl {
 
             double targetAngleInDegrees = (Math.toDegrees(Math.atan2(dy, dx))) % 360;
 
-            double currentAngle = snake.getDirection().angle();
+            double currentAngle = snake.getDirection().getAngle();
             double angleDifference = targetAngleInDegrees - currentAngle;
 
             // Normalise la différence d'angle à l'intervalle [-180, 180)

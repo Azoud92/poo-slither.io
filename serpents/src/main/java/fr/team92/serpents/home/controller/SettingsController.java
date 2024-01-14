@@ -1,16 +1,15 @@
-package fr.team92.serpents.game.controller;
+package fr.team92.serpents.home.controller;
 
 import java.io.IOException;
 
+import fr.team92.serpents.home.model.SettingsModel;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
-import javafx.scene.control.ToggleGroup;
 import javafx.stage.Stage;
 
 public class SettingsController {
@@ -20,18 +19,6 @@ public class SettingsController {
 
     @FXML
     private Slider foodSlider;
-
-    @FXML
-    private RadioButton autoCollisionOnRadioButton;
-
-    @FXML
-    private RadioButton autoCollisionOffRadioButton;
-
-    @FXML
-    private RadioButton wallCrossingOnRadioButton;
-
-    @FXML
-    private RadioButton wallCrossingOffRadioButton;
 
     @FXML
     private Button saveButton;
@@ -47,7 +34,6 @@ public class SettingsController {
 
     @FXML
     public void initialize() {
-
         botsSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             numberOfBots = newVal.intValue();
             botsValueLabel.setText(String.format("%.0f", newVal));
@@ -59,27 +45,21 @@ public class SettingsController {
         });
 
         ButtonsAnimations.addAnimations(saveButton);
-        // Initialisation du contrôleur
-        ToggleGroup autoCollisionGroup = new ToggleGroup();
-        autoCollisionOnRadioButton.setToggleGroup(autoCollisionGroup);
-        autoCollisionOffRadioButton.setToggleGroup(autoCollisionGroup);
-        autoCollisionOnRadioButton.setSelected(true); // TODO: a adapter plus tard
 
-        ToggleGroup wallCrossingGroup = new ToggleGroup();
-        wallCrossingOnRadioButton.setToggleGroup(wallCrossingGroup);
-        wallCrossingOffRadioButton.setToggleGroup(wallCrossingGroup);
-        wallCrossingOnRadioButton.setSelected(true); // TODO: a adapter plus tard
+        SettingsModel gameSettings = SettingsModel.loadSettings();
+        if (gameSettings != null) {
+            botsSlider.setValue(gameSettings.getNumberOfBots());
+            foodSlider.setValue(gameSettings.getNumberOfFood());
+        }
     }
 
     @FXML
     public void saveButtonClicked() {
         numberOfBots = (int) botsSlider.getValue();
         numberOfFood = (int) foodSlider.getValue();
-        boolean autoCollision = autoCollisionOnRadioButton.isSelected();// TODO: a utiliser plus tard
-        boolean wallCrossing = wallCrossingOnRadioButton.isSelected();// TODO: a utiliser plus tard
-
+        
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fr/team92/serpents/game/view/homepage.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fr/team92/serpents/home/view/homepage.fxml"));
             Parent root = loader.load();
             Stage appStage = (Stage) saveButton.getScene().getWindow();
             Scene homePageScene = new Scene(root, appStage.getWidth(), appStage.getHeight());
@@ -87,6 +67,10 @@ public class SettingsController {
             HomePageController homePageController = loader.getController();
             homePageController.setNumberOfBots(numberOfBots);
             homePageController.setNumberOfFood(numberOfFood);
+
+            SettingsModel settings = new SettingsModel(numberOfBots, numberOfFood);
+            SettingsModel.saveSettings(settings);
+
             appStage.setScene(homePageScene);
 
         } catch (IOException e) {

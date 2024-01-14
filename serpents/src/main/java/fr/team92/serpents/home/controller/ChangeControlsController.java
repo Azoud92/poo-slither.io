@@ -1,4 +1,4 @@
-package fr.team92.serpents.game.controller;
+package fr.team92.serpents.home.controller;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -122,7 +122,7 @@ public class ChangeControlsController {
             KeyCode rightKey2, KeyCode accelerateKey2) {
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fr/team92/serpents/game/view/homepage.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fr/team92/serpents/home/view/homepage.fxml"));
             Parent root = loader.load();
 
             HomePageController homePageController = loader.getController();

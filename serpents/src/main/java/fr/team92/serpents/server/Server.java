@@ -11,8 +11,8 @@ import java.util.concurrent.Executors;
 
 import fr.team92.serpents.game.controller.GameController;
 import fr.team92.serpents.game.model.GameModel;
-import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.snake.model.Snake;
+import fr.team92.serpents.snake.model.segments.Segment;
 import fr.team92.serpents.utils.Direction;
 import fr.team92.serpents.utils.Position;
 
@@ -155,18 +155,6 @@ public final class Server {
     }
 
     /**
-     * Retire un serpent du modèle du jeu
-     * @param snake Serpent à retirer
-     */
-    public void removeSnake(Snake snake) {
-        if (snake == null) return;
-        synchronized (gameModel) {
-            if (!snake.isDead()) snake.die();
-            gameModel.removeSnake(snake);
-        }
-    }
-
-    /**
      * Retourne une position libre pour un serpent (pour le placer lorsqu'il rejoint la partie)
      * @param minDistanceInit Distance minimale entre la tête du serpent et les autres serpents
      * @param segmentDiameter Diamètre d'un segment du serpent
@@ -179,7 +167,7 @@ public final class Server {
             int initLength, double segmentSpacing, Direction startDirection) {
 
         synchronized (gameModel) {
-            return gameModel.getFreePositionForSnake(minDistanceInit, segmentDiameter, initLength, segmentSpacing, startDirection);
+            return gameModel.getFreePositionForSnake(minDistanceInit, segmentDiameter, initLength, startDirection);
         }
     }
 
@@ -189,7 +177,7 @@ public final class Server {
      */
     public Map<Position, Segment> getGrid() {
         synchronized (gameModel) {
-            return gameModel.getGrid();
+            return gameModel.getSnakesSegmentsGrid();
         }
     }
 

@@ -1,4 +1,4 @@
-package fr.team92.serpents.game.controller;
+package fr.team92.serpents.home.controller;
 
 import javafx.animation.ScaleTransition;
 import javafx.scene.control.Button;

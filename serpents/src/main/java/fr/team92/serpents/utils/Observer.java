@@ -1,6 +1,6 @@
 package fr.team92.serpents.utils;
 
-import fr.team92.serpents.game.model.GameMode;
+import fr.team92.serpents.game.view.GameMode;
 
 /**
  * Interface d'un observateur
