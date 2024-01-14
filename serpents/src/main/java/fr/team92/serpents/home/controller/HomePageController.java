@@ -33,8 +33,7 @@ public class HomePageController {
     private Button singlePlayerButton;
     @FXML
     private Button twoPlayerButton;
-    @FXML
-    private Button multiPlayerButton;
+
     @FXML
     private Button optionsButton;
     @FXML
@@ -57,7 +56,6 @@ public class HomePageController {
 
         ButtonsAnimations.addAnimations(singlePlayerButton);
         ButtonsAnimations.addAnimations(twoPlayerButton);
-        ButtonsAnimations.addAnimations(multiPlayerButton);
         ButtonsAnimations.addAnimations(optionsButton);
         ButtonsAnimations.addAnimations(changeControlsButton);
         ButtonsAnimations.addAnimations(exitButton);

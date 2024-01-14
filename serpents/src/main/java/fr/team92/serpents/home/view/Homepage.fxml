@@ -55,18 +55,6 @@
                                 <Font size="20.0" />
                             </font>
                         </Button>
-                        <Button fx:id="multiPlayerButton" onAction="#multiplayerClicked" prefHeight="50.0" prefWidth="150.0" style="-fx-background-color: black;" text="Multijoueur" textFill="WHITE">
-                            <graphic>
-                                <ImageView>
-                                    <image>
-                                        <Image url="@ressources/multi.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                     <font>
-                        <Font size="20.0" />
-                     </font>
-                        </Button>
                     </VBox>
                <HBox alignment="CENTER" prefHeight="146.0" prefWidth="1920.0" spacing="20" style="-fx-padding: 10;">
                     <children>
