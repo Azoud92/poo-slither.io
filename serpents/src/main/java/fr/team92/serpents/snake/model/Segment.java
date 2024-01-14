@@ -69,6 +69,10 @@ public final class Segment implements SerializableToJSON {
         return dead;
     }
 
+    public void setDead(boolean dead) {
+        this.dead = dead;
+    }
+
     /**
      * Tuer le segment
      */
@@ -102,7 +106,8 @@ public final class Segment implements SerializableToJSON {
         json.add("position", position.toJSON());
         json.addProperty("diameter", diameter);
         json.addProperty("behavior", behavior.getName());
-        
+        json.addProperty("dead", dead);
+
         return json;
     }
 

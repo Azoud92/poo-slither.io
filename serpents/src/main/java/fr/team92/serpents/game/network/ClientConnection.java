@@ -18,7 +18,6 @@ import fr.team92.serpents.snake.model.BurrowingSegmentBehavior;
 import fr.team92.serpents.snake.model.Segment;
 import fr.team92.serpents.utils.Direction;
 import fr.team92.serpents.utils.Position;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 
@@ -119,7 +118,7 @@ public class ClientConnection {
         }
     }
 
-    public synchronized void sendWindowSize(double width, double height) {
+    public void sendWindowSize(double width, double height) {
         JsonObject windowSizeMsg = new JsonObject();
         windowSizeMsg.addProperty("type", "window_size");
         windowSizeMsg.addProperty("width", width);
@@ -157,27 +156,29 @@ public class ClientConnection {
         }
     }
 
-    private synchronized void handle_message(String msg) {
+    private void handle_message(String msg) {
         JsonObject json = gson.fromJson(msg, JsonObject.class);
         ServerMessageType type = ServerMessageType.valueOf(json.get("type").getAsString().toUpperCase());
         System.out.println(type);
         switch (type) {
             case DIRECTION:
 
-                double newAngle = json.get("angle").getAsDouble();
+                JsonObject angleObject = json.get("angle").getAsJsonObject();
+                double newAngle = angleObject.get("angle").getAsDouble();
                 direction = new Direction(newAngle);
                 break;
 
             case HEAD_POS:
-                System.out.println("HEAD_POS");
-                double headX = json.get("x").getAsDouble();
-                double headY = json.get("y").getAsDouble();
+
+                JsonObject posObject = json.get("pos").getAsJsonObject();
+                double headX = posObject.get("x").getAsDouble();
+                double headY = posObject.get("y").getAsDouble();
 
                 gameController.setHeadPos(new Position(headX, headY));
                 break;
 
             case CELL_SIZE:
-                int cellSize = json.get("cellSize").getAsInt();
+                int cellSize = json.get("size").getAsInt();
                 gameController.setCellSize(cellSize);
                 break;
 
@@ -187,32 +188,25 @@ public class ClientConnection {
                 break;
 
             case VISIBLE_SEGMENTS:
-                JsonArray segmentsArray = json.get("segments").getAsJsonArray();
+                JsonArray segmentsArray = json.get("array").getAsJsonArray();
                 for (JsonElement segmentElement : segmentsArray) {
-                    JsonObject segmentObject = segmentElement.getAsJsonObject();
-                    Position position = gson.fromJson(segmentObject.get("position"), Position.class);
-                    Segment segment = gson.fromJson(segmentObject.get("segment"), Segment.class);
-                    segment.setPosition(position);
-                    gameModel.addSegment(segment);
-                }
-                break;
-
-            case SNAKE:
-                JsonArray snakeArray = json.get("segments").getAsJsonArray();
-                for (JsonElement segmentElement : snakeArray) {
-                    JsonObject segmentObject = segmentElement.getAsJsonObject();
+                    JsonObject segmentWrapper = segmentElement.getAsJsonObject();
+                    JsonObject segmentObject = segmentWrapper.get("segment").getAsJsonObject();
                     int diameter = segmentObject.get("diameter").getAsInt();
                     Position position = gson.fromJson(segmentObject.get("position"), Position.class);
-                    try {
-                        segmentObject.get("behavior").getAsString();
-                        Segment segment = new Segment(position, diameter, new BurrowingSegmentBehavior());
-                        segment.setPosition(position);
-                        gameModel.addSegment(segment);
-                    } catch (Exception e) {
-                        Segment segment = new Segment(position, diameter, null);
-                        segment.setPosition(position);
-                        gameModel.addSegment(segment);
+                    String behavior = segmentObject.get("behavior").getAsString();
+                    boolean dead = segmentObject.get("dead").getAsBoolean();
+                    Segment segment;
+                    if (behavior.equals("normal")) {
+                        segment = new Segment(position, diameter, null);
+                    } else if (behavior.equals("burrowing")) {
+                        segment = new Segment(position, diameter, new BurrowingSegmentBehavior());
+                    } else {
+                        throw new IllegalArgumentException("Unknown segment behavior: " + behavior);
                     }
+                    segment.setDead(dead);
+                    segment.setPosition(position);
+                    gameModel.addSegment(segment);
                 }
                 break;
 
@@ -226,7 +220,7 @@ public class ClientConnection {
      * 
      * @param message Données à envoyer
      */
-    public synchronized void send(String message) {
+    public void send(String message) {
         if (out != null && socket != null && socket.isConnected()) {
             out.println(message);
         } else {
@@ -237,7 +231,7 @@ public class ClientConnection {
     /**
      * Ecoute les données envoyées par le serveur
      */
-    private synchronized void listen() {
+    private void listen() {
         try {
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
@@ -274,13 +268,13 @@ public class ClientConnection {
         send(directionMsg.toString());
     }
 
-    public synchronized void sendAccel() {
+    public void sendAccel() {
         JsonObject accelMsg = new JsonObject();
         accelMsg.addProperty("type", "accelerate");
         send(accelMsg.toString());
     }
 
-    public synchronized void stopAccel() {
+    public void stopAccel() {
         JsonObject stopAccelMsg = new JsonObject();
         stopAccelMsg.addProperty("type", "decelerate");
         send(stopAccelMsg.toString());

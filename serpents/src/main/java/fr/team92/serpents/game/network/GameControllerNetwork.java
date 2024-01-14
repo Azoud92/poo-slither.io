@@ -11,6 +11,8 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 
 public class GameControllerNetwork {
     private final ClientConnection clientConnection;
@@ -27,6 +29,11 @@ public class GameControllerNetwork {
         this.scene = scene;
         setKeyListeners(scene);
         setMouseListeners(scene);
+
+        Window window = scene.getWindow();
+        window.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, event -> {
+            clientConnection.disconnect();
+        });
     }
 
     public void setKeyMap(KeyCode leftKey, KeyCode rightKey, KeyCode accelerateKey) {

@@ -226,12 +226,17 @@ public final class GameModel implements Observable {
             removeSnake(snake);
         }
 
-        if (snakes.size() == 1) {
-            state = GameState.FINISHED;
-        }
-        if (snakes.stream().map(s -> s.getController()).filter(c -> c instanceof HumanSnakeController).count() == 0) {
-            state = GameState.FINISHED;
-        }
+        // TODO: A corriger
+
+        /*
+         * if (snakes.size() == 1) {
+         * state = GameState.FINISHED;
+         * }
+         * if (snakes.stream().map(s -> s.getController()).filter(c -> c instanceof
+         * HumanSnakeController).count() == 0) {
+         * state = GameState.FINISHED;
+         * }
+         */
 
         notifyObservers();
     }

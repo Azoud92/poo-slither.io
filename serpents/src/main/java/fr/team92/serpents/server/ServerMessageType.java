@@ -23,11 +23,6 @@ public enum ServerMessageType {
      */
     VISIBLE_SEGMENTS,
 
-    /**
-     * Représente le serpent envoyé par le serveur.
-     */
-    SNAKE,
-
     /*
      * Représente la direction du serpent envoyé par le serveur.
      */

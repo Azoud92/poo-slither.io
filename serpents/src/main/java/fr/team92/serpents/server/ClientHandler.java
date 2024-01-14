@@ -94,6 +94,7 @@ public class ClientHandler extends Thread implements Observer {
                 System.out.println("[INFORMATION] Données reçues du client (IP "
                         + clientSocket.getInetAddress().getHostAddress() + ") : " + inputLine);
                 handle_message(inputLine);
+
             }
         } catch (IOException e) {
             if (!Thread.currentThread().isInterrupted())
@@ -110,25 +111,25 @@ public class ClientHandler extends Thread implements Observer {
      * envoyé au client.
      */
     private synchronized void createSnake() {
-        Direction startDirection = Direction.random();
+        do {
+            Direction startDirection = Direction.random();
 
-        Position startPosition = server.getFreePositionForSnake(Snake.MIN_DISTANCE_INIT,
-                Snake.SEGMENT_DIAMETER, Snake.INIT_LENGTH, Snake.SEGMENT_SPACING, startDirection);
+            Position startPosition = server.getFreePositionForSnake(Snake.MIN_DISTANCE_INIT,
+                    Snake.SEGMENT_DIAMETER, Snake.INIT_LENGTH, Snake.SEGMENT_SPACING, startDirection);
 
-        if (startPosition == null) {
-            System.err.println(ServerError.NO_FREE_POSITION_FOR_SNAKE);
-            // On envoie au client un message d'erreur
-            send(gson.toJson(ServerError.NO_FREE_POSITION_FOR_SNAKE.toJSON()));
-            closeConnection();
-            return;
-        }
+            if (startPosition == null) {
+                System.err.println(ServerError.NO_FREE_POSITION_FOR_SNAKE);
+                // On envoie au client un message d'erreur
+                send(gson.toJson(ServerError.NO_FREE_POSITION_FOR_SNAKE.toJSON()));
+                closeConnection();
+                return;
+            }
 
-        snake = Snake.CreateNetworkSnake(Snake.INIT_LENGTH, startPosition, startDirection);
+            snake = Snake.CreateNetworkSnake(Snake.INIT_LENGTH, startPosition, startDirection);
+        } while (!server.isValidSnake(snake));
         server.addSnake(snake);
 
         System.out.println("[INFORMATION] Serpent créé (IP " + clientSocket.getInetAddress().getHostAddress() + ")");
-        // On envoie au client les données du serpent
-        send(gson.toJson(snake.toJSON()));
     }
 
     /**
@@ -148,7 +149,6 @@ public class ClientHandler extends Thread implements Observer {
                     createSnake();
                 } else {
                     System.err.println(ServerError.SNAKE_ALREADY_CREATED);
-                    gson.toJson(ServerError.SNAKE_ALREADY_CREATED.toJSON());
                     closeConnection();
                 }
                 break;
@@ -229,22 +229,35 @@ public class ClientHandler extends Thread implements Observer {
      */
     public synchronized void closeConnection() {
         try {
+            System.out.println("try");
             if (out != null) {
                 out.close();
             }
+            System.out.println("try2");
             if (in != null) {
                 in.close();
             }
+            System.out.println("try3");
             if (clientSocket != null && !clientSocket.isClosed()) {
                 clientSocket.close();
             }
+            System.out.println("try4");
             if (snake != null) {
                 server.removeSnake(snake);
             }
+            System.out.println("try5");
             server.removeClientHandler(this);
+            System.out.println("try6");
             System.out.println("[INFORMATION] Connexion client fermée (IP "
                     + clientSocket.getInetAddress().getHostAddress() + ")");
         } catch (IOException e) {
+            System.out.println("catch");
+            if (snake != null) {
+                server.removeSnake(snake);
+            }
+            System.out.println("catch2");
+            server.removeClientHandler(this);
+            System.out.println("catch3");
             System.err.println(ServerError.CLIENT_CONNECTION_CLOSE_ERROR + " (IP "
                     + clientSocket.getInetAddress().getHostAddress() + ") : " + e.getMessage());
         }
@@ -257,21 +270,28 @@ public class ClientHandler extends Thread implements Observer {
      */
     @Override
     public synchronized void update() {
-        System.out.println("UPDATE");
         if (snake == null || width < 0 || height < 0) {
             return;
         }
+        JsonObject messageDir = new JsonObject();
+        messageDir.addProperty("type", ServerMessageType.DIRECTION.toString().toLowerCase());
+        messageDir.add("angle", gson.toJsonTree(snake.getDirection()));
+        send(messageDir.toString());
+
+        JsonObject messageHeadPos = new JsonObject();
+        messageHeadPos.addProperty("type", ServerMessageType.HEAD_POS.toString().toLowerCase());
+        messageHeadPos.add("pos", gson.toJsonTree(snake.getHeadPosition()));
+        send(messageHeadPos.toString());
+
+        JsonObject messageCellSize = new JsonObject();
+        messageCellSize.addProperty("type", ServerMessageType.CELL_SIZE.toString().toLowerCase());
+        messageCellSize.addProperty("size", Snake.SEGMENT_DIAMETER);
+        send(messageCellSize.toString());
 
         Map<Position, Segment> grid = server.getGrid();
 
         JsonObject message = new JsonObject();
         message.addProperty("type", ServerMessageType.VISIBLE_SEGMENTS.toString().toLowerCase());
-
-        message.addProperty("direction", gson.toJsonTree(snake.getDirection()).toString().toLowerCase());
-
-        message.addProperty("head_pos", gson.toJsonTree(snake.getHeadPosition()).toString().toLowerCase());
-
-        message.addProperty("cell_size", Snake.SEGMENT_DIAMETER);
 
         // On crée un JsonArray pour stocker les segments visibles
         JsonArray segmentsInView = new JsonArray();
@@ -295,9 +315,7 @@ public class ClientHandler extends Thread implements Observer {
             // On vérifie si le segment est dans le champ de vision
             if (distanceX <= width / 2 && distanceY <= height / 2) {
                 JsonObject segmentData = new JsonObject();
-                segmentData.add("position", segmentPosition.toJSON());
                 segmentData.add("segment", segment.toJSON());
-
                 segmentsInView.add(segmentData);
             }
         }

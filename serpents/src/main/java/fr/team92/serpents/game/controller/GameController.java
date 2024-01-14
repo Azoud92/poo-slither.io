@@ -51,7 +51,10 @@ public final class GameController {
     }
 
     private void loopTask() {
+        System.out.println(model.getState());
+        System.out.println("loopTask");
         if (model.getState() != GameState.RUNNING) {
+            System.out.println("not running");
             gameLoop.stop();
             return;
         } else if (model.getState() == GameState.RUNNING) {
@@ -171,7 +174,6 @@ public final class GameController {
                 snake.decelerate();
             }
         }
-        model.notifyAll();
         model.moveSnakes(lastUpdate);
     }
 

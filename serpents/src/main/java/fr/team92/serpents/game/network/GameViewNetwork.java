@@ -48,7 +48,7 @@ public class GameViewNetwork implements Observer {
                 return;
             }
 
-            int cellSize = gameController.getCellSize();
+            int cellSize = gameController.getCellSize() * 15;
 
             for (Segment segment : segments) {
                 Position pos = segment.getPosition();

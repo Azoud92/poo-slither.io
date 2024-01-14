@@ -5,7 +5,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Représente la boucle de jeu pour la partie serveur (utilisant un ExecutorService)
+ * Représente la boucle de jeu pour la partie serveur (utilisant un
+ * ExecutorService)
  */
 public final class ServerGameLoop implements GameLoop {
 
@@ -30,7 +31,8 @@ public final class ServerGameLoop implements GameLoop {
     private boolean running;
 
     /**
-     * Initialise une boucle de jeu pour la partie serveur en ligne 
+     * Initialise une boucle de jeu pour la partie serveur en ligne
+     * 
      * @param runnable le runnable à exécuter à chaque rafraichissement
      */
     public ServerGameLoop(Runnable runnable) {
@@ -46,6 +48,7 @@ public final class ServerGameLoop implements GameLoop {
 
     @Override
     public void stop() {
+        System.out.println("stop");
         if (executorService != null && !executorService.isShutdown()) {
             executorService.shutdownNow();
             running = false;

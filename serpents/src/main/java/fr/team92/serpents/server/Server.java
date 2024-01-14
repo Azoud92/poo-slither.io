@@ -86,18 +86,20 @@ public final class Server {
      * Démarre le serveur pour écouter et accepter les connexions des clients.
      * Le serveur fonctionne en continu jusqu'à ce qu'il soit explicitement arrêté
      */
-    private synchronized void start() {
+    private void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("[INFORMATION] Serveur démarré sur le port " + port
-                    + ". En attente de connexions...");
+            System.out.println("[INFORMATION] Serveur démarré sur le port " + port + ". En attente de connexions...");
             while (!serverSocket.isClosed()) {
-                // Traitement de la connexion du client
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("[INFORMATION] Connexion établie (IP "
-                        + clientSocket.getInetAddress().getHostAddress() + ")");
+                System.out.println(
+                        "[INFORMATION] Connexion établie (IP " + clientSocket.getInetAddress().getHostAddress() + ")");
                 ClientHandler clientHandler = new ClientHandler(clientSocket, this);
+
+                synchronized (gameModel) {
+                    gameModel.addObserver(clientHandler);
+                }
                 clientsHandlers.add(clientHandler);
-                gameModel.addObserver(clientHandler);
+
                 executorService.execute(clientHandler);
             }
         } catch (IOException e) {
@@ -111,7 +113,7 @@ public final class Server {
      * Arrête le serveur en fermant le ServerSocket et en interrompant tous les
      * ClientHandler actifs
      */
-    private synchronized void stop() {
+    private void stop() {
         try {
             if (serverSocket == null || serverSocket.isClosed()) {
                 System.err.println("[ERREUR] Erreur lors de l'arrêt du serveur : celui-ci n'est pas démarré");
@@ -140,12 +142,14 @@ public final class Server {
     public void removeClientHandler(ClientHandler clientHandler) {
         if (clientHandler == null)
             return;
+
+        System.out.println("removeClientHandler1");
         synchronized (gameModel) {
             gameModel.removeObserver(clientHandler);
         }
-        synchronized (clientsHandlers) {
-            clientsHandlers.remove(clientHandler);
-        }
+        System.out.println("removeClientHandler2");
+        clientsHandlers.remove(clientHandler);
+        System.out.println("removeClientHandler3");
     }
 
     /**
@@ -226,6 +230,12 @@ public final class Server {
      */
     public double getHeight() {
         return HEIGHT;
+    }
+
+    public boolean isValidSnake(Snake snake) {
+        synchronized (gameModel) {
+            return gameModel.isValidSnake(snake);
+        }
     }
 
     public static void main(String[] args) {
